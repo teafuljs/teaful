@@ -1,8 +1,25 @@
-# Fragmented store
+<h1 align="center">
+Fragmented store
+</h1>
+<p align="center">
+    Tiny (~400 B) and simple (P)React <b>state management library</b>
+</p>
+<p align="center">
+    Store update -> <b>only</b> components that use the updated property are rendered.
+</p>
 
-When we update a property of the store, **only the components that use that particular property are rendered**.
+<div align="center">
 
-It is intended to be a small library and we want to keep it simple.
+[![npm version](https://badge.fury.io/js/fragmented-store.svg)](https://badge.fury.io/js/fragmented-store)
+[![PRs Welcome][badge-prwelcome]][prwelcome]
+
+<a href="https://twitter.com/intent/follow?screen_name=aralroca">
+<img src="https://img.shields.io/twitter/follow/aralroca?style=social&logo=twitter"
+            alt="follow on Twitter"></a>
+
+</div>
+
+
 
 ## Getting started:
 

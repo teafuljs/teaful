@@ -13,13 +13,15 @@ Fragmented store
 [![npm version](https://badge.fury.io/js/fragmented-store.svg)](https://badge.fury.io/js/fragmented-store)
 [![PRs Welcome][badge-prwelcome]][prwelcome]
 
+
 <a href="https://twitter.com/intent/follow?screen_name=aralroca">
 <img src="https://img.shields.io/twitter/follow/aralroca?style=social&logo=twitter"
             alt="follow on Twitter"></a>
 
 </div>
 
-
+[badge-prwelcome]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
+[prwelcome]: http://makeapullrequest.com
 
 ## Getting started:
 

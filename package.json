@@ -1,0 +1,34 @@
+{
+  "name": "fragmented-store",
+  "version": "0.1.0",
+  "description": "Small library to manage the (P)React state",
+  "source": "index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.module.js",
+  "unpkg": "dist/index.umd.js",
+  "scripts": {
+    "build": "microbundle",
+    "dev": "microbundle watch",
+    "prepublish": "yarn build",
+  },
+  "keywords": [
+    "react",
+    "preact",
+    "state",
+    "state manager",
+    "javascript"
+  ],
+  "author": {
+    "name": "Aral Roca Gòmez",
+    "email": "contact@aralroca.com"
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">= 16.8.0"
+  },
+  "devDependencies": {
+    "microbundle": "0.11.0",
+    "react": "16.13.1",
+    "react-dom": "16.13.1"
+  }
+}

@@ -1,13 +1,13 @@
 {
   "name": "fragmented-store",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Small library to manage the (P)React state",
   "source": "index.js",
   "main": "dist/index.js",
   "module": "dist/index.module.js",
   "unpkg": "dist/index.umd.js",
   "scripts": {
-    "build": "microbundle --jsx",
+    "build": "microbundle  --jsx React.createElement --no-compress --sourcemap",
     "dev": "microbundle watch",
     "prepublish": "yarn build"
   },

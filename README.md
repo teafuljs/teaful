@@ -95,3 +95,7 @@ function Age() {
   );
 }
 ```
+
+## Demo
+
+* https://codesandbox.io/s/fragmented-store-example-4p5dv?file=/src/App.js

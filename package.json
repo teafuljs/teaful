@@ -9,7 +9,7 @@
   "scripts": {
     "build": "microbundle",
     "dev": "microbundle watch",
-    "prepublish": "yarn build",
+    "prepublish": "yarn build"
   },
   "keywords": [
     "react",

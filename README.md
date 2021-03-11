@@ -1,6 +1,22 @@
 # Fragmented store
 
-When we update a property of the store, **only** the components that use that particular property **are rendered** even if they consume other elements of the store.
+When we update a property of the store, **only the components that use that particular property are rendered**.
+
+It is intended to be a small library and we want to keep it simple.
+
+## Getting started:
+
+Install it with Yarn:
+
+```
+yarn add fragmented-store
+```
+
+Or install it with Npm:
+
+```
+npm install fragmented-store --save
+```
 
 ## Usage:
 

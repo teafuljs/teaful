@@ -7,7 +7,7 @@
   "module": "dist/index.module.js",
   "unpkg": "dist/index.umd.js",
   "scripts": {
-    "build": "microbundle",
+    "build": "microbundle --jsx",
     "dev": "microbundle watch",
     "prepublish": "yarn build"
   },

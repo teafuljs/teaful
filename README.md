@@ -1,6 +1,11 @@
 <h1 align="center">
-Fragmented store
+Fragmented Store
 </h1>
+
+<p align="center">
+    <img src="logo.svg" width="200" alt="fragmented-store" />
+</p>
+
 <p align="center">
     Tiny (~400 B) and simple (P)React <b>state management library</b>
 </p>

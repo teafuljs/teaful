@@ -7,7 +7,7 @@ Fragmented Store
 </p>
 
 <p align="center">
-    Tiny (~400 B) and simple (P)React <b>state management library</b>
+    Tiny (~500 B) and simple (P)React <b>state management library</b>
 </p>
 <p align="center">
     Store update -> <b>only</b> components that use the updated property are rendered.
@@ -47,9 +47,9 @@ npm install fragmented-store --save
 ```js
 import createStore from "fragmented-store";
 
-const { Provider, useUsername, useAge } = createStore({
+const { Provider, useUsername, useAge, useUnfragmentedStore } = createStore({
   username: "Aral",
-  age: 31
+  age: 30
 });
 
 export default function App() {
@@ -58,6 +58,7 @@ export default function App() {
       <Title />
       <UpdateTitle />
       <Age />
+      <AllStore />
     </Provider>
   );
 }
@@ -76,7 +77,7 @@ function UpdateTitle() {
   console.log("render UpdateTitle");
 
   return (
-    <button onClick={() => setUsername((u) => u + "a")}>
+    <button onClick={() => setUsername((s) => s + "a")}>
       Update {username}
     </button>
   );
@@ -85,13 +86,97 @@ function UpdateTitle() {
 function Age() {
   const [age, setAge] = useAge();
 
-  console.log("render Age");
+  console.log("render age");
 
   return (
     <div>
       <div>{age}</div>
-      <button onClick={() => setAge((a) => a + 1)}>Inc age</button>
+      <button onClick={() => setAge((s) => s + 1)}>Inc age</button>
     </div>
+  );
+}
+
+function AllStore() {
+  const [store, update] = useUnfragmentedStore();
+
+  console.log({ store }); // all store
+
+  return (
+    <button onClick={() => update({ age: 30, username: "Aral" })}>Reset</button>
+  );
+}
+```
+
+### Provider
+
+The `Provider` is required for any of its child components to consume fragmented-store hooks.
+
+```js
+import createStore from "fragmented-store";
+
+const { Provider } = createStore({
+  username: "Aral",
+  age: 30
+});
+
+function App() {
+  return (
+    <Provider>
+     {/* rest */} 
+    </Provider>
+  );
+}
+```
+
+### Fragmented store
+
+The power of this library is that you can use fragmented parts of the store, so if a component uses only one field of the store, it will only re-render again if there is a change in this particular field and it will not render again if the other fields change.
+
+For each of the fields of the store, there is a hook with its name, examples:
+
+- username 👉 `useUsername`
+- age 👉 `useAge`
+- anotherExample 👉 `useAnotherExample`
+
+```js
+import createStore from "fragmented-store";
+
+const { useUsername } = createStore({
+  username: "Aral",
+  age: 30
+});
+
+function FragmentedExample() {
+  const [username, setUsername] = useUsername();
+
+  return (
+    <button onClick={() => setUsername("AnotherUserName")}>
+      Update {username}
+    </button>
+  );
+}
+```
+
+### Unfragmented store
+
+The advantage of this library is to use the store in a fragmented way. Even so, there are cases when we want to reset the whole store or do more complex things. For these cases, we can use the hook `useUnfragmentedStore`.
+
+```js
+import createStore from "fragmented-store";
+
+const { useUnfragmentedStore } = createStore({
+  username: "Aral",
+  age: 30
+});
+
+function UnfragmentedExample() {
+  const [store, update] = useUnfragmentedStore();
+
+  return (
+    <>
+      <h1>{state.username}, {state.age}</h1>
+      <button onClick={() => update({ age: 30, username: "Aral" })}>Reset</button>
+    </>
   );
 }
 ```

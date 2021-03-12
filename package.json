@@ -7,7 +7,7 @@
   "module": "dist/index.module.js",
   "unpkg": "dist/index.umd.js",
   "scripts": {
-    "build": "microbundle  --jsx React.createElement --no-compress --sourcemap",
+    "build": "microbundle  --jsx React.createElement",
     "dev": "microbundle watch",
     "prepublish": "yarn build"
   },

@@ -1,17 +1,16 @@
 import React, { useState, useContext, createContext } from "react";
 
 export default function createStore(store = {}) {
-  const storeUtils = Object.keys(store).reduce((o, key) => {
-    const fieldCapitalized = `${key[0].toUpperCase()}${key.slice(
-      1,
-      key.length
-    )}`;
+  const keys = Object.keys(store);
+  const capitalize = (k) => `${k[0].toUpperCase()}${k.slice(1, k.length)}`;
+
+  const storeUtils = keys.reduce((o, key) => {
     const context = createContext(store[key]);
 
     return {
       ...o,
       contexts: [...(o.contexts || []), { context, key }],
-      [`use${fieldCapitalized}`]: () => useContext(context)
+      [`use${capitalize(key)}`]: () => useContext(context)
     };
   }, {});
 
@@ -32,6 +31,24 @@ export default function createStore(store = {}) {
       );
 
     return <Component>{children}</Component>;
+  };
+
+  storeUtils.useUnfragmentedStore = () => {
+    const state = {};
+    const updates = {};
+    keys.forEach((k) => {
+      const [s, u] = storeUtils[`use${capitalize(k)}`]();
+      state[k] = s;
+      updates[k] = u;
+    });
+
+    function updater(newState) {
+      const s =
+        typeof newState === "function" ? newState(state) : newState || {};
+      Object.keys(s).forEach((k) => updates[k] && updates[k](s[k]));
+    }
+
+    return [state, updater];
   };
 
   return storeUtils;

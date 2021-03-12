@@ -43,70 +43,6 @@ npm install fragmented-store --save
 ```
 
 ## Usage:
-
-```js
-import createStore from "fragmented-store";
-
-const { Provider, useUsername, useAge, useUnfragmentedStore } = createStore({
-  username: "Aral",
-  age: 30
-});
-
-export default function App() {
-  return (
-    <Provider>
-      <Title />
-      <UpdateTitle />
-      <Age />
-      <AllStore />
-    </Provider>
-  );
-}
-
-function Title() {
-  const [username] = useUsername();
-
-  console.log("render Title");
-
-  return <h1>{username}</h1>;
-}
-
-function UpdateTitle() {
-  const [username, setUsername] = useUsername();
-
-  console.log("render UpdateTitle");
-
-  return (
-    <button onClick={() => setUsername((s) => s + "a")}>
-      Update {username}
-    </button>
-  );
-}
-
-function Age() {
-  const [age, setAge] = useAge();
-
-  console.log("render age");
-
-  return (
-    <div>
-      <div>{age}</div>
-      <button onClick={() => setAge((s) => s + 1)}>Inc age</button>
-    </div>
-  );
-}
-
-function AllStore() {
-  const [store, update] = useUnfragmentedStore();
-
-  console.log({ store }); // all store
-
-  return (
-    <button onClick={() => update({ age: 30, username: "Aral" })}>Reset</button>
-  );
-}
-```
-
 ### Provider
 
 The `Provider` is required for any of its child components to consume fragmented-store hooks.
@@ -181,6 +117,69 @@ function UnfragmentedExample() {
 }
 ```
 
-## Demo
+## Example
 
 * https://codesandbox.io/s/fragmented-store-example-4p5dv?file=/src/App.js
+
+```js
+import createStore from "fragmented-store";
+
+const { Provider, useUsername, useAge, useUnfragmentedStore } = createStore({
+  username: "Aral",
+  age: 30
+});
+
+export default function App() {
+  return (
+    <Provider>
+      <Title />
+      <UpdateTitle />
+      <Age />
+      <AllStore />
+    </Provider>
+  );
+}
+
+function Title() {
+  const [username] = useUsername();
+
+  console.log("render Title");
+
+  return <h1>{username}</h1>;
+}
+
+function UpdateTitle() {
+  const [username, setUsername] = useUsername();
+
+  console.log("render UpdateTitle");
+
+  return (
+    <button onClick={() => setUsername((s) => s + "a")}>
+      Update {username}
+    </button>
+  );
+}
+
+function Age() {
+  const [age, setAge] = useAge();
+
+  console.log("render age");
+
+  return (
+    <div>
+      <div>{age}</div>
+      <button onClick={() => setAge((s) => s + 1)}>Inc age</button>
+    </div>
+  );
+}
+
+function AllStore() {
+  const [store, update] = useUnfragmentedStore();
+
+  console.log({ store }); // all store
+
+  return (
+    <button onClick={() => update({ age: 30, username: "Aral" })}>Reset</button>
+  );
+}
+```

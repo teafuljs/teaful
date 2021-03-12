@@ -7,10 +7,10 @@ Fragmented Store
 </p>
 
 <p align="center">
-    Tiny (~500 B) and simple (P)React <b>state management library</b>
+    Tiny (~500 B), easy and simple (P)React <b>state management library</b>
 </p>
 <p align="center">
-    Store update -> <b>only</b> components that use the updated property are rendered.
+    After a store update -> <b>only</b> components that use the <b>updated property</b> are rendered.
 </p>
 
 <div align="center">

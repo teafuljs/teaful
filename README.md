@@ -52,7 +52,7 @@ import createStore from "fragmented-store";
 
 const { Provider } = createStore({
   username: "Aral",
-  age: 30
+  age: 31
 });
 
 function App() {
@@ -79,7 +79,7 @@ import createStore from "fragmented-store";
 
 const { useUsername } = createStore({
   username: "Aral",
-  age: 30
+  age: 31
 });
 
 function FragmentedExample() {
@@ -102,7 +102,7 @@ import createStore from "fragmented-store";
 
 const { useUnfragmentedStore } = createStore({
   username: "Aral",
-  age: 30
+  age: 31
 });
 
 function UnfragmentedExample() {
@@ -111,7 +111,7 @@ function UnfragmentedExample() {
   return (
     <>
       <h1>{state.username}, {state.age}</h1>
-      <button onClick={() => update({ age: 30, username: "Aral" })}>Reset</button>
+      <button onClick={() => update({ age: 31, username: "Aral" })}>Reset</button>
     </>
   );
 }
@@ -126,7 +126,7 @@ import createStore from "fragmented-store";
 
 const { Provider, useUsername, useAge, useUnfragmentedStore } = createStore({
   username: "Aral",
-  age: 30
+  age: 31
 });
 
 export default function App() {
@@ -179,7 +179,7 @@ function AllStore() {
   console.log({ store }); // all store
 
   return (
-    <button onClick={() => update({ age: 30, username: "Aral" })}>Reset</button>
+    <button onClick={() => update({ age: 31, username: "Aral" })}>Reset</button>
   );
 }
 ```

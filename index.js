@@ -55,7 +55,9 @@ export default function createStore(store = {}) {
     const state = {}
     const updates = {}
     keys.forEach((k) => {
-      const [s, u] = storeUtils[`use${capitalize(k)}`]()
+      const hookName = `use${capitalize(k)}`
+      if (hookName === 'useStore') return
+      const [s, u] = storeUtils[hookName]()
       state[k] = s
       updates[k] = u
     })

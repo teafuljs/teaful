@@ -95,18 +95,18 @@ function FragmentedExample() {
 
 ### Unfragmented store
 
-The advantage of this library is to use the store in a fragmented way. Even so, there are cases when we want to reset the whole store or do more complex things. For these cases, we can use the hook `useUnfragmentedStore`.
+The advantage of this library is to use the store in a fragmented way. Even so, there are cases when we want to reset the whole store or do more complex things. For these cases, we can use the hook `useStore`.
 
 ```js
 import createStore from "fragmented-store";
 
-const { useUnfragmentedStore } = createStore({
+const { useStore } = createStore({
   username: "Aral",
   age: 31
 });
 
 function UnfragmentedExample() {
-  const [store, update] = useUnfragmentedStore();
+  const [store, update] = useStore();
 
   return (
     <>
@@ -124,7 +124,7 @@ function UnfragmentedExample() {
 ```js
 import createStore from "fragmented-store";
 
-const { Provider, useUsername, useAge, useUnfragmentedStore } = createStore({
+const { Provider, useUsername, useAge, useStore } = createStore({
   username: "Aral",
   age: 31
 });
@@ -174,7 +174,7 @@ function Age() {
 }
 
 function AllStore() {
-  const [store, update] = useUnfragmentedStore();
+  const [store, update] = useStore();
 
   console.log({ store }); // all store
 

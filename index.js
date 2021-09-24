@@ -1,69 +1,74 @@
-import React, { useState, useContext, createContext } from "react";
+import React, { useState, useContext, createContext } from 'react'
 
 export default function createStore(store = {}) {
-  const keys = Object.keys(store);
-  const capitalize = (k) => `${k[0].toUpperCase()}${k.slice(1, k.length)}`;
+  const keys = Object.keys(store)
+  const capitalize = (k) => `${k[0].toUpperCase()}${k.slice(1, k.length)}`
 
-  // Store utils is the object that we will return with everything 
-  // (Provider, hooks). 
+  // storeUtils is the object we'll return with everything
+  // (Provider, hooks)
   //
-  // We initialize it by creating a context for each property and 
-  // returning a hook to consume the context of each property.
+  // We initialize it by creating a context for each property and
+  // returning a hook to consume the context of each property
   const storeUtils = keys.reduce((o, key) => {
-    const context = createContext(store[key]); // Property context
+    const context = createContext(store[key]) // Property context
+    const keyCapitalized = capitalize(key)
+
+    if (keyCapitalized === 'Store') {
+      console.error('Avoid to use the "store" name at the first level, it\'s reserved for the "useStore" hook.')
+    }
 
     return {
       ...o,
       // All contexts
       contexts: [...(o.contexts || []), { context, key }],
       // Hook to consume the property context
-      [`use${capitalize(key)}`]: () => useContext(context)
-    };
-  }, {});
+      [`use${keyCapitalized}`]: () => useContext(context),
+    }
+  }, {})
 
-  // We create the main provider, where it is a component that returns 
-  // the wrapped children of all the providers (since we have all the 
-  // created contexts we can extract each Provider).
+  // We create the main provider by wrapping all the providers
   storeUtils.Provider = ({ children }) => {
-    const Empty = ({ children }) => children;
+    const Empty = ({ children }) => children
     const Component = storeUtils.contexts
       .map(({ context, key }) => ({ children }) => {
-        const ctx = useState(store[key]);
-        return <context.Provider value={ctx}>{children}</context.Provider>;
+        const ctx = useState(store[key])
+        return <context.Provider value={ctx}>{children}</context.Provider>
       })
       .reduce(
-        (RestProviders, Provider) => ({ children }) => (
-          <Provider>
-            <RestProviders>{children}</RestProviders>
-          </Provider>
-        ),
+        (RestProviders, Provider) =>
+          ({ children }) =>
+          (
+            <Provider>
+              <RestProviders>{children}</RestProviders>
+            </Provider>
+          ),
         Empty
-      );
+      )
 
-    return <Component>{children}</Component>;
-  };
+    return <Component>{children}</Component>
+  }
 
-  // How plus, we create the hook useUnfragmentedStore to return all the 
-  // status and create an updater. All using all the created hooks at 
-  // the same time.
-  storeUtils.useUnfragmentedStore = () => {
-    const state = {};
-    const updates = {};
+  // As a bonus, we create the useStore hook to return all the
+  // state. Also to return an updater that uses all the created hooks at
+  // the same time
+  storeUtils.useStore = () => {
+    const state = {}
+    const updates = {}
     keys.forEach((k) => {
-      const [s, u] = storeUtils[`use${capitalize(k)}`]();
-      state[k] = s;
-      updates[k] = u;
-    });
+      const [s, u] = storeUtils[`use${capitalize(k)}`]()
+      state[k] = s
+      updates[k] = u
+    })
 
     function updater(newState) {
       const s =
-        typeof newState === "function" ? newState(state) : newState || {};
-      Object.keys(s).forEach((k) => updates[k] && updates[k](s[k]));
+        typeof newState === 'function' ? newState(state) : newState || {}
+      Object.keys(s).forEach((k) => updates[k] && updates[k](s[k]))
     }
 
-    return [state, updater];
-  };
+    return [state, updater]
+  }
 
   // Return everything we've generated
-  return storeUtils;
+  return storeUtils
 }

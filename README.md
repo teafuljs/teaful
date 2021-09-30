@@ -117,6 +117,30 @@ function UnfragmentedExample() {
 }
 ```
 
+### Callbacks
+
+The second param of `createStore` is **callbacks** `Object<function>`. Callbacks are executed for any property change. It's useful for example to fetch data to an endpoint after the state change, and roll back the state if the request fails. 
+
+
+```js
+const initialState = {
+  quantity: 2,
+  userName: 'Aral',
+}
+
+// This is new
+const callbacks = {
+  quantity: (newValue, prevValue, setValue) => {
+    // Update quantity from API
+    fetch('/api/quantity', { method: 'POST', body: newValue })
+     // Revert state change if it fails
+     .catch(e => setValue(prevValue))
+  }
+}
+
+const { Provider, useQuantity } = createStore(initialState, callbacks)
+```
+
 ## Example
 
 * https://codesandbox.io/s/fragmented-store-example-4p5dv?file=/src/App.js

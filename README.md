@@ -126,6 +126,7 @@ The second param of `createStore` is **callbacks** `Object<function>`. Callbacks
 const initialState = {
   quantity: 2,
   userName: 'Aral',
+  age: 31,
 }
 
 // Every callback is executed after a property change
@@ -135,6 +136,12 @@ const callbacks = {
     fetch('/api/quantity', { method: 'POST', body: newValue })
      // Revert state change if it fails
      .catch(e => setValue(prevValue))
+  },
+  age: (newValue, prevValue, setValue) => {
+    if (newValue > 100) {
+      alert("Sorry, no more than 100 😜");
+      setValue(prevValue);
+    }
   }
 }
 

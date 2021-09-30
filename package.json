@@ -1,6 +1,6 @@
 {
   "name": "fragmented-store",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Small library to manage the (P)React state",
   "source": "index.js",
   "main": "dist/index.js",

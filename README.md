@@ -128,10 +128,10 @@ const initialState = {
   userName: 'Aral',
 }
 
-// This is new
+// Every callback is executed after a property change
 const callbacks = {
   quantity: (newValue, prevValue, setValue) => {
-    // Update quantity from API
+    // Update quantity on API
     fetch('/api/quantity', { method: 'POST', body: newValue })
      // Revert state change if it fails
      .catch(e => setValue(prevValue))

@@ -1,7 +1,7 @@
 import React, { useState, useContext, createContext } from "react";
 
-export default function createStore(store = {}, callbacks = {}) {
-  const keys = Object.keys(store);
+export default function createStore(defaultStore = {}) {
+  const keys = Object.keys(defaultStore);
   const capitalize = (k) => `${k[0].toUpperCase()}${k.slice(1, k.length)}`;
 
   // storeUtils is the object we'll return with everything
@@ -10,7 +10,7 @@ export default function createStore(store = {}, callbacks = {}) {
   // We initialize it by creating a context for each property and
   // returning a hook to consume the context of each property
   const storeUtils = keys.reduce((o, key) => {
-    const context = createContext(store[key]); // Property context
+    const context = createContext([defaultStore[key], () => console.error('You can\'t change store value because store provider not found.')]); // Property context
     const keyCapitalized = capitalize(key);
 
     if (keyCapitalized === "Store") {
@@ -29,7 +29,7 @@ export default function createStore(store = {}, callbacks = {}) {
   }, {});
 
   // We create the main provider by wrapping all the providers
-  storeUtils.Provider = ({ children }) => {
+  storeUtils.Provider = ({ store, callbacks = {}, children }) => {
     const Empty = ({ children }) => children;
     const Component = storeUtils.contexts
       .map(({ context, key }) => ({ children }) => {

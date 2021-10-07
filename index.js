@@ -1,91 +1,145 @@
-import React, { useState, useContext, createContext } from "react";
+import React, { useState, useContext, createContext, useEffect } from "react";
 
-export default function createStore(store = {}, callbacks = {}) {
-  const keys = Object.keys(store);
+export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
   const capitalize = (k) => `${k[0].toUpperCase()}${k.slice(1, k.length)}`;
+  const mainContext = createContext();
+  const useMainContext = () => useContext(mainContext);
+  const hooks = {};
+  const contexts = {};
+  let allStore = defaultStore;
+  let initStore = defaultStore;
+  let keys = Object.keys(defaultStore);
 
-  // storeUtils is the object we'll return with everything
-  // (Provider, hooks)
-  //
-  // We initialize it by creating a context for each property and
-  // returning a hook to consume the context of each property
-  const storeUtils = keys.reduce((o, key) => {
-    const context = createContext(store[key]); // Property context
-    const keyCapitalized = capitalize(key);
-
-    if (keyCapitalized === "Store") {
-      console.error(
-        'Avoid to use the "store" name at the first level, it\'s reserved for the "useStore" hook.'
-      );
-    }
-
-    return {
-      ...o,
-      // All contexts
-      contexts: [...(o.contexts || []), { context, key }],
-      // Hook to consume the property context
-      [`use${keyCapitalized}`]: () => useContext(context),
-    };
-  }, {});
-
-  // We create the main provider by wrapping all the providers
-  storeUtils.Provider = ({ children }) => {
+  function Provider({ store = {}, callbacks = {}, children }) {
     const Empty = ({ children }) => children;
-    const Component = storeUtils.contexts
-      .map(({ context, key }) => ({ children }) => {
-        const [value, setter] = useState(store[key]);
-        const cb = callbacks[key];
+    const [, forceRender] = useState(0);
+
+    const Component = Object.keys(contexts)
+      .map((key) => ({ children }) => {
+        const context = contexts[key];
+        const [value, setter] = useState(allStore[key]);
+        const cb = callbacks[key] || defaultCallbacks[key];
 
         const updater = (newValue) => {
           let nVal = newValue;
-          setter(newValue);
           if (typeof nVal === "function") nVal = newValue(value);
+          allStore[key] = nVal;
+          setter(newValue);
           if (typeof cb === "function") cb(nVal, value, setter);
         };
 
+        const reset = () => {
+          updater(initStore[key]);
+        };
+
         return (
-          <context.Provider value={[value, updater]}>
+          <context.Provider value={[value, updater, reset]}>
             {children}
           </context.Provider>
         );
       })
       .reduce(
-        (RestProviders, Provider) =>
-          ({ children }) =>
-          (
-            <Provider>
-              <RestProviders>{children}</RestProviders>
-            </Provider>
-          ),
+        (RestProviders, Provider) => ({ children }) => (
+          <Provider>
+            <RestProviders>{children}</RestProviders>
+          </Provider>
+        ),
         Empty
       );
 
-    return <Component>{children}</Component>;
-  };
+    useEffect(() => {
+      initStore = { ...initStore, ...store };
+      addNewValues(store);
+    }, [store]);
 
-  // As a bonus, we create the useStore hook to return all the
-  // state. Also to return an updater that uses all the created hooks at
-  // the same time
-  storeUtils.useStore = () => {
-    const state = {};
-    const updates = {};
-    keys.forEach((k) => {
-      const hookName = `use${capitalize(k)}`;
-      if (hookName === "useStore") return;
-      const [s, u] = storeUtils[hookName]();
-      state[k] = s;
-      updates[k] = u;
-    });
-
-    function updater(newState) {
-      const s =
-        typeof newState === "function" ? newState(state) : newState || {};
-      Object.keys(s).forEach((k) => updates[k] && updates[k](s[k]));
+    function addNewValues(vals, force) {
+      const newKeys = Object.keys(vals);
+      if (!newKeys.length) return;
+      keys = [...new Set([...keys, ...newKeys])];
+      allStore = { ...allStore, ...vals };
+      addMissingContextsAndHooks(force);
+      forceRender((v) => v + 1);
     }
 
-    return [state, updater];
-  };
+    return (
+      <mainContext.Provider value={addNewValues}>
+        <Component>{children}</Component>
+      </mainContext.Provider>
+    );
+  }
 
-  // Return everything we've generated
-  return storeUtils;
+  function addMissingContextsAndHooks(force) {
+    let updated = false;
+
+    for (let key of keys) {
+      const keyCapitalized = capitalize(key);
+
+      if (!force && (contexts[key] || hooks[`use${keyCapitalized}`])) continue;
+
+      const context = createContext([
+        allStore[key],
+        () =>
+          console.error(
+            "You can't change store value because store provider not found."
+          )
+      ]);
+      const useHook = () => useContext(context);
+
+      if (keyCapitalized === "Store") {
+        console.error(
+          'Avoid to use the "store" name at the first level, it\'s reserved for the "useStore" hook.'
+        );
+      }
+      if (!(key in initStore)) initStore[key] = undefined;
+      updated = true;
+      contexts[key] = context;
+      hooks[`use${keyCapitalized}`] = useHook;
+    }
+
+    if (!updated) return;
+
+    hooks.useStore = () => {
+      const addNewValues = useMainContext();
+      const state = {};
+      const updates = {};
+      keys.forEach((k) => {
+        const hookName = `use${capitalize(k)}`;
+        if (hookName === "useStore") return;
+        const [s, u] = hooks[hookName]();
+        state[k] = s;
+        updates[k] = u;
+      });
+
+      function updater(newState) {
+        const s =
+          typeof newState === "function" ? newState(state) : newState || {};
+        addNewValues(s);
+        Object.keys(s).forEach((k) => updates[k] && updates[k](s[k]));
+      }
+
+      function reset() {
+        updater(initStore);
+      }
+
+      return [state, updater, reset];
+    };
+  }
+
+  function useHooks() {
+    return new Proxy(hooks, {
+      get: (target, prop) => {
+        if (prop in target) return target[prop];
+        return () => {
+          const addNewValues = useMainContext();
+          let key = prop.replace("use", "");
+          key = key.replace(key[0], key[0].toLowerCase());
+          return [undefined, (v) => addNewValues({ [key]: v })];
+        };
+      }
+    });
+  }
+
+  addMissingContextsAndHooks();
+
+  return { Provider, useHooks };
 }

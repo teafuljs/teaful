@@ -72,19 +72,13 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
     let updated = false;
 
     for (let key of keys) {
-      if (!key) continue
+      if (!key) continue;
 
       const keyCapitalized = capitalize(key);
 
       if (!force && (contexts[key] || hooks[`use${keyCapitalized}`])) continue;
 
-      const context = createContext([
-        allStore[key],
-        () =>
-          console.error(
-            "You can't change store value because store provider not found."
-          )
-      ]);
+      const context = createContext([allStore[key]]);
       const useHook = () => useContext(context);
 
       if (keyCapitalized === "Store") {
@@ -106,7 +100,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       const state = {};
       const updates = {};
       keys.forEach((k) => {
-        if (!k) return
+        if (!k) return;
         const hookName = `use${capitalize(k)}`;
         if (hookName === "useStore") return;
         const [s, u] = hooks[hookName]();

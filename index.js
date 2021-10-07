@@ -72,6 +72,8 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
     let updated = false;
 
     for (let key of keys) {
+      if (!key) continue
+
       const keyCapitalized = capitalize(key);
 
       if (!force && (contexts[key] || hooks[`use${keyCapitalized}`])) continue;
@@ -104,6 +106,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       const state = {};
       const updates = {};
       keys.forEach((k) => {
+        if (!k) return
         const hookName = `use${capitalize(k)}`;
         if (hookName === "useStore") return;
         const [s, u] = hooks[hookName]();

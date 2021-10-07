@@ -139,7 +139,8 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
           const addNewValues = useMainContext();
           let key = prop.replace("use", "");
           key = key.replace(key[0], key[0].toLowerCase());
-          return [undefined, (v) => addNewValues({ [key]: v })];
+          const updater = (v) => addNewValues({ [key]: v })
+          return [undefined, updater, () => { }];
         };
       }
     });

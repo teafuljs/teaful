@@ -54,8 +54,14 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
 
     function addNewValues(vals, force) {
       const newKeys = Object.keys(vals);
+      const oldKeysLength = keys.length;
+
       if (!newKeys.length) return;
+
       keys = [...new Set([...keys, ...newKeys])];
+
+      if (keys.length === oldKeysLength) return;
+
       allStore = { ...allStore, ...vals };
       addMissingContextsAndHooks(force);
       forceRender((v) => v + 1);

@@ -1,5 +1,7 @@
 import React, { useState, useContext, createContext, useEffect } from "react";
 
+const libName = "FragmentedStore";
+
 export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
   const capitalize = (k) => `${k[0].toUpperCase()}${k.slice(1, k.length)}`;
   const mainContext = createContext();
@@ -11,41 +13,39 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
   let keys = Object.keys(defaultStore);
 
   function Provider({ store = {}, callbacks = {}, children }) {
-    const Empty = ({ children }) => children;
     const [, forceRender] = useState(0);
 
-    const Component = Object.keys(contexts)
-      .map((key) => ({ children }) => {
-        const context = contexts[key];
-        const [value, setter] = useState(allStore[key]);
-        const cb = callbacks[key] || defaultCallbacks[key];
+    const el = Object.keys(contexts)
+      .map((key) => {
+        const Provider = ({ children }) => {
+          const context = contexts[key];
+          const [value, setter] = useState(allStore[key]);
+          const cb = callbacks[key] || defaultCallbacks[key];
 
-        const updater = (newValue) => {
-          let nVal = newValue;
-          if (typeof nVal === "function") nVal = newValue(value);
-          allStore[key] = nVal;
-          setter(newValue);
-          if (typeof cb === "function") cb(nVal, value, setter);
+          const updater = (newValue) => {
+            let nVal = newValue;
+            if (typeof nVal === "function") nVal = newValue(value);
+            allStore[key] = nVal;
+            setter(newValue);
+            if (typeof cb === "function") cb(nVal, value, setter);
+          };
+
+          const reset = () => {
+            updater(initStore[key]);
+          };
+
+          return (
+            <context.Provider value={[value, updater, reset]}>
+              {children}
+            </context.Provider>
+          );
         };
-
-        const reset = () => {
-          updater(initStore[key]);
-        };
-
-        return (
-          <context.Provider value={[value, updater, reset]}>
-            {children}
-          </context.Provider>
-        );
+        Provider.displayName = `${libName}(${key})`;
+        return Provider;
       })
-      .reduce(
-        (RestProviders, Provider) => ({ children }) => (
-          <Provider>
-            <RestProviders>{children}</RestProviders>
-          </Provider>
-        ),
-        Empty
-      );
+      .reduce((c, Provider) => <Provider>{c}</Provider>, children);
+
+    mainContext.displayName = libName;
 
     useEffect(() => {
       initStore = { ...initStore, ...store };
@@ -54,23 +54,17 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
 
     function addNewValues(vals, force) {
       const newKeys = Object.keys(vals);
-      const oldKeysLength = keys.length;
-
       if (!newKeys.length) return;
-
+      const oldKeysLength = keys.length;
       keys = [...new Set([...keys, ...newKeys])];
-
       if (keys.length === oldKeysLength) return;
-
       allStore = { ...allStore, ...vals };
       addMissingContextsAndHooks(force);
       forceRender((v) => v + 1);
     }
 
     return (
-      <mainContext.Provider value={addNewValues}>
-        <Component>{children}</Component>
-      </mainContext.Provider>
+      <mainContext.Provider value={addNewValues}>{el}</mainContext.Provider>
     );
   }
 
@@ -97,6 +91,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
         );
       }
       if (!(key in initStore)) initStore[key] = undefined;
+      context.displayName = `${libName}(${key})`;
       updated = true;
       contexts[key] = context;
       hooks[`use${keyCapitalized}`] = useHook;
@@ -139,7 +134,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
           const addNewValues = useMainContext();
           let key = prop.replace("use", "");
           key = key.replace(key[0], key[0].toLowerCase());
-          const updater = (v) => addNewValues({ [key]: v })
+          const updater = (v) => addNewValues({ [key]: v });
           return [undefined, updater, () => { }];
         };
       }

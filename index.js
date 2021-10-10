@@ -1,4 +1,12 @@
-function createStore(defaultStore = {}, defaultCallbacks = {}) {
+import React, {
+  useState,
+  useContext,
+  createContext,
+  useEffect,
+  useRef,
+} from "react";
+
+export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
   const mainContext = createContext();
   const useMainContext = () => useContext(mainContext);
   const hooks = {};
@@ -130,7 +138,7 @@ function createStore(defaultStore = {}, defaultCallbacks = {}) {
           // const [invented, setInvented, resetInvented] = useStore().invented
           const addNewValues = useMainContext();
           const updater = (v) => addNewValues({ [prop]: v });
-          return [undefined, updater, () => {}];
+          return [undefined, updater, () => { }];
         },
       });
     },

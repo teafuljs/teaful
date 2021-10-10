@@ -8,7 +8,7 @@
   "unpkg": "dist/index.umd.js",
   "scripts": {
     "format": "npx prettier --write index.js",
-    "build": "microbundle  --jsx React.createElement",
+    "build": "microbundle --jsx React.createElement",
     "dev": "microbundle watch",
     "prepublish": "yarn build"
   },
@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@testing-library/react": "12.1.2",
-    "microbundle": "0.14.0",
+    "microbundle": "0.13.3",
     "react": "17.0.2",
     "react-dom": "17.0.2"
   }

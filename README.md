@@ -112,6 +112,48 @@ function UnfragmentedExample() {
 }
 ```
 
+### Adding new properties to the store
+
+There are 3 ways to add a new property to the store:
+
+#### 1. Adding a new property on the Provider
+
+```js
+import createStore from "fragstore";
+
+const { Provider } = createStore({ username: "Aral" });
+
+function App() {
+  return <Provider store={{ count: 0 }}>{/* rest */}</Provider>;
+}
+```
+
+#### 2. Using the `useStore` to consume to a new property
+
+```js
+const [newProp, setNewProp] = useStore().newProp
+const [anotherProp, setAnotherProp] = useStore().anotherProp
+
+// ...
+setNewProp("I'm a new property")
+setAnotherProp("I'm another new property")
+```
+
+
+#### 3. Using all the store with `useStore` directly *(not recommended)*
+
+```js
+const [store, setStore] = useStore()
+
+// ...
+setStore({ 
+  newProp: "I'm a new property",
+  anotherProp: "I'm another new property" 
+})
+```
+
+The problem with using the entire store is that the component will re-render whenever any property in the store is updated.
+
 ### Callbacks
 
 The second param of `createStore` is **callbacks** `Object<function>`. Callbacks are executed for any property change. It's useful for example to fetch data to an endpoint after the state change, and roll back the state if the request fails. 

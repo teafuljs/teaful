@@ -161,11 +161,11 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
      * // Default usage
      * const [age, setAge, resetAge] = useStore().age
      * 
-     * // Is possible to consume a non existing property of the store
-     * const [invented, setInvented, resetInvented] = useStore().invented
+     * // Consume/create/update new properties of the store
+     * const [newProp, setNewProp, resetNewProp] = useStore().newProp
      * 
-     * // or all the store together
-     * const [store, update, reset] = useStore()
+     * // Consume/update or all the store properties
+     * const [store, updateStore, resetStore] = useStore()
      */
     useStore() {
       return new Proxy([], {

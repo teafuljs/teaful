@@ -1,73 +1,13 @@
-import React, { useState, useContext, createContext, useEffect } from "react";
-
-const libName = "FragmentedStore";
-
-export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
+function createStore(defaultStore = {}, defaultCallbacks = {}) {
   const mainContext = createContext();
   const useMainContext = () => useContext(mainContext);
   const hooks = {};
   const contexts = {};
   let allStore = defaultStore;
-  let initStore = defaultStore;
+  let initialStore = defaultStore;
   let keys = Object.keys(defaultStore);
 
-  function Provider({ store = {}, callbacks = {}, children }) {
-    const [, forceRender] = useState(0);
-
-    const el = Object.keys(contexts)
-      .map((key) => {
-        const Provider = ({ children }) => {
-          const context = contexts[key];
-          const [value, setter] = useState(allStore[key]);
-          const cb = callbacks[key] || defaultCallbacks[key];
-
-          const updater = (newValue) => {
-            let nVal = newValue;
-            if (typeof nVal === "function") nVal = newValue(value);
-            allStore[key] = nVal;
-            setter(newValue);
-            if (typeof cb === "function") cb(nVal, value, setter);
-          };
-
-          const reset = () => {
-            updater(initStore[key]);
-          };
-
-          return (
-            <context.Provider value={[value, updater, reset]}>
-              {children}
-            </context.Provider>
-          );
-        };
-        Provider.displayName = `${libName}(${key})`;
-        return Provider;
-      })
-      .reduce((c, Provider) => <Provider>{c}</Provider>, children);
-
-    mainContext.displayName = libName;
-
-    useEffect(() => {
-      initStore = { ...initStore, ...store };
-      addNewValues(store);
-    }, [store]);
-
-    function addNewValues(vals, force) {
-      const newKeys = Object.keys(vals);
-      if (!newKeys.length) return;
-      const oldKeysLength = keys.length;
-      keys = [...new Set([...keys, ...newKeys])];
-      if (keys.length === oldKeysLength) return;
-      allStore = { ...allStore, ...vals };
-      addMissingContextsAndHooks(force);
-      forceRender((v) => v + 1);
-    }
-
-    return (
-      <mainContext.Provider value={addNewValues}>{el}</mainContext.Provider>
-    );
-  }
-
-  function addMissingContextsAndHooks(force) {
+  function createMissingContexts(force) {
     let updated = false;
 
     for (let key of keys) {
@@ -75,7 +15,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
 
       const context = createContext(allStore[key]);
 
-      if (!(key in initStore)) initStore[key] = undefined;
+      if (!(key in initialStore)) initialStore[key] = undefined;
       context.displayName = `${libName}(${key})`;
       updated = true;
       contexts[key] = context;
@@ -103,17 +43,79 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       }
 
       function reset() {
-        updater(initStore);
+        updater(initialStore);
       }
 
       return [state, updater, reset];
     };
   }
 
-  addMissingContextsAndHooks();
+  createMissingContexts();
 
   return {
-    Provider,
+    Provider({ store = {}, callbacks = {}, children }) {
+      const [, forceRender] = useState(0);
+      const initialized = useRef();
+
+      function initStore() {
+        initialStore = { ...initialStore, ...store };
+        addNewValues(store);
+      }
+
+      if (!initialized.current) initStore();
+
+      useEffect(() => {
+        if (initialized.current) return initStore();
+        initialized.current = true;
+      }, [store]);
+
+      const el = Object.keys(contexts)
+        .map((key) => {
+          const Provider = ({ children }) => {
+            const context = contexts[key];
+            const [value, setter] = useState(allStore[key]);
+            const cb = callbacks[key] || defaultCallbacks[key];
+
+            const updater = (newValue) => {
+              let nVal = newValue;
+              if (typeof nVal === "function") nVal = newValue(value);
+              allStore[key] = nVal;
+              setter(newValue);
+              if (typeof cb === "function") cb(nVal, value, setter);
+            };
+
+            const reset = () => {
+              updater(initialStore[key]);
+            };
+
+            return (
+              <context.Provider value={[value, updater, reset]}>
+                {children}
+              </context.Provider>
+            );
+          };
+          Provider.displayName = `${libName}(${key})`;
+          return Provider;
+        })
+        .reduce((c, Provider) => <Provider>{c}</Provider>, children);
+
+      mainContext.displayName = libName;
+
+      function addNewValues(vals, force) {
+        const newKeys = Object.keys(vals);
+        if (!newKeys.length) return;
+        const oldKeysLength = keys.length;
+        keys = [...new Set([...keys, ...newKeys])];
+        if (keys.length === oldKeysLength) return;
+        allStore = { ...allStore, ...vals };
+        createMissingContexts(force);
+        forceRender((v) => v + 1);
+      }
+
+      return (
+        <mainContext.Provider value={addNewValues}>{el}</mainContext.Provider>
+      );
+    },
     useStore() {
       return new Proxy([], {
         get: (_, prop) => {
@@ -128,9 +130,9 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
           // const [invented, setInvented, resetInvented] = useStore().invented
           const addNewValues = useMainContext();
           const updater = (v) => addNewValues({ [prop]: v });
-          return [undefined, updater, () => { }];
-        }
+          return [undefined, updater, () => {}];
+        },
       });
-    }
+    },
   };
 }

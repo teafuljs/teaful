@@ -73,13 +73,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
     for (let key of keys) {
       if (!force && (contexts[key] || hooks[key])) continue;
 
-      const context = createContext([
-        allStore[key],
-        () =>
-          console.error(
-            "You can't change store value because store provider not found."
-          )
-      ]);
+      const context = createContext(allStore[key]);
 
       if (!(key in initStore)) initStore[key] = undefined;
       context.displayName = `${libName}(${key})`;

@@ -6,6 +6,8 @@ import React, {
   useRef,
 } from "react";
 
+const libName = "FragmentedStore";
+
 export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
   const mainContext = createContext();
   const useMainContext = () => useContext(mainContext);

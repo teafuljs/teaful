@@ -1,13 +1,13 @@
 <h1 align="center">
-Fragmented Store
+Fragstore
 </h1>
 
 <p align="center">
-    <img src="logo.svg" width="200" alt="fragmented-store" />
+    <img src="logo.svg" width="200" alt="Fragstore" />
 </p>
 
 <p align="center">
-    Tiny (~500 B), easy and simple (P)React <b>state management library</b>
+    Tiny (~800 B), easy and simple (P)React <b>state management library</b>
 </p>
 <p align="center">
     After a store update -> <b>only</b> components that use the <b>updated property</b> are rendered.
@@ -15,7 +15,7 @@ Fragmented Store
 
 <div align="center">
 
-[![npm version](https://badge.fury.io/js/fragmented-store.svg)](https://badge.fury.io/js/fragmented-store)
+[![npm version](https://badge.fury.io/js/fragstore.svg)](https://badge.fury.io/js/fragstore)
 [![PRs Welcome][badge-prwelcome]][prwelcome]
 
 
@@ -33,13 +33,13 @@ Fragmented Store
 Install it with Yarn:
 
 ```
-yarn add fragmented-store
+yarn add fragstore
 ```
 
 Or install it with Npm:
 
 ```
-npm install fragmented-store --save
+npm install fragstore --save
 ```
 
 ## Usage:
@@ -48,7 +48,7 @@ npm install fragmented-store --save
 The `Provider` is required for any of its child components to consume the store.
 
 ```js
-import createStore from "fragmented-store";
+import createStore from "fragstore";
 
 const { Provider } = createStore({
   username: "Aral",
@@ -64,13 +64,13 @@ function App() {
 }
 ```
 
-### Fragmented store
+### Fragmented store (meaning of Fragstore)
 
 The power of this library is that you can use fragmented parts of the store, so if a component uses only one field of the store, it will only re-render again if there is a change in this particular field and it will not render again if the other fields change.
 
 
 ```js
-import createStore from "fragmented-store";
+import createStore from "fragstore";
 
 const { useStore } = createStore({
   username: "Aral",
@@ -93,7 +93,7 @@ function FragmentedExample() {
 The advantage of this library is to use the store in a fragmented way. Even so, there are cases when we want to reset the whole store or do more complex things. For these cases, we can use the hook `useStore` directly.
 
 ```js
-import createStore from "fragmented-store";
+import createStore from "fragstore";
 
 const { useStore } = createStore({
   username: "Aral",
@@ -158,7 +158,7 @@ Also you can overwrite or define callbacks on the `Provider`:
 ## Example
 
 ```js
-import createStore from "fragmented-store";
+import createStore from "fragstore";
 
 const { Provider, useStore } = createStore({
   username: "Aral",

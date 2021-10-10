@@ -6,7 +6,7 @@ import React, {
   useRef,
 } from "react";
 
-const libName = "FragmentedStore";
+const libName = "Fragstore";
 
 export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
   const mainContext = createContext();
@@ -60,9 +60,37 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
     };
   }
 
+  mainContext.displayName = libName;
   createMissingContexts();
 
+  /**
+   * createStore function returns the Provider component with the 
+   * useStore hook.
+   * 
+   * @returns {object} { Provider, useStore }
+   */
   return {
+
+    /**
+     * Provider of the store
+     * 
+     * @example
+     * 
+     * // Default usage
+     * const { Provider } = createStore({ count: 0 })
+     * // ...
+     * <Provider>{children}</Provider>
+     * 
+     * // Creating the default store in the Provider
+     * const { Provider } = createStore()
+     * // ...
+     * <Provider store={{ count: 0 }}>{children}</Provider>
+     * 
+     * // Defining callbacks
+     * const { Provider } = createStore({ count: 0 })
+     * // ...
+     * <Provider callbacks={{ count: (v) => console.log(v) }}>{children}</Provider>
+     */
     Provider({ store = {}, callbacks = {}, children }) {
       const [, forceRender] = useState(0);
       const initialized = useRef();
@@ -109,8 +137,6 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
         })
         .reduce((c, Provider) => <Provider>{c}</Provider>, children);
 
-      mainContext.displayName = libName;
-
       function addNewValues(vals, force) {
         const newKeys = Object.keys(vals);
         if (!newKeys.length) return;
@@ -126,21 +152,32 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
         <mainContext.Provider value={addNewValues}>{el}</mainContext.Provider>
       );
     },
+
+    /**
+     * useStore is a hook that returns a Proxy object that can be used to read
+     * and write properties of the store.
+     * 
+     * @example
+     * // Default usage
+     * const [age, setAge, resetAge] = useStore().age
+     * 
+     * // Is possible to consume a non existing property of the store
+     * const [invented, setInvented, resetInvented] = useStore().invented
+     * 
+     * // or all the store together
+     * const [store, update, reset] = useStore()
+     */
     useStore() {
       return new Proxy([], {
         get: (_, prop) => {
           // const [store, update, reset] = useStore()
-          if (prop > -1) {
-            return hooks.__store()[prop];
-          }
+          if (prop > -1) return hooks.__store()[prop];
 
           // const [age, setAge, resetAge] = useStore().age
           if (prop in hooks) return hooks[prop]();
 
           // const [invented, setInvented, resetInvented] = useStore().invented
-          const addNewValues = useMainContext();
-          const updater = (v) => addNewValues({ [prop]: v });
-          return [undefined, updater, () => { }];
+          return [undefined, (v) => useMainContext()({ [prop]: v }), () => { }];
         },
       });
     },

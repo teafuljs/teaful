@@ -1,5 +1,5 @@
 {
-  "name": "fragmented-store",
+  "name": "fragstore",
   "version": "0.4.0",
   "description": "Small library to manage the (P)React state",
   "source": "index.js",

@@ -45,7 +45,7 @@ npm install fragmented-store --save
 ## Usage:
 ### Provider
 
-The `Provider` is required for any of its child components to consume fragmented-store hooks.
+The `Provider` is required for any of its child components to consume the store.
 
 ```js
 import createStore from "fragmented-store";
@@ -68,22 +68,17 @@ function App() {
 
 The power of this library is that you can use fragmented parts of the store, so if a component uses only one field of the store, it will only re-render again if there is a change in this particular field and it will not render again if the other fields change.
 
-For each of the fields of the store, there is a hook with its name, examples:
-
-- username 👉 `useUsername`
-- age 👉 `useAge`
-- anotherExample 👉 `useAnotherExample`
 
 ```js
 import createStore from "fragmented-store";
 
-const { useUsername } = createStore({
+const { useStore } = createStore({
   username: "Aral",
   age: 31
 });
 
 function FragmentedExample() {
-  const [username, setUsername] = useUsername();
+  const [username, setUsername] = useStore().username;
 
   return (
     <button onClick={() => setUsername("AnotherUserName")}>
@@ -95,7 +90,7 @@ function FragmentedExample() {
 
 ### Unfragmented store
 
-The advantage of this library is to use the store in a fragmented way. Even so, there are cases when we want to reset the whole store or do more complex things. For these cases, we can use the hook `useStore`.
+The advantage of this library is to use the store in a fragmented way. Even so, there are cases when we want to reset the whole store or do more complex things. For these cases, we can use the hook `useStore` directly.
 
 ```js
 import createStore from "fragmented-store";
@@ -131,13 +126,13 @@ const initialState = {
 
 // Every callback is executed after a property change
 const callbacks = {
-  quantity: (newValue, prevValue, setValue) => {
+  quantity(newValue, prevValue, setValue) {
     // Update quantity on API
     fetch('/api/quantity', { method: 'POST', body: newValue })
      // Revert state change if it fails
      .catch(e => setValue(prevValue))
   },
-  age: (newValue, prevValue, setValue) => {
+  age(newValue, prevValue, setValue) {
     if (newValue > 100) {
       alert("Sorry, no more than 100 😜");
       setValue(prevValue);
@@ -148,14 +143,24 @@ const callbacks = {
 const { Provider, useQuantity } = createStore(initialState, callbacks)
 ```
 
-## Example
+Also you can overwrite or define callbacks on the `Provider`:
 
-* https://codesandbox.io/s/fragmented-store-example-4p5dv?file=/src/App.js
+```js
+<Provider 
+  store={{ newProperty: 'Another value'}} 
+  callbacks={{ 
+    newProperty(value) {
+      console.log(value)
+    }
+  }}>
+```
+
+## Example
 
 ```js
 import createStore from "fragmented-store";
 
-const { Provider, useUsername, useAge, useStore } = createStore({
+const { Provider, useStore } = createStore({
   username: "Aral",
   age: 31
 });
@@ -163,46 +168,14 @@ const { Provider, useUsername, useAge, useStore } = createStore({
 export default function App() {
   return (
     <Provider>
-      <Title />
-      <UpdateTitle />
-      <Age />
       <AllStore />
+      <Username />
+      <Age />
+      <NewProperty />
     </Provider>
   );
 }
 
-function Title() {
-  const [username] = useUsername();
-
-  console.log("render Title");
-
-  return <h1>{username}</h1>;
-}
-
-function UpdateTitle() {
-  const [username, setUsername] = useUsername();
-
-  console.log("render UpdateTitle");
-
-  return (
-    <button onClick={() => setUsername((s) => s + "a")}>
-      Update {username}
-    </button>
-  );
-}
-
-function Age() {
-  const [age, setAge] = useAge();
-
-  console.log("render age");
-
-  return (
-    <div>
-      <div>{age}</div>
-      <button onClick={() => setAge((s) => s + 1)}>Inc age</button>
-    </div>
-  );
-}
 
 function AllStore() {
   const [store, update] = useStore();
@@ -210,7 +183,57 @@ function AllStore() {
   console.log({ store }); // all store
 
   return (
-    <button onClick={() => update({ age: 31, username: "Aral" })}>Reset</button>
+    <button onClick={() => update({ age: 31, username: "Aral" })}>
+      Reset
+    </button>
+  );
+}
+
+function Username() {
+  const [username, setUsername, resetUsername] = useStore().username;
+
+  return (
+    <>
+      <h1>{username}</h1>
+      <button onClick={() => setUsername("Another name")}>
+        Update username
+      </button>
+      <button onClick={resetUsername}>
+        Reset username
+      </button>
+    </>
+  );
+}
+
+function Age() {
+  const [age, setAge, resetAge] = useStore().age;
+
+  console.log("render age", age);
+
+  return (
+    <div>
+      <div>{age}</div>
+      <button onClick={() => setAge((s) => s + 1)}>Inc age</button>
+      <button onClick={resetAge}>Reset age</button>
+    </div>
+  );
+}
+
+function NewProperty() {
+  const [newProperty, setNewProperty] = useStore().newProperty;
+
+  return (
+    <>
+      {
+        newProperty 
+          ? <div>{newProperty}</div>
+          : (
+             <button onClick={() => setNewProperty("I'm a new property")}>
+              Create new property
+             </button>
+          )
+      }
+    </>
   );
 }
 ```

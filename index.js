@@ -3,7 +3,6 @@ import React, { useState, useContext, createContext, useEffect } from "react";
 const libName = "FragmentedStore";
 
 export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
-  const capitalize = (k) => `${k[0].toUpperCase()}${k.slice(1, k.length)}`;
   const mainContext = createContext();
   const useMainContext = () => useContext(mainContext);
   const hooks = {};
@@ -72,40 +71,34 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
     let updated = false;
 
     for (let key of keys) {
-      if (!key) continue;
+      if (!force && (contexts[key] || hooks[key])) continue;
 
-      const keyCapitalized = capitalize(key);
+      const context = createContext([
+        allStore[key],
+        () =>
+          console.error(
+            "You can't change store value because store provider not found."
+          )
+      ]);
 
-      if (!force && (contexts[key] || hooks[`use${keyCapitalized}`])) continue;
-
-      const context = createContext([allStore[key]]);
-      const useHook = () => useContext(context);
-
-      if (keyCapitalized === "Store") {
-        console.error(
-          'Avoid to use the "store" name at the first level, it\'s reserved for the "useStore" hook.'
-        );
-      }
       if (!(key in initStore)) initStore[key] = undefined;
       context.displayName = `${libName}(${key})`;
       updated = true;
       contexts[key] = context;
-      hooks[`use${keyCapitalized}`] = useHook;
+      hooks[key] = () => useContext(context);
     }
 
     if (!updated) return;
 
-    hooks.useStore = () => {
+    hooks.__store = () => {
       const addNewValues = useMainContext();
       const state = {};
       const updates = {};
-      keys.forEach((k) => {
-        if (!k) return;
-        const hookName = `use${capitalize(k)}`;
-        if (hookName === "useStore") return;
-        const [s, u] = hooks[hookName]();
-        state[k] = s;
-        updates[k] = u;
+      keys.forEach((key) => {
+        if (key === "store") return;
+        const [s, u] = hooks[key]();
+        state[key] = s;
+        updates[key] = u;
       });
 
       function updater(newState) {
@@ -123,22 +116,27 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
     };
   }
 
-  function useHooks() {
-    return new Proxy(hooks, {
-      get: (target, prop) => {
-        if (prop in target) return target[prop];
-        return () => {
-          const addNewValues = useMainContext();
-          let key = prop.replace("use", "");
-          key = key.replace(key[0], key[0].toLowerCase());
-          const updater = (v) => addNewValues({ [key]: v });
-          return [undefined, updater, () => { }];
-        };
-      }
-    });
-  }
-
   addMissingContextsAndHooks();
 
-  return { Provider, useHooks };
+  return {
+    Provider,
+    useStore() {
+      return new Proxy([], {
+        get: (_, prop) => {
+          // const [store, update, reset] = useStore()
+          if (prop > -1) {
+            return hooks.__store()[prop];
+          }
+
+          // const [age, setAge, resetAge] = useStore().age
+          if (prop in hooks) return hooks[prop]();
+
+          // const [invented, setInvented, resetInvented] = useStore().invented
+          const addNewValues = useMainContext();
+          const updater = (v) => addNewValues({ [prop]: v });
+          return [undefined, updater, () => { }];
+        }
+      });
+    }
+  };
 }

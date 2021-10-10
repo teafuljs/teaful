@@ -1,6 +1,6 @@
 {
   "name": "fragmented-store",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Small library to manage the (P)React state",
   "source": "index.js",
   "main": "dist/index.js",
@@ -27,6 +27,7 @@
     "react": ">= 16.8.0"
   },
   "devDependencies": {
+    "@testing-library/react": "12.1.2",
     "microbundle": "0.14.0",
     "react": "17.0.2",
     "react-dom": "17.0.2"

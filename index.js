@@ -176,7 +176,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
           // const [age, setAge, resetAge] = useStore().age
           if (prop in hooks) return hooks[prop]();
 
-          // const [invented, setInvented, resetInvented] = useStore().invented
+          // const [newProp, setNewProp, resetNewProp] = useStore().newProp
           return [undefined, (v) => useMainContext()({ [prop]: v }), () => { }];
         },
       });

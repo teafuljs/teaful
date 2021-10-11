@@ -2,7 +2,7 @@
   "name": "fragstore",
   "version": "0.4.0",
   "description": "Small library to manage the (P)React state",
-  "source": "index.js",
+  "source": "package/index.js",
   "main": "dist/index.js",
   "module": "dist/index.module.js",
   "unpkg": "dist/index.umd.js",

@@ -150,8 +150,10 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
 }
 
 function getField(store, path) {
-  return (Array.isArray(path) ? path : path.split('.'))
-    .reduce((a, c) => (a && a[c] ? a[c] : undefined), store)
+  return (Array.isArray(path) ? path : path.split(".")).reduce(
+    (a, c) => a?.[c],
+    store
+  );
 }
 
 function setField(store = {}, [prop, ...rest], value) {

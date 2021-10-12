@@ -170,28 +170,38 @@ The problem with using the entire store is that the component will re-render whe
 
 ### Callbacks
 
-The second param of `createStore` is **callbacks** `Object<function>`. Callbacks are executed for any property change. It's useful for example to fetch data to an endpoint after the state change, and roll back the state if the request fails. 
+The second param of `createStore` is **callbacks** `Object<function>`. It's useful for example to fetch data to an endpoint after the state change, and roll back the state if the request fails. Callbacks can only be created at the first level. That is, if we have an update in `cart.items[0].price`, only the callback of the cart `{ cart() {} }` will be called. However you receive the updated `path` and you can implement the logic inside the callback:
 
+Example: 
 
 ```js
 const initialState = {
   quantity: 2,
   userName: 'Aral',
   age: 31,
+  cart: {
+    items: [{ name: 'example', price: 10 }]
+  }
 }
 
 // Every callback is executed after a property change
 const callbacks = {
-  quantity(newValue, prevValue, setValue) {
+  quantity({ value, prevValue, updateValue }) {
     // Update quantity on API
-    fetch('/api/quantity', { method: 'POST', body: newValue })
+    fetch('/api/quantity', { method: 'POST', body: value })
      // Revert state change if it fails
-     .catch(e => setValue(prevValue))
+     .catch(e => updateValue(prevValue))
   },
-  age(newValue, prevValue, setValue) {
-    if (newValue > 100) {
+  age({ value, prevValue, updateValue }) {
+    if (value > 100) {
       alert("Sorry, no more than 100 😜");
-      setValue(prevValue);
+      updateValue(prevValue);
+    }
+  },
+  cart({ path, value, prevValue, updateValue }) {
+    if (path === "cart.items.0" && value.price > 10) {
+      alert(`Price of ${value.name} should be lower than 10`);
+      updateValue(prevValue);
     }
   }
 }

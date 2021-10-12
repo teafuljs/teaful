@@ -118,16 +118,27 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
     );
   }
 
+  /**
+   * Reset all store and notifies to all fields
+   * 
+   * When resetAllStore() is called, all fields of the store
+   * are reset to the initial value.
+   */
   function resetAllStore() {
     updateAllStore(initialStore);
   }
 
+  /**
+   * 1. Updates any field of the store 
+   * 2. Notifies to all the involved subscribers
+   * 3. Calls the callback if defined
+   */
   function updateField(path, callCallback = true) {
     const fieldPath = Array.isArray(path) ? path : path.split(".");
     const [firstKey] = fieldPath;
     const isCb = callCallback && typeof allCallbacks[firstKey] === "function";
     const cb = isCb ? allCallbacks[firstKey] : undefined;
-    const prevCbValue = allStore[firstKey];
+    const prevValue = isCb ? getField(allStore, fieldPath) : undefined;
 
     return (newValue) => {
       let value = newValue;
@@ -139,12 +150,23 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       allStore = setField(allStore, fieldPath, value);
       subscription.notify(`store.${path}`);
 
-      if (cb) {
-        cb(value, prevCbValue, updateField(path, false));
+      if (isCb) {
+        cb({
+          path: fieldPath.join("."),
+          value,
+          prevValue,
+          updateValue: updateField(path, false)
+        });
       }
     };
   }
 
+  /**
+   * Reset a field of the store
+   * 
+   * When resetField(path) is called, the field of the store is 
+   * reset to the initial value.
+   */
   function resetField(path) {
     return () => updateField(path)(getField(initialStore, path));
   }
@@ -157,6 +179,10 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    */
   return { Provider, useStore };
 }
+
+// ##########################################################
+// ######################  Helpers  #########################
+// ##########################################################
 
 function getField(store, path) {
   return (Array.isArray(path) ? path : path.split(".")).reduce(

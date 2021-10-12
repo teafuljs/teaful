@@ -288,7 +288,7 @@ function CartFirstItem() {
 
   return (
     <>
-      <h1>Item: {JSON.stringify(item)}€</h1>
+      <h1>Item: {JSON.stringify(item)}</h1>
       <button onClick={() => setItem({ name: "new Item" })}>
         Update item
       </button>

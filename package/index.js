@@ -52,29 +52,40 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
   * @example
   * // Default usage
   * const [age, setAge, resetAge] = useStore().age
+  * const [cartQuantity, setCartQuantity] = useStore.cart.quantity()
   * 
   * // Consume/create/update new properties of the store
-  * const [newProp, setNewProp, resetNewProp] = useStore().newProp
+  * const [newProp, setNewProp, resetNewProp] = useStore.newProp()
   * 
   * // Consume/update or all the store properties
   * const [store, updateStore, resetStore] = useStore()
   */
-  function useStore() {
-    return new Proxy([], {
-      get: (_, prop) => {
-        // const [store, update, reset] = useStore()
-        if (prop > -1) {
-          useSubscription('store')
-          return [allStore, updateAllStore, resetAllStore][prop];
-        }
+  const validator = {
+    path: [],
+    discard: new Set(["prototype", "isReactComponent"]),
+    get(_, path) {
+      if (!this.discard.has(path)) this.path.push(path);
+      return new Proxy(() => { }, validator);
+    },
+    apply() {
+      const path = this.path.slice();
+      this.path = [];
 
-        // const [age, setAge, resetAge] = useStore().age
-        // const [newProp, setNewProp, resetNewProp] = useStore().newProp
-        useSubscription(`store.${prop}`)
-        return [getField(allStore, prop), updateField(prop), resetField(prop)]
-      },
-    });
-  }
+      // const [store, update, reset] = useStore()
+      if (path.length === 0) {
+        useSubscription("store");
+        return [allStore, updateAllStore, resetAllStore];
+      }
+
+      // const [age, setAge, resetAge] = useStore.age()
+      // const [cartQuantity, setCartQuantity] = useStore.cart.quantity()
+      // const [newProp, setNewProp, resetNewProp] = useStore.newProp()
+      const prop = path.join(".");
+      useSubscription(`store.${prop}`);
+      return [getField(allStore, prop), updateField(prop), resetField(prop)];
+    }
+  };
+  const useStore = new Proxy(() => { }, validator);
 
   /**
    * 

@@ -74,16 +74,26 @@ import createStore from "fragstore";
 
 const { useStore } = createStore({
   username: "Aral",
-  age: 31
+  age: 31,
+  cart: {
+    price: 0,
+    items: []
+  }
 });
 
 function FragmentedExample() {
-  const [username, setUsername] = useStore().username;
+  const [username, setUsername] = useStore.username();
+  const [cartPrice, setCartPrice] = useStore.cart.price();
 
   return (
-    <button onClick={() => setUsername("AnotherUserName")}>
-      Update {username}
-    </button>
+    <>
+      <button onClick={() => setUsername("AnotherUserName")}>
+        Update {username}
+      </button>
+       <button onClick={() => setCartPrice(v => v + 1)}>
+        Increment price: {cartPrice}€
+      </button>
+    </>
   );
 }
 ```
@@ -106,7 +116,11 @@ function UnfragmentedExample() {
   return (
     <>
       <h1>{state.username}, {state.age}</h1>
-      <button onClick={() => update({ age: 31, username: "Aral" })}>Reset</button>
+      <button 
+        onClick={() => update({ age: 32, cart: { price: 0, items: [] } })}
+      >
+        Update store
+      </button>
     </>
   );
 }
@@ -131,8 +145,8 @@ function App() {
 #### 2. Using the `useStore` to consume to a new property
 
 ```js
-const [newProp, setNewProp] = useStore().newProp
-const [anotherProp, setAnotherProp] = useStore().anotherProp
+const [newProp, setNewProp] = useStore.newProp()
+const [anotherProp, setAnotherProp] = useStore.anotherProp()
 
 // ...
 setNewProp("I'm a new property")
@@ -204,7 +218,11 @@ import createStore from "fragstore";
 
 const { Provider, useStore } = createStore({
   username: "Aral",
-  age: 31
+  age: 31,
+  cart: {
+    price: 0,
+    items: [],
+  }
 });
 
 export default function App() {
@@ -212,6 +230,8 @@ export default function App() {
     <Provider>
       <AllStore />
       <Username />
+      <CartPrice />
+      <CartFirstItem />
       <Age />
       <NewProperty />
     </Provider>
@@ -232,11 +252,11 @@ function AllStore() {
 }
 
 function Username() {
-  const [username, setUsername, resetUsername] = useStore().username;
+  const [username, setUsername, resetUsername] = useStore.username();
 
   return (
     <>
-      <h1>{username}</h1>
+      <h1>Username: {username}</h1>
       <button onClick={() => setUsername("Another name")}>
         Update username
       </button>
@@ -247,8 +267,40 @@ function Username() {
   );
 }
 
+function CartPrice() {
+  const [price, setPrice, resetPrice] = useStore.cart.price();
+
+  return (
+    <>
+      <h1>Price: {price}€</h1>
+      <button onClick={() => setPrice(v => v + 1)}>
+        Inc price
+      </button>
+      <button onClick={resetPrice}>
+        Reset username
+      </button>
+    </>
+  );
+}
+
+function CartFirstItem() {
+  const [item, setItem, resetItem] = useStore.cart.items[0]();
+
+  return (
+    <>
+      <h1>Item: {JSON.stringify(item)}€</h1>
+      <button onClick={() => setItem({ name: "new Item" })}>
+        Update item
+      </button>
+      <button onClick={resetItem}>
+        Reset item
+      </button>
+    </>
+  );
+}
+
 function Age() {
-  const [age, setAge, resetAge] = useStore().age;
+  const [age, setAge, resetAge] = useStore.age();
 
   console.log("render age", age);
 
@@ -262,7 +314,7 @@ function Age() {
 }
 
 function NewProperty() {
-  const [newProperty, setNewProperty] = useStore().newProperty;
+  const [newProperty, setNewProperty] = useStore.newProperty();
 
   return (
     <>

@@ -51,7 +51,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
   * 
   * @example
   * // Default usage
-  * const [age, setAge, resetAge] = useStore().age
+  * const [age, setAge, resetAge] = useStore.age()
   * const [cartQuantity, setCartQuantity] = useStore.cart.quantity()
   * 
   * // Consume/create/update new properties of the store

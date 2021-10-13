@@ -137,7 +137,6 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
     const fieldPath = Array.isArray(path) ? path : path.split(".");
     const [firstKey] = fieldPath;
     const isCb = callCallback && typeof allCallbacks[firstKey] === "function";
-    const cb = isCb ? allCallbacks[firstKey] : undefined;
     const prevValue = isCb ? getField(allStore, fieldPath) : undefined;
 
     return (newValue) => {
@@ -151,7 +150,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       subscription.notify(`store.${path}`);
 
       if (isCb) {
-        cb({
+        allCallbacks[firstKey]({
           path: fieldPath.join("."),
           value,
           prevValue,

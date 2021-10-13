@@ -65,7 +65,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
     discard: new Set(["prototype", "isReactComponent"]),
     get(_, path) {
       if (!this.discard.has(path)) this.path.push(path);
-      return new Proxy(() => { }, validator);
+      return new Proxy(() => {}, validator);
     },
     apply() {
       const path = this.path.slice();
@@ -83,9 +83,9 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       const prop = path.join(".");
       useSubscription(`store.${prop}`);
       return [getField(allStore, prop), updateField(prop), resetField(prop)];
-    }
+    },
   };
-  const useStore = new Proxy(() => { }, validator);
+  const useStore = new Proxy(() => {}, validator);
 
   /**
    *
@@ -120,7 +120,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
 
   /**
    * Reset all store and notifies to all fields
-   * 
+   *
    * When resetAllStore() is called, all fields of the store
    * are reset to the initial value.
    */
@@ -129,7 +129,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
   }
 
   /**
-   * 1. Updates any field of the store 
+   * 1. Updates any field of the store
    * 2. Notifies to all the involved subscribers
    * 3. Calls the callback if defined
    */
@@ -154,7 +154,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
           path: fieldPath.join("."),
           value,
           prevValue,
-          updateValue: updateField(path, false)
+          updateValue: updateField(path, false),
         });
       }
     };
@@ -162,8 +162,8 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
 
   /**
    * Reset a field of the store
-   * 
-   * When resetField(path) is called, the field of the store is 
+   *
+   * When resetField(path) is called, the field of the store is
    * reset to the initial value.
    */
   function resetField(path) {
@@ -214,6 +214,6 @@ function createSubscription() {
     unsubscribe(key, listener) {
       listeners[key].delete(listener);
       if (listeners[key].size === 0) delete listeners[key];
-    }
+    },
   };
 }

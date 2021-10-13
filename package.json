@@ -1,13 +1,16 @@
 {
-  "name": "fragmented-store",
-  "version": "0.3.0",
+  "name": "fragstore",
+  "version": "0.4.0",
   "description": "Small library to manage the (P)React state",
-  "source": "index.js",
+  "source": "package/index.js",
   "main": "dist/index.js",
   "module": "dist/index.module.js",
   "unpkg": "dist/index.umd.js",
   "scripts": {
-    "build": "microbundle  --jsx React.createElement",
+    "format": "npx prettier --write package tests",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "build": "microbundle --jsx React.createElement",
     "dev": "microbundle watch",
     "prepublish": "yarn build"
   },
@@ -26,9 +29,19 @@
   "peerDependencies": {
     "react": ">= 16.8.0"
   },
+  "jest": {
+    "testEnvironment": "jsdom"
+  },
   "devDependencies": {
-    "microbundle": "0.13.3",
+    "@babel/polyfill": "^7.12.1",
+    "@babel/preset-env": "7.15.8",
+    "@babel/preset-react": "7.14.5",
+    "@testing-library/react": "12.1.2",
+    "babel-jest": "27.2.5",
+    "jest": "27.2.5",
+    "microbundle": "0.14.0",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "react-test-renderer": "^17.0.2"
   }
 }

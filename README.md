@@ -147,8 +147,10 @@ function App() {
 ```js
 const { Provider } = createStore({ username: "Aral" });
 // ...
-const [newProp, setNewProp] = useStore.newProp("I'm a new value") // initial value
-const [anotherProp, setAnotherProp] = useStore.anotherProp({ another: true })
+const [newProp, setNewProp] = useStore.newProp("Initial value of newProp")
+const [anotherProp, setAnotherProp] = useStore.anotherProp()
+// ...
+setAnotherProp("Initial value of anotherProp")
 ```
 
 The **argument only works when the value is undefined**. For example this is not going to work because `username` is already defined inside the `createStore`:

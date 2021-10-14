@@ -65,7 +65,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
     discard: new Set(["prototype", "isReactComponent"]),
     get(_, path) {
       if (!this.discard.has(path)) this.path.push(path);
-      return new Proxy(() => { }, validator);
+      return new Proxy(() => {}, validator);
     },
     apply(t, _, args) {
       const path = this.path.slice();
@@ -81,22 +81,25 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       // const [cartQuantity, setCartQuantity] = useStore.cart.quantity()
       // const [newProp, setNewProp, resetNewProp] = useStore.newProp()
       const prop = path.join(".");
-      const update = updateField(prop)
-      let value = getField(allStore, prop)
-      let initializeValue = args[0] !== undefined && value === undefined
+      const update = updateField(prop);
+      let value = getField(allStore, prop);
 
-      // Set initial value
+      let initializeValue =
+        args[0] !== undefined &&
+        value === undefined &&
+        getField(initialStore, prop) === undefined;
+
       if (initializeValue) {
         value = args[0];
         initialStore = setField(initialStore, path, value);
       }
-      useEffect(() => initializeValue && update(value), [])
+      useEffect(() => initializeValue && update(value), []);
       useSubscription(`store.${prop}`);
 
       return [value, update, resetField(prop)];
     },
   };
-  const useStore = new Proxy(() => { }, validator);
+  const useStore = new Proxy(() => {}, validator);
 
   /**
    *

@@ -151,9 +151,10 @@ const [newProp, setNewProp] = useStore.newProp("Initial value of newProp")
 const [anotherProp, setAnotherProp] = useStore.anotherProp()
 // ...
 setAnotherProp("Initial value of anotherProp")
+setNewProp("Next value of newProp")
 ```
 
-The **argument only works when the value is undefined**. For example this is not going to work because `username` is already defined inside the `createStore`:
+The hook argument works to define the initial value. It doesn't work when the initial value is already defined in `createStore` or `Provider`:
 
 ```js
 const { Provider } = createStore({ username: "Aral" });
@@ -161,6 +162,8 @@ const { Provider } = createStore({ username: "Aral" });
 const [username, setUsername] = useStore.username("Another name")
 console.log(username) // -> Aral
 ```
+
+In this case, if you want to update the value you should use the `setUsername` method.
 
 #### 3. Using all the store with `useStore` directly *(not recommended)*
 

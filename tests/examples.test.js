@@ -66,7 +66,7 @@ describe("Examples", () => {
   });
 
   test("should work with a counter: as a new value (not defined on the store)", async () => {
-    const { useStore, Provider } = createStore({ anotherValue: '' });
+    const { useStore, Provider } = createStore({ anotherValue: "" });
 
     function Counter() {
       const [count, setCount, resetCount] = useStore.count();
@@ -81,8 +81,10 @@ describe("Examples", () => {
     }
 
     function DisplayCounter() {
-      const [anotherValue] = useStore.anotherValue('Should not be overwritted (only for initial values)');
-      const [count] = useStore.count(0); // default value
+      const [anotherValue] = useStore.anotherValue(
+        "Should not be overwritted (only for initial values)"
+      );
+      const [count] = useStore.count(0); // initial value
       return (
         <>
           <p data-testid="number">{count}</p>

@@ -145,14 +145,25 @@ function App() {
 #### 2. Using the `useStore` to consume to a new property
 
 ```js
-const [newProp, setNewProp] = useStore.newProp()
-const [anotherProp, setAnotherProp] = useStore.anotherProp()
-
+const { Provider } = createStore({ username: "Aral" });
 // ...
-setNewProp("I'm a new property")
-setAnotherProp("I'm another new property")
+const [newProp, setNewProp] = useStore.newProp("Initial value of newProp")
+const [anotherProp, setAnotherProp] = useStore.anotherProp()
+// ...
+setAnotherProp("Initial value of anotherProp")
+setNewProp("Next value of newProp")
 ```
 
+The hook argument works to define the initial value. It doesn't work when the initial value is already defined in `createStore` or `Provider`:
+
+```js
+const { Provider } = createStore({ username: "Aral" });
+// ...
+const [username, setUsername] = useStore.username("Another name")
+console.log(username) // -> Aral
+```
+
+In this case, if you want to update the value you should use the `setUsername` method.
 
 #### 3. Using all the store with `useStore` directly *(not recommended)*
 

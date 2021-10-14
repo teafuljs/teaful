@@ -145,14 +145,20 @@ function App() {
 #### 2. Using the `useStore` to consume to a new property
 
 ```js
-const [newProp, setNewProp] = useStore.newProp()
-const [anotherProp, setAnotherProp] = useStore.anotherProp()
-
+const { Provider } = createStore({ username: "Aral" });
 // ...
-setNewProp("I'm a new property")
-setAnotherProp("I'm another new property")
+const [newProp, setNewProp] = useStore.newProp("I'm a new value") // initial value
+const [anotherProp, setAnotherProp] = useStore.anotherProp({ another: true })
 ```
 
+The **argument only works when the value is undefined**. For example this is not going to work because `username` is already defined inside the `createStore`:
+
+```js
+const { Provider } = createStore({ username: "Aral" });
+// ...
+const [username, setUsername] = useStore.username("Another name")
+console.log(username) // -> Aral
+```
 
 #### 3. Using all the store with `useStore` directly *(not recommended)*
 

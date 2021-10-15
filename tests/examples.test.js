@@ -6,7 +6,7 @@ import createStore from "../package/index";
 
 describe("Examples", () => {
   test("should work with a counter", async () => {
-    const { useStore, Provider } = createStore({ count: 0 });
+    const { useStore } = createStore({ count: 0 });
 
     function Counter() {
       const [count, setCount, resetCount] = useStore.count();
@@ -26,10 +26,10 @@ describe("Examples", () => {
     }
 
     render(
-      <Provider>
+      <>
         <Counter />
         <DisplayCounter />
-      </Provider>
+      </>
     );
 
     expect(screen.getByRole("heading").textContent).toBe("0");
@@ -66,7 +66,7 @@ describe("Examples", () => {
   });
 
   test("should work with a counter: as a new value (not defined on the store)", async () => {
-    const { useStore, Provider } = createStore({ anotherValue: "" });
+    const { useStore } = createStore({ anotherValue: "" });
 
     function Counter() {
       const [count, setCount, resetCount] = useStore.count();
@@ -94,10 +94,10 @@ describe("Examples", () => {
     }
 
     render(
-      <Provider>
+      <>
         <Counter />
         <DisplayCounter />
-      </Provider>
+      </>
     );
 
     expect(screen.getByRole("heading").textContent).toBe("0");
@@ -134,5 +134,89 @@ describe("Examples", () => {
 
     // Another value
     expect(screen.getByTestId("anotherValue").textContent).toBe("");
+  });
+
+  test("should work as a todo list", () => {
+    const { useStore } = createStore({ todo: [], done: [] });
+
+    function AddTodoTask() {
+      const [todo, setTodo] = useStore.todo();
+      const addTask = (e) => {
+        e.preventDefault();
+        setTodo([...todo, e.target.children[0].value]);
+      };
+      return (
+        <form onSubmit={addTask}>
+          <input type="text" />
+          <button type="submit">Add</button>
+        </form>
+      );
+    }
+
+    function TodoList() {
+      const [todo, setTodo] = useStore.todo();
+      const [done, setDone] = useStore.done();
+      return (
+        <div>
+          <h1>Todo tasks</h1>
+          <ul data-testid="todo">
+            {todo.map((t) => (
+              <li key={t}>
+                {t}
+                <button
+                  onClick={() => {
+                    setTodo(todo.filter((t) => t !== t));
+                    setDone([...done, t]);
+                  }}
+                >
+                  Done
+                </button>
+              </li>
+            ))}
+          </ul>
+          <h1>Done tasks</h1>
+          <ul data-testid="done">
+            {done.map((d) => (
+              <li key={d}>
+                {d}
+                <button
+                  onClick={() => {
+                    setDone(done.filter((t) => t !== d));
+                    setTodo([...todo, d]);
+                  }}
+                >
+                  Undone
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+
+    render(
+      <>
+        <AddTodoTask />
+        <TodoList />
+      </>
+    );
+
+    // Add task
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "New task" },
+    });
+    fireEvent.click(screen.getByText("Add"));
+    expect(screen.getByTestId("todo").textContent).toContain("New task");
+    expect(screen.getByTestId("done").textContent).not.toContain("New task");
+
+    // Move to done
+    fireEvent.click(screen.getByText("Done"));
+    expect(screen.getByTestId("todo").textContent).not.toContain("New task");
+    expect(screen.getByTestId("done").textContent).toContain("New task");
+
+    // Move to todo
+    fireEvent.click(screen.getByText("Undone"));
+    expect(screen.getByTestId("todo").textContent).toContain("New task");
+    expect(screen.getByTestId("done").textContent).not.toContain("New task");
   });
 });

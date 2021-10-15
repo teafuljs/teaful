@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef } from "react";
+import {useEffect, useReducer, useRef} from 'react';
 
 export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
   const subscription = createSubscription();
@@ -14,7 +14,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    * @example
    *
    * // Default usage
-   * const { Provider } = createStore({ count: 0 })
+   * const { Provider } = createStore({ count: 0 })
    * // ...
    * <Provider>{children}</Provider>
    *
@@ -24,21 +24,24 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    * <Provider store={{ count: 0 }}>{children}</Provider>
    *
    * // Defining callbacks
-   * const { Provider } = createStore({ count: 0 })
+   * const { Provider } = createStore({ count: 0 })
    * // ...
-   * <Provider callbacks={{ count: (v) => console.log(v) }}>{children}</Provider>
+   * <Provider callbacks={{ count: (v) => console.log(v) }}>
+   *  {children}
+   * </Provider>
+   * @return {React.ReactNode} children
    */
-  function Provider({ store = {}, callbacks = {}, children }) {
+  function Provider({store = {}, callbacks = {}, children}) {
     const initialized = useRef();
 
     if (!initialized.current) {
-      initialStore = allStore = { ...allStore, ...store };
-      allCallbacks = { ...allCallbacks, ...callbacks };
+      initialStore = allStore = {...allStore, ...store};
+      allCallbacks = {...allCallbacks, ...callbacks};
     }
 
     useEffect(() => {
       if (!initialized.current) return (initialized.current = true);
-      allCallbacks = { ...allCallbacks, ...callbacks };
+      allCallbacks = {...allCallbacks, ...callbacks};
       updateAllStore(store);
     }, [store, callbacks]);
 
@@ -62,7 +65,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    */
   const validator = {
     path: [],
-    discard: new Set(["prototype", "isReactComponent"]),
+    discard: new Set(['prototype', 'isReactComponent']),
     get(_, path) {
       if (!this.discard.has(path)) this.path.push(path);
       return new Proxy(() => {}, validator);
@@ -73,18 +76,18 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
 
       // const [store, update, reset] = useStore()
       if (path.length === 0) {
-        useSubscription("store");
+        useSubscription('store');
         return [allStore, updateAllStore, resetAllStore];
       }
 
       // const [age, setAge, resetAge] = useStore.age()
       // const [cartQuantity, setCartQuantity] = useStore.cart.quantity()
       // const [newProp, setNewProp, resetNewProp] = useStore.newProp()
-      const prop = path.join(".");
+      const prop = path.join('.');
       const update = updateField(prop);
       let value = getField(allStore, prop);
 
-      let initializeValue =
+      const initializeValue =
         args[0] !== undefined &&
         value === undefined &&
         getField(initialStore, prop) === undefined;
@@ -102,9 +105,9 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
   const useStore = new Proxy(() => {}, validator);
 
   /**
-   *
    * Hook to register a listener to force a render when the
    * subscribed field changes.
+   * @param {string} key
    */
   function useSubscription(key) {
     const [, forceRender] = useReducer((v) => v + 1, 0);
@@ -120,15 +123,16 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    *
    * This way, if updateAllStore({ name: 'John' }) is called,
    * the other fields of the store doesn't need to be notified.
+   * @param {any} newStore
    */
   function updateAllStore(newStore) {
     let fields = newStore;
 
-    if (typeof newStore === "function") fields = newStore(allStore);
+    if (typeof newStore === 'function') fields = newStore(allStore);
 
-    allStore = { ...allStore, ...fields };
+    allStore = {...allStore, ...fields};
     Object.keys(fields).forEach((field) =>
-      subscription.notify(`store.${field}`)
+      subscription.notify(`store.${field}`),
     );
   }
 
@@ -146,17 +150,20 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    * 1. Updates any field of the store
    * 2. Notifies to all the involved subscribers
    * 3. Calls the callback if defined
+   * @param {string} path
+   * @param {boolean} callCallback
+   * @return {any}
    */
   function updateField(path, callCallback = true) {
-    const fieldPath = Array.isArray(path) ? path : path.split(".");
+    const fieldPath = Array.isArray(path) ? path : path.split('.');
     const [firstKey] = fieldPath;
-    const isCb = callCallback && typeof allCallbacks[firstKey] === "function";
+    const isCb = callCallback && typeof allCallbacks[firstKey] === 'function';
     const prevValue = isCb ? getField(allStore, fieldPath) : undefined;
 
     return (newValue) => {
       let value = newValue;
 
-      if (typeof newValue === "function") {
+      if (typeof newValue === 'function') {
         value = newValue(getField(allStore, path));
       }
 
@@ -165,7 +172,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
 
       if (isCb) {
         allCallbacks[firstKey]({
-          path: fieldPath.join("."),
+          path: fieldPath.join('.'),
           value,
           prevValue,
           updateValue: updateField(path, false),
@@ -179,6 +186,8 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    *
    * When resetField(path) is called, the field of the store is
    * reset to the initial value.
+   * @param {string} path
+   * @return {function}
    */
   function resetField(path) {
     return () => updateField(path)(getField(initialStore, path));
@@ -190,7 +199,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    *
    * @returns {object} { Provider, useStore }
    */
-  return { Provider, useStore };
+  return {Provider, useStore};
 }
 
 // ##########################################################
@@ -198,14 +207,14 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
 // ##########################################################
 
 function getField(store, path) {
-  return (Array.isArray(path) ? path : path.split(".")).reduce(
-    (a, c) => a?.[c],
-    store
+  return (Array.isArray(path) ? path : path.split('.')).reduce(
+      (a, c) => a?.[c],
+      store,
   );
 }
 
 function setField(store = {}, [prop, ...rest], value) {
-  const newObj = Array.isArray(store) ? [...store] : { ...store };
+  const newObj = Array.isArray(store) ? [...store] : {...store};
   newObj[prop] = rest.length ? setField(store[prop], rest, value) : value;
   return newObj;
 }

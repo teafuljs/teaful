@@ -4,7 +4,7 @@ import "@babel/polyfill";
 
 import createStore from "../package/index";
 
-describe("Examples", () => {
+describe("Rerender", () => {
   test("should rerender ONLY Cart, CartPrice and AllStore after update cart.price", async () => {
     const { useStore } = createStore({
       cart: { price: 0, items: [] },

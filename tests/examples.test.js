@@ -1,5 +1,7 @@
 import React from "react";
-import { render, fireEvent, waitFor, screen } from "@testing-library/react";
+import { render, waitFor, screen } from "@testing-library/react";
+import userEvent from '@testing-library/user-event'
+
 import "@babel/polyfill";
 
 import createStore from "../package/index";
@@ -35,31 +37,31 @@ describe("Examples", () => {
     expect(screen.getByRole("heading").textContent).toBe("0");
 
     // Inc
-    fireEvent.click(screen.getByText("+"));
+    userEvent.click(screen.getByText("+"));
     await waitFor(() => screen.getByRole("heading"));
     expect(screen.getByRole("heading").textContent).toBe("1");
     expect(screen.getByTestId("number").textContent).toContain("1");
 
     // Inc again
-    fireEvent.click(screen.getByText("+"));
+    userEvent.click(screen.getByText("+"));
     await waitFor(() => screen.getByRole("heading"));
     expect(screen.getByRole("heading").textContent).toBe("2");
     expect(screen.getByTestId("number").textContent).toContain("2");
 
     // Dec
-    fireEvent.click(screen.getByText("-"));
+    userEvent.click(screen.getByText("-"));
     await waitFor(() => screen.getByRole("heading"));
     expect(screen.getByRole("heading").textContent).toBe("1");
     expect(screen.getByTestId("number").textContent).toContain("1");
 
     // Inc again
-    fireEvent.click(screen.getByText("+"));
+    userEvent.click(screen.getByText("+"));
     await waitFor(() => screen.getByRole("heading"));
     expect(screen.getByRole("heading").textContent).toBe("2");
     expect(screen.getByTestId("number").textContent).toContain("2");
 
     // Reset
-    fireEvent.click(screen.getByText("reset"));
+    userEvent.click(screen.getByText("reset"));
     await waitFor(() => screen.getByRole("heading"));
     expect(screen.getByRole("heading").textContent).toBe("0");
     expect(screen.getByTestId("number").textContent).toContain("0");
@@ -103,31 +105,31 @@ describe("Examples", () => {
     expect(screen.getByRole("heading").textContent).toBe("0");
 
     // Inc
-    fireEvent.click(screen.getByText("+"));
+    userEvent.click(screen.getByText("+"));
     await waitFor(() => screen.getByRole("heading"));
     expect(screen.getByRole("heading").textContent).toBe("1");
     expect(screen.getByTestId("number").textContent).toContain("1");
 
     // Inc again
-    fireEvent.click(screen.getByText("+"));
+    userEvent.click(screen.getByText("+"));
     await waitFor(() => screen.getByRole("heading"));
     expect(screen.getByRole("heading").textContent).toBe("2");
     expect(screen.getByTestId("number").textContent).toContain("2");
 
     // Dec
-    fireEvent.click(screen.getByText("-"));
+    userEvent.click(screen.getByText("-"));
     await waitFor(() => screen.getByRole("heading"));
     expect(screen.getByRole("heading").textContent).toBe("1");
     expect(screen.getByTestId("number").textContent).toContain("1");
 
     // Inc again
-    fireEvent.click(screen.getByText("+"));
+    userEvent.click(screen.getByText("+"));
     await waitFor(() => screen.getByRole("heading"));
     expect(screen.getByRole("heading").textContent).toBe("2");
     expect(screen.getByTestId("number").textContent).toContain("2");
 
     // Reset
-    fireEvent.click(screen.getByText("reset"));
+    userEvent.click(screen.getByText("reset"));
     await waitFor(() => screen.getByRole("heading"));
     expect(screen.getByRole("heading").textContent).toBe("0");
     expect(screen.getByTestId("number").textContent).toContain("0");
@@ -202,20 +204,18 @@ describe("Examples", () => {
     );
 
     // Add task
-    fireEvent.change(screen.getByRole("textbox"), {
-      target: { value: "New task" },
-    });
-    fireEvent.click(screen.getByText("Add"));
+    userEvent.type(screen.getByRole("textbox"), "New task");
+    userEvent.click(screen.getByText("Add"));
     expect(screen.getByTestId("todo").textContent).toContain("New task");
     expect(screen.getByTestId("done").textContent).not.toContain("New task");
 
     // Move to done
-    fireEvent.click(screen.getByText("Done"));
+    userEvent.click(screen.getByText("Done"));
     expect(screen.getByTestId("todo").textContent).not.toContain("New task");
     expect(screen.getByTestId("done").textContent).toContain("New task");
 
     // Move to todo
-    fireEvent.click(screen.getByText("Undone"));
+    userEvent.click(screen.getByText("Undone"));
     expect(screen.getByTestId("todo").textContent).toContain("New task");
     expect(screen.getByTestId("done").textContent).not.toContain("New task");
   });

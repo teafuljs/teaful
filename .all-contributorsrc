@@ -6,6 +6,16 @@
   "commit": false,
   "contributors": [
     {
+      "login": "aralroca",
+      "name": "Aral Roca Gomez",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/13313058?v=4",
+      "profile": "https://aralroca.com",
+      "contributions": [
+        "maintenance",
+        "code"
+      ]
+    },
+    {
       "login": "danielart",
       "name": "Danielo Artola",
       "avatar_url": "https://avatars.githubusercontent.com/u/4655428?v=4",

@@ -23,6 +23,15 @@
       "contributions": [
         "infra"
       ]
+    },
+    {
+      "login": "shinshin86",
+      "name": "Yuki Shindo",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8216064?v=4",
+      "profile": "https://shinshin86.com",
+      "contributions": [
+        "infra"
+      ]
     }
   ],
   "contributorsPerLine": 7,

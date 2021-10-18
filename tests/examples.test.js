@@ -1,14 +1,14 @@
-import React from "react";
-import { render, waitFor, screen } from "@testing-library/react";
-import userEvent from '@testing-library/user-event'
+import React from 'react';
+import { render, waitFor, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
-import "@babel/polyfill";
+import '@babel/polyfill';
 
-import createStore from "../package/index";
+import createStore from '../package/index';
 
-describe("Examples", () => {
-  test("should work with a counter", async () => {
-    const { useStore } = createStore({ count: 0 });
+describe('Examples', () => {
+  test('should work with a counter', async () => {
+    const { useStore, Provider } = createStore({ count: 0 });
 
     function Counter() {
       const [count, setCount, resetCount] = useStore.count();
@@ -28,47 +28,47 @@ describe("Examples", () => {
     }
 
     render(
-      <>
+      <Provider>
         <Counter />
         <DisplayCounter />
-      </>
+      </Provider>,
     );
 
-    expect(screen.getByRole("heading").textContent).toBe("0");
+    expect(screen.getByRole('heading').textContent).toBe('0');
 
     // Inc
-    userEvent.click(screen.getByText("+"));
-    await waitFor(() => screen.getByRole("heading"));
-    expect(screen.getByRole("heading").textContent).toBe("1");
-    expect(screen.getByTestId("number").textContent).toContain("1");
+    userEvent.click(screen.getByText('+'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('1');
+    expect(screen.getByTestId('number').textContent).toContain('1');
 
     // Inc again
-    userEvent.click(screen.getByText("+"));
-    await waitFor(() => screen.getByRole("heading"));
-    expect(screen.getByRole("heading").textContent).toBe("2");
-    expect(screen.getByTestId("number").textContent).toContain("2");
+    userEvent.click(screen.getByText('+'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('2');
+    expect(screen.getByTestId('number').textContent).toContain('2');
 
     // Dec
-    userEvent.click(screen.getByText("-"));
-    await waitFor(() => screen.getByRole("heading"));
-    expect(screen.getByRole("heading").textContent).toBe("1");
-    expect(screen.getByTestId("number").textContent).toContain("1");
+    userEvent.click(screen.getByText('-'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('1');
+    expect(screen.getByTestId('number').textContent).toContain('1');
 
     // Inc again
-    userEvent.click(screen.getByText("+"));
-    await waitFor(() => screen.getByRole("heading"));
-    expect(screen.getByRole("heading").textContent).toBe("2");
-    expect(screen.getByTestId("number").textContent).toContain("2");
+    userEvent.click(screen.getByText('+'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('2');
+    expect(screen.getByTestId('number').textContent).toContain('2');
 
     // Reset
-    userEvent.click(screen.getByText("reset"));
-    await waitFor(() => screen.getByRole("heading"));
-    expect(screen.getByRole("heading").textContent).toBe("0");
-    expect(screen.getByTestId("number").textContent).toContain("0");
+    userEvent.click(screen.getByText('reset'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('0');
+    expect(screen.getByTestId('number').textContent).toContain('0');
   });
 
-  test("should work with a counter: as a new value (not defined on the store)", async () => {
-    const { useStore } = createStore({ anotherValue: "" });
+  test('should work with a counter: as a new value (not defined on the store)', async () => {
+    const { useStore } = createStore({ anotherValue: '' });
 
     function Counter() {
       const [count, setCount, resetCount] = useStore.count();
@@ -84,7 +84,7 @@ describe("Examples", () => {
 
     function DisplayCounter() {
       const [anotherValue] = useStore.anotherValue(
-        "Should not be overwritted (only for initial values)"
+        'Should not be overwritted (only for initial values)',
       );
       const [count] = useStore.count(0); // initial value
       return (
@@ -99,46 +99,46 @@ describe("Examples", () => {
       <>
         <Counter />
         <DisplayCounter />
-      </>
+      </>,
     );
 
-    expect(screen.getByRole("heading").textContent).toBe("0");
+    expect(screen.getByRole('heading').textContent).toBe('0');
 
     // Inc
-    userEvent.click(screen.getByText("+"));
-    await waitFor(() => screen.getByRole("heading"));
-    expect(screen.getByRole("heading").textContent).toBe("1");
-    expect(screen.getByTestId("number").textContent).toContain("1");
+    userEvent.click(screen.getByText('+'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('1');
+    expect(screen.getByTestId('number').textContent).toContain('1');
 
     // Inc again
-    userEvent.click(screen.getByText("+"));
-    await waitFor(() => screen.getByRole("heading"));
-    expect(screen.getByRole("heading").textContent).toBe("2");
-    expect(screen.getByTestId("number").textContent).toContain("2");
+    userEvent.click(screen.getByText('+'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('2');
+    expect(screen.getByTestId('number').textContent).toContain('2');
 
     // Dec
-    userEvent.click(screen.getByText("-"));
-    await waitFor(() => screen.getByRole("heading"));
-    expect(screen.getByRole("heading").textContent).toBe("1");
-    expect(screen.getByTestId("number").textContent).toContain("1");
+    userEvent.click(screen.getByText('-'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('1');
+    expect(screen.getByTestId('number').textContent).toContain('1');
 
     // Inc again
-    userEvent.click(screen.getByText("+"));
-    await waitFor(() => screen.getByRole("heading"));
-    expect(screen.getByRole("heading").textContent).toBe("2");
-    expect(screen.getByTestId("number").textContent).toContain("2");
+    userEvent.click(screen.getByText('+'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('2');
+    expect(screen.getByTestId('number').textContent).toContain('2');
 
     // Reset
-    userEvent.click(screen.getByText("reset"));
-    await waitFor(() => screen.getByRole("heading"));
-    expect(screen.getByRole("heading").textContent).toBe("0");
-    expect(screen.getByTestId("number").textContent).toContain("0");
+    userEvent.click(screen.getByText('reset'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('0');
+    expect(screen.getByTestId('number').textContent).toContain('0');
 
     // Another value
-    expect(screen.getByTestId("anotherValue").textContent).toBe("");
+    expect(screen.getByTestId('anotherValue').textContent).toBe('');
   });
 
-  test("should work as a todo list", () => {
+  test('should work as a todo list', () => {
     const { useStore } = createStore({ todo: [], done: [] });
 
     function AddTodoTask() {
@@ -200,23 +200,23 @@ describe("Examples", () => {
       <>
         <AddTodoTask />
         <TodoList />
-      </>
+      </>,
     );
 
     // Add task
-    userEvent.type(screen.getByRole("textbox"), "New task");
-    userEvent.click(screen.getByText("Add"));
-    expect(screen.getByTestId("todo").textContent).toContain("New task");
-    expect(screen.getByTestId("done").textContent).not.toContain("New task");
+    userEvent.type(screen.getByRole('textbox'), 'New task');
+    userEvent.click(screen.getByText('Add'));
+    expect(screen.getByTestId('todo').textContent).toContain('New task');
+    expect(screen.getByTestId('done').textContent).not.toContain('New task');
 
     // Move to done
-    userEvent.click(screen.getByText("Done"));
-    expect(screen.getByTestId("todo").textContent).not.toContain("New task");
-    expect(screen.getByTestId("done").textContent).toContain("New task");
+    userEvent.click(screen.getByText('Done'));
+    expect(screen.getByTestId('todo').textContent).not.toContain('New task');
+    expect(screen.getByTestId('done').textContent).toContain('New task');
 
     // Move to todo
-    userEvent.click(screen.getByText("Undone"));
-    expect(screen.getByTestId("todo").textContent).toContain("New task");
-    expect(screen.getByTestId("done").textContent).not.toContain("New task");
+    userEvent.click(screen.getByText('Undone'));
+    expect(screen.getByTestId('todo').textContent).toContain('New task');
+    expect(screen.getByTestId('done').textContent).not.toContain('New task');
   });
 });

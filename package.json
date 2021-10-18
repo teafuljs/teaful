@@ -7,7 +7,7 @@
   "module": "dist/index.module.js",
   "unpkg": "dist/index.umd.js",
   "scripts": {
-    "format": "npx prettier --write package tests",
+    "lint": "npx eslint --fix package tests ",
     "test": "jest",
     "test:watch": "jest --watch",
     "build": "microbundle --jsx React.createElement",
@@ -40,6 +40,9 @@
     "@testing-library/react": "12.1.2",
     "@testing-library/user-event": "^13.4.1",
     "babel-jest": "27.2.5",
+    "eslint": "^8.0.1",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-react": "^7.26.1",
     "jest": "27.2.5",
     "microbundle": "0.14.0",
     "react": "17.0.2",

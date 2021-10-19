@@ -250,7 +250,10 @@ describe("Callbacks", () => {
 
   test("Updating the prevValue should work as limit | via createStore", () => {
     const cart = ({ path, prevValue, value, updateValue }) => {
-      if (path === "cart.price" && value > 4) {
+      if (
+        (path === "cart.price" && value > 4) ||
+        (path === "cart" && value.price > 4)
+      ) {
         updateValue(prevValue);
       }
     };
@@ -259,8 +262,15 @@ describe("Callbacks", () => {
 
     function Test() {
       const [price, setPrice] = useStore.cart.price();
+      const [, setCart] = useStore.cart();
+
+      const onClick = () => {
+        if (price % 2 === 0) return setPrice((v) => v + 1);
+        setCart((c) => ({ ...c, price: c.price + 1 }));
+      };
+
       return (
-        <button data-testid="click" onClick={() => setPrice((v) => v + 1)}>
+        <button data-testid="click" onClick={onClick}>
           {price}
         </button>
       );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { act } from "react-dom/test-utils";
@@ -246,6 +246,98 @@ describe("Callbacks", () => {
       times: 2,
       path: "username",
     });
+  });
+
+  test("Updating the prevValue should work as limit | via createStore", () => {
+    const cart = ({ path, prevValue, value, updateValue }) => {
+      if (path === "cart.price" && value > 4) {
+        updateValue(prevValue);
+      }
+    };
+    const initialStore = { cart: { price: 0 } };
+    const { useStore } = createStore(initialStore, { cart });
+
+    function Test() {
+      const [price, setPrice] = useStore.cart.price();
+      return (
+        <button data-testid="click" onClick={() => setPrice((v) => v + 1)}>
+          {price}
+        </button>
+      );
+    }
+
+    render(<Test />);
+
+    const btn = screen.getByTestId("click");
+    expect(btn.textContent).toBe("0");
+    userEvent.click(btn);
+    expect(btn.textContent).toBe("1");
+    userEvent.click(btn);
+    expect(btn.textContent).toBe("2");
+    userEvent.click(btn);
+    expect(btn.textContent).toBe("3");
+    userEvent.click(btn);
+    expect(btn.textContent).toBe("4");
+
+    // No more than 4 (logic inside callback)
+    userEvent.click(btn);
+    expect(btn.textContent).toBe("4");
+    userEvent.click(btn);
+    expect(btn.textContent).toBe("4");
+  });
+
+  test("Updating the prevValue should work as limit | via Provider + updating state", () => {
+    const initialStore = { cart: { price: 0 } };
+    const { useStore, Provider } = createStore(initialStore);
+
+    function Test({ displayText }) {
+      const [price, setPrice] = useStore.cart.price();
+
+      return (
+        <button data-testid="click" onClick={() => setPrice((v) => v + 1)}>
+          {displayText ? "No more than 4!! :)" : price}
+        </button>
+      );
+    }
+
+    function TestApp() {
+      const [displayText, setDisplayText] = useState(false);
+
+      function cart({ path, prevValue, value, updateValue }) {
+        if (path !== "cart.price") return;
+        if (value > 4) {
+          updateValue(prevValue);
+          setDisplayText(true);
+        } else {
+          setDisplayText(false);
+        }
+      }
+
+      return (
+        <Provider callbacks={{ cart }}>
+          <Test displayText={displayText} />
+        </Provider>
+      );
+    }
+
+    render(<TestApp />);
+
+    const btn = screen.getByTestId("click");
+    expect(btn.textContent).toBe("0");
+    userEvent.click(btn);
+    expect(btn.textContent).toBe("1");
+    userEvent.click(btn);
+    expect(btn.textContent).toBe("2");
+    userEvent.click(btn);
+    expect(btn.textContent).toBe("3");
+    userEvent.click(btn);
+    expect(btn.textContent).toBe("4");
+
+    // No more than 4 (logic inside callback)
+    userEvent.click(btn);
+    expect(btn.textContent).toBe("No more than 4!! :)");
+    userEvent.click(btn);
+    expect(btn.textContent).toBe("No more than 4!! :)");
   });
 });
 

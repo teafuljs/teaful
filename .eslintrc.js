@@ -13,17 +13,32 @@ module.exports = {
     'ecmaFeatures': {
       'jsx': true,
     },
-    'ecmaVersion': 13,
+    'ecmaVersion': 2020,
     'sourceType': 'module',
   },
   'plugins': [
     'react',
+    'react-hooks',
+    'testing-library',
+    'jest'
   ],
   'rules': {
     'require-jsdoc': 0,
     'max-len': [
       'error',
       { 'code': 95 },
+    ],
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: 'react',
+            importNames: ['default'],
+            message: 'React default is automatically imported by webpack.',
+          },
+        ],
+      },
     ],
   },
 };

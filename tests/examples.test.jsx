@@ -1,5 +1,4 @@
-import React from 'react';
-import { render, waitFor, screen } from '@testing-library/react';
+import {render, waitFor, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import '@babel/polyfill';
@@ -8,7 +7,7 @@ import createStore from '../package/index';
 
 describe('Examples', () => {
   test('should work with a counter', async () => {
-    const { useStore, Provider } = createStore({ count: 0 });
+    const {useStore, Provider} = createStore({count: 0});
 
     function Counter() {
       const [count, setCount, resetCount] = useStore.count();
@@ -28,10 +27,10 @@ describe('Examples', () => {
     }
 
     render(
-      <Provider>
-        <Counter />
-        <DisplayCounter />
-      </Provider>,
+        <Provider>
+          <Counter />
+          <DisplayCounter />
+        </Provider>,
     );
 
     expect(screen.getByRole('heading').textContent).toBe('0');
@@ -68,7 +67,7 @@ describe('Examples', () => {
   });
 
   test('should work with a counter: as a new value (not defined on the store)', async () => {
-    const { useStore } = createStore({ anotherValue: '' });
+    const {useStore} = createStore({anotherValue: ''});
 
     function Counter() {
       const [count, setCount, resetCount] = useStore.count();
@@ -84,7 +83,7 @@ describe('Examples', () => {
 
     function DisplayCounter() {
       const [anotherValue] = useStore.anotherValue(
-        'Should not be overwritted (only for initial values)',
+          'Should not be overwritted (only for initial values)',
       );
       const [count] = useStore.count(0); // initial value
       return (
@@ -96,10 +95,10 @@ describe('Examples', () => {
     }
 
     render(
-      <>
-        <Counter />
-        <DisplayCounter />
-      </>,
+        <>
+          <Counter />
+          <DisplayCounter />
+        </>,
     );
 
     expect(screen.getByRole('heading').textContent).toBe('0');
@@ -139,7 +138,7 @@ describe('Examples', () => {
   });
 
   test('should work as a todo list', () => {
-    const { useStore } = createStore({ todo: [], done: [] });
+    const {useStore} = createStore({todo: [], done: []});
 
     function AddTodoTask() {
       const [todo, setTodo] = useStore.todo();
@@ -197,10 +196,10 @@ describe('Examples', () => {
     }
 
     render(
-      <>
-        <AddTodoTask />
-        <TodoList />
-      </>,
+        <>
+          <AddTodoTask />
+          <TodoList />
+        </>,
     );
 
     // Add task

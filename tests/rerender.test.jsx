@@ -1,5 +1,6 @@
-import React from 'react';
-import {render, fireEvent, screen} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
 import '@babel/polyfill';
 
 import createStore from '../package/index';
@@ -68,7 +69,7 @@ describe('Rerender', () => {
         expect(renderCartItems).toHaveBeenCalledTimes(1);
         expect(renderAllStore).toHaveBeenCalledTimes(1);
 
-        fireEvent.click(screen.getByTestId('inc'));
+        userEvent.click(screen.getByTestId('inc'));
 
         // After update
         expect(renderUsername).toHaveBeenCalledTimes(1);

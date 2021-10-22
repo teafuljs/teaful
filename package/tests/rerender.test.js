@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 
 import '@babel/polyfill';
 
-import createStore from '../package/index';
+import createStore from '../index';
 
 describe('Rerender', () => {
   test('should rerender ONLY Cart, CartPrice and AllStore after update cart.price',

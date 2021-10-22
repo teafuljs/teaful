@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 
 import '@babel/polyfill';
 
-import createStore from '../package/index';
+import createStore from '../index';
 
 describe('Examples', () => {
-  test('should work with a counter', async () => {
-    const {useStore, Provider} = createStore({count: 0});
+  it('should work with a counter', async () => {
+    const {useStore, Store} = createStore({count: 0});
 
     function Counter() {
       const [count, setCount, resetCount] = useStore.count();
@@ -27,10 +27,10 @@ describe('Examples', () => {
     }
 
     render(
-        <Provider>
+        <Store>
           <Counter />
           <DisplayCounter />
-        </Provider>,
+        </Store>,
     );
 
     expect(screen.getByRole('heading').textContent).toBe('0');
@@ -66,78 +66,79 @@ describe('Examples', () => {
     expect(screen.getByTestId('number').textContent).toContain('0');
   });
 
-  test('should work with a counter: as a new value (not defined on the store)', async () => {
-    const {useStore} = createStore({anotherValue: ''});
+  it('should work with a counter: as a new value (not defined on the store)',
+      async () => {
+        const {useStore} = createStore({anotherValue: ''});
 
-    function Counter() {
-      const [count, setCount, resetCount] = useStore.count();
-      return (
-        <div>
-          <h1>{count}</h1>
-          <button onClick={() => setCount((v) => v + 1)}>+</button>
-          <button onClick={() => setCount((v) => v - 1)}>-</button>
-          <button onClick={resetCount}>reset</button>
-        </div>
-      );
-    }
+        function Counter() {
+          const [count, setCount, resetCount] = useStore.count();
+          return (
+            <div>
+              <h1>{count}</h1>
+              <button onClick={() => setCount((v) => v + 1)}>+</button>
+              <button onClick={() => setCount((v) => v - 1)}>-</button>
+              <button onClick={resetCount}>reset</button>
+            </div>
+          );
+        }
 
-    function DisplayCounter() {
-      const [anotherValue] = useStore.anotherValue(
-          'Should not be overwritted (only for initial values)',
-      );
-      const [count] = useStore.count(0); // initial value
-      return (
-        <>
-          <p data-testid="number">{count}</p>
-          <p data-testid="anotherValue">{anotherValue}</p>
-        </>
-      );
-    }
+        function DisplayCounter() {
+          const [anotherValue] = useStore.anotherValue(
+              'Should not be overwritted (only for initial values)',
+          );
+          const [count] = useStore.count(0); // initial value
+          return (
+            <>
+              <p data-testid="number">{count}</p>
+              <p data-testid="anotherValue">{anotherValue}</p>
+            </>
+          );
+        }
 
-    render(
-        <>
-          <Counter />
-          <DisplayCounter />
-        </>,
-    );
+        render(
+            <>
+              <Counter />
+              <DisplayCounter />
+            </>,
+        );
 
-    expect(screen.getByRole('heading').textContent).toBe('0');
+        expect(screen.getByRole('heading').textContent).toBe('0');
 
-    // Inc
-    userEvent.click(screen.getByText('+'));
-    await waitFor(() => screen.getByRole('heading'));
-    expect(screen.getByRole('heading').textContent).toBe('1');
-    expect(screen.getByTestId('number').textContent).toContain('1');
+        // Inc
+        userEvent.click(screen.getByText('+'));
+        await waitFor(() => screen.getByRole('heading'));
+        expect(screen.getByRole('heading').textContent).toBe('1');
+        expect(screen.getByTestId('number').textContent).toContain('1');
 
-    // Inc again
-    userEvent.click(screen.getByText('+'));
-    await waitFor(() => screen.getByRole('heading'));
-    expect(screen.getByRole('heading').textContent).toBe('2');
-    expect(screen.getByTestId('number').textContent).toContain('2');
+        // Inc again
+        userEvent.click(screen.getByText('+'));
+        await waitFor(() => screen.getByRole('heading'));
+        expect(screen.getByRole('heading').textContent).toBe('2');
+        expect(screen.getByTestId('number').textContent).toContain('2');
 
-    // Dec
-    userEvent.click(screen.getByText('-'));
-    await waitFor(() => screen.getByRole('heading'));
-    expect(screen.getByRole('heading').textContent).toBe('1');
-    expect(screen.getByTestId('number').textContent).toContain('1');
+        // Dec
+        userEvent.click(screen.getByText('-'));
+        await waitFor(() => screen.getByRole('heading'));
+        expect(screen.getByRole('heading').textContent).toBe('1');
+        expect(screen.getByTestId('number').textContent).toContain('1');
 
-    // Inc again
-    userEvent.click(screen.getByText('+'));
-    await waitFor(() => screen.getByRole('heading'));
-    expect(screen.getByRole('heading').textContent).toBe('2');
-    expect(screen.getByTestId('number').textContent).toContain('2');
+        // Inc again
+        userEvent.click(screen.getByText('+'));
+        await waitFor(() => screen.getByRole('heading'));
+        expect(screen.getByRole('heading').textContent).toBe('2');
+        expect(screen.getByTestId('number').textContent).toContain('2');
 
-    // Reset
-    userEvent.click(screen.getByText('reset'));
-    await waitFor(() => screen.getByRole('heading'));
-    expect(screen.getByRole('heading').textContent).toBe('0');
-    expect(screen.getByTestId('number').textContent).toContain('0');
+        // Reset
+        userEvent.click(screen.getByText('reset'));
+        await waitFor(() => screen.getByRole('heading'));
+        expect(screen.getByRole('heading').textContent).toBe('0');
+        expect(screen.getByTestId('number').textContent).toContain('0');
 
-    // Another value
-    expect(screen.getByTestId('anotherValue').textContent).toBe('');
-  });
+        // Another value
+        expect(screen.getByTestId('anotherValue').textContent).toBe('');
+      });
 
-  test('should work as a todo list', () => {
+  it('should work as a todo list', () => {
     const {useStore} = createStore({todo: [], done: []});
 
     function AddTodoTask() {

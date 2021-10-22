@@ -9,29 +9,29 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
   let allCallbacks = defaultCallbacks;
 
   /**
-   * Provider of the store
+   * Store of the store
    *
    * @example
    *
    * // Default usage
-   * const { Provider } = createStore({ count: 0 })
+   * const { Store } = createStore({ count: 0 })
    * // ...
-   * <Provider>{children}</Provider>
+   * <Store>{children}</Store>
    *
-   * // Creating the default store in the Provider
-   * const { Provider } = createStore()
+   * // Creating the default store in the Store
+   * const { Store } = createStore()
    * // ...
-   * <Provider store={{ count: 0 }}>{children}</Provider>
+   * <Store store={{ count: 0 }}>{children}</Store>
    *
    * // Defining callbacks
-   * const { Provider } = createStore({ count: 0 })
+   * const { Store } = createStore({ count: 0 })
    * // ...
-   * <Provider callbacks={{ count: (v) => console.log(v) }}>
+   * <Store callbacks={{ count: (v) => console.log(v) }}>
    *  {children}
-   * </Provider>
+   * </Store>
    * @return {React.ReactNode} children
    */
-  function Provider({store = {}, callbacks = {}, children}) {
+  function Store({store = {}, callbacks = {}, children}) {
     const initialized = useRef();
 
     if (!initialized.current) {
@@ -68,7 +68,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
     discard: new Set(['prototype', 'isReactComponent']),
     get(_, path) {
       if (!this.discard.has(path)) this.path.push(path);
-      return new Proxy(() => {}, validator);
+      return new Proxy(() => { }, validator);
     },
     apply(t, _, args) {
       const path = this.path.slice();
@@ -102,7 +102,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       return [value, update, resetField(prop)];
     },
   };
-  const useStore = new Proxy(() => {}, validator);
+  const useStore = new Proxy(() => { }, validator);
 
   /**
    * Hook to register a listener to force a render when the
@@ -194,12 +194,12 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
   }
 
   /**
-   * createStore function returns the Provider component with the
+   * createStore function returns the Store component with the
    * useStore hook.
    *
-   * @returns {object} { Provider, useStore }
+   * @returns {object} { Store, useStore }
    */
-  return {Provider, useStore};
+  return {Store, useStore};
 }
 
 // ##########################################################

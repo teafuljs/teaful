@@ -1,13 +1,19 @@
 {
   "name": "fragstore",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Small library to manage the (P)React state",
   "source": "package/index.js",
   "main": "dist/index.js",
-  "module": "dist/index.module.js",
-  "unpkg": "dist/index.umd.js",
+  "umd:main": "dist/index.umd.js",
+  "module": "dist/index.m.js",
+  "exports": {
+    "require": "./dist/index.js",
+    "default": "./dist/index.modern.js"
+  },
+  "types": "dist/index.d.ts" ,
   "scripts": {
-    "lint": "npx eslint --fix package tests",
+    "lint": "eslint ./package",
+    "format": "eslint --fix ./package",
     "test": "jest",
     "test:watch": "jest --watch",
     "build": "microbundle --jsx React.createElement",

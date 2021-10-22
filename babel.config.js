@@ -1,15 +1,15 @@
 module.exports = {
   presets: [
     [
-      "@babel/preset-env",
+      '@babel/preset-env',
       {
         shippedProposals: true,
         targets: {
-          node: "current",
+          node: 'current',
         },
       },
     ],
-    ["@babel/preset-react", { runtime: "automatic" }],
+    ['@babel/preset-react', {runtime: 'automatic'}],
   ],
   plugins: [],
 };

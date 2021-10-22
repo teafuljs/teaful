@@ -46,23 +46,23 @@ npm install fragstore --save
 ```
 
 ## Usage:
-### Provider
+### Store
 
-The `Provider` is required for any of its child components to consume the store.
+The `Store` is required for any of its child components to consume the store.
 
 ```js
 import createStore from "fragstore";
 
-const { Provider } = createStore({
+const { Store } = createStore({
   username: "Aral",
   age: 31
 });
 
 function App() {
   return (
-    <Provider>
+    <Store>
      {/* rest */} 
-    </Provider>
+    </Store>
   );
 }
 ```
@@ -133,22 +133,22 @@ function UnfragmentedExample() {
 
 There are 3 ways to add a new property to the store:
 
-#### 1. Adding a new property on the Provider
+#### 1. Adding a new property on the Store
 
 ```js
 import createStore from "fragstore";
 
-const { Provider } = createStore({ username: "Aral" });
+const { Store } = createStore({ username: "Aral" });
 
 function App() {
-  return <Provider store={{ count: 0 }}>{/* rest */}</Provider>;
+  return <Store store={{ count: 0 }}>{/* rest */}</Store>;
 }
 ```
 
 #### 2. Using the `useStore` to consume to a new property
 
 ```js
-const { Provider } = createStore({ username: "Aral" });
+const { Store } = createStore({ username: "Aral" });
 // ...
 const [newProp, setNewProp] = useStore.newProp("Initial value of newProp")
 const [anotherProp, setAnotherProp] = useStore.anotherProp()
@@ -157,10 +157,10 @@ setAnotherProp("Initial value of anotherProp")
 setNewProp("Next value of newProp")
 ```
 
-The hook argument works to define the initial value. It doesn't work when the initial value is already defined in `createStore` or `Provider`:
+The hook argument works to define the initial value. It doesn't work when the initial value is already defined in `createStore` or `Store`:
 
 ```js
-const { Provider } = createStore({ username: "Aral" });
+const { Store } = createStore({ username: "Aral" });
 // ...
 const [username, setUsername] = useStore.username("Another name")
 console.log(username) // -> Aral
@@ -220,13 +220,13 @@ const callbacks = {
   }
 }
 
-const { Provider, useQuantity } = createStore(initialState, callbacks)
+const { Store, useQuantity } = createStore(initialState, callbacks)
 ```
 
-Also you can overwrite or define callbacks on the `Provider`:
+Also you can overwrite or define callbacks on the `Store`:
 
 ```js
-<Provider 
+<Store 
   store={{ newProperty: 'Another value'}} 
   callbacks={{ 
     newProperty(value) {
@@ -240,7 +240,7 @@ Also you can overwrite or define callbacks on the `Provider`:
 ```js
 import createStore from "fragstore";
 
-const { Provider, useStore } = createStore({
+const { Store, useStore } = createStore({
   username: "Aral",
   age: 31,
   cart: {
@@ -251,14 +251,14 @@ const { Provider, useStore } = createStore({
 
 export default function App() {
   return (
-    <Provider>
+    <Store>
       <AllStore />
       <Username />
       <CartPrice />
       <CartFirstItem />
       <Age />
       <NewProperty />
-    </Provider>
+    </Store>
   );
 }
 

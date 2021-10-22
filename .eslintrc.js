@@ -20,13 +20,14 @@ module.exports = {
     'react',
     'react-hooks',
     'testing-library',
-    'jest'
+    'jest',
   ],
   'rules': {
     'require-jsdoc': 0,
+    'react/prop-types': 0,
     'max-len': [
       'error',
-      { 'code': 95 },
+      {'code': 80, 'ignoreStrings': true},
     ],
     'no-restricted-imports': [
       'error',

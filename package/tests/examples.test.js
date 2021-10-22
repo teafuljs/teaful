@@ -6,7 +6,7 @@ import '@babel/polyfill';
 import createStore from '../index';
 
 describe('Examples', () => {
-  test('should work with a counter', async () => {
+  it('should work with a counter', async () => {
     const {useStore, Store} = createStore({count: 0});
 
     function Counter() {
@@ -66,7 +66,7 @@ describe('Examples', () => {
     expect(screen.getByTestId('number').textContent).toContain('0');
   });
 
-  test('should work with a counter: as a new value (not defined on the store)',
+  it('should work with a counter: as a new value (not defined on the store)',
       async () => {
         const {useStore} = createStore({anotherValue: ''});
 
@@ -138,7 +138,7 @@ describe('Examples', () => {
         expect(screen.getByTestId('anotherValue').textContent).toBe('');
       });
 
-  test('should work as a todo list', () => {
+  it('should work as a todo list', () => {
     const {useStore} = createStore({todo: [], done: []});
 
     function AddTodoTask() {

@@ -8,7 +8,7 @@ import '@babel/polyfill';
 import createStore from '../index';
 
 describe('Callbacks', () => {
-  test('should work via createStore', () => {
+  it('should work via createStore', () => {
     const cart = jest.fn();
     const username = jest.fn();
     const callbacks = {cart, username};
@@ -65,7 +65,7 @@ describe('Callbacks', () => {
     });
   });
 
-  test('should work via Store', () => {
+  it('should work via Store', () => {
     const cart = jest.fn();
     const username = jest.fn();
     const callbacks = {cart, username};
@@ -126,7 +126,7 @@ describe('Callbacks', () => {
     });
   });
 
-  test('Should be possible to overwrite only ONE callback from createStore using the Store', () => {
+  it('Should be possible to overwrite only ONE callback from createStore using the Store', () => {
     const cart = jest.fn();
     const username = jest.fn();
     const initialStore = {cart: {price: 0, items: []}, username: 'Aral'};
@@ -186,7 +186,7 @@ describe('Callbacks', () => {
     });
   });
 
-  test('Updating again the value inside the callback should not call again the callback', () => {
+  it('Updating again the value inside the callback should not call again the callback', () => {
     const cart = jest.fn();
     const username = jest.fn();
     const callbacks = {cart, username};
@@ -248,7 +248,7 @@ describe('Callbacks', () => {
     });
   });
 
-  test('Updating the prevValue should work as limit | via createStore', () => {
+  it('Updating the prevValue should work as limit | via createStore', () => {
     const cart = ({path, prevValue, value, updateValue}) => {
       if (
         (path === 'cart.price' && value > 4) ||
@@ -296,7 +296,7 @@ describe('Callbacks', () => {
     expect(btn.textContent).toBe('4');
   });
 
-  test('Updating the prevValue should work as limit | via Store + updating state', () => {
+  it('Updating the prevValue should work as limit | via Store + updating state', () => {
     const initialStore = {cart: {price: 0}};
     const {useStore, Store} = createStore(initialStore);
 

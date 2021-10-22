@@ -12,7 +12,8 @@
   },
   "types": "dist/index.d.ts" ,
   "scripts": {
-    "lint": "eslint --fix ./package",
+    "lint": "eslint ./package",
+    "format": "eslint --fix ./package",
     "test": "jest",
     "test:watch": "jest --watch",
     "build": "microbundle --jsx React.createElement",

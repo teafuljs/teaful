@@ -24,7 +24,7 @@ Fragstore
 
 <a href="https://twitter.com/intent/follow?screen_name=aralroca">
 <img src="https://img.shields.io/twitter/follow/aralroca?style=social&logo=twitter"
-            alt="follow on Twitter"></a>
+            alt="follow me on Twitter"></a>
 
 </div>
 

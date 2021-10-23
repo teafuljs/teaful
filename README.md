@@ -48,19 +48,19 @@ npm install fragstore --save
 ## Usage:
 ### Store
 
-The `Store` is required for any of its child components to consume the store.
+The `Store` is an optional component where you can send the same parameters than the `createStore`. Sometimes can be useful, for example, when the initial store is defined by an API, or also if you want to change some component state (not store) after some callback.
 
 ```js
 import createStore from "fragstore";
 
-const { Store } = createStore({
-  username: "Aral",
-  age: 31
-});
+const { Store } = createStore();
 
 function App() {
   return (
-    <Store>
+    <Store store={{ 
+      username: "Aral",
+      age: 31,
+    }}>
      {/* rest */} 
     </Store>
   );

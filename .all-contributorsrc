@@ -32,6 +32,15 @@
       "contributions": [
         "infra"
       ]
+    },
+    {
+      "login": "dididy",
+      "name": "YONGJAE LEE(이용재)",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16266103?v=4",
+      "profile": "https://github.com/dididy",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

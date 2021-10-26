@@ -202,6 +202,74 @@ describe('Examples', () => {
         // Another value
         expect(screen.getByTestId('anotherValue').textContent).toBe('');
       });
+  it('should work with a counter in a class component: as a new value (not defined on the store)',
+      async () => {
+        const {useStore, withStore} = createStore();
+
+        class Counter extends Component {
+          // Forcing update to verify that the initial value is not overwritten
+          componentDidMount() {
+            this.forceUpdate();
+          }
+          render() {
+            const [count, setCount, resetCount] = this.props.store;
+            return (
+              <div>
+                <h1>{count}</h1>
+                <button onClick={() => setCount((v) => v + 1)}>+</button>
+                <button onClick={() => setCount((v) => v - 1)}>-</button>
+                <button onClick={resetCount}>reset</button>
+              </div>
+            );
+          }
+        }
+
+        const CounterWithStore = withStore.counter.count(Counter, 0);
+
+        function DisplayCounter() {
+          const [count] = useStore.counter.count();
+          return <p data-testid="number">{count}</p>;
+        }
+
+        render(
+            <>
+              <CounterWithStore />
+              <DisplayCounter />
+            </>,
+        );
+
+        expect(screen.getByRole('heading').textContent).toBe('0');
+
+        // Inc
+        userEvent.click(screen.getByText('+'));
+        await waitFor(() => screen.getByRole('heading'));
+        expect(screen.getByRole('heading').textContent).toBe('1');
+        expect(screen.getByTestId('number').textContent).toContain('1');
+
+        // Inc again
+        userEvent.click(screen.getByText('+'));
+        await waitFor(() => screen.getByRole('heading'));
+        expect(screen.getByRole('heading').textContent).toBe('2');
+        expect(screen.getByTestId('number').textContent).toContain('2');
+
+        // Dec
+        userEvent.click(screen.getByText('-'));
+        await waitFor(() => screen.getByRole('heading'));
+        expect(screen.getByRole('heading').textContent).toBe('1');
+        expect(screen.getByTestId('number').textContent).toContain('1');
+
+        // Inc again
+        userEvent.click(screen.getByText('+'));
+        await waitFor(() => screen.getByRole('heading'));
+        expect(screen.getByRole('heading').textContent).toBe('2');
+        expect(screen.getByTestId('number').textContent).toContain('2');
+
+        // Reset
+        userEvent.click(screen.getByText('reset'));
+        await waitFor(() => screen.getByRole('heading'));
+        expect(screen.getByRole('heading').textContent).toBe('0');
+        expect(screen.getByTestId('number').textContent).toContain('0');
+      });
 
   it('should work as a todo list', () => {
     const {useStore} = createStore({todo: [], done: []});

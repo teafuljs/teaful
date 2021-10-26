@@ -80,14 +80,14 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
     },
     apply(getMode, _, args) {
       const mode = getMode();
-      const param = args[mode === MODE_WITH ? 1 : 0];
+      const param = args[0];
       const path = this.path.slice();
       this.path = [];
 
       // MODE_WITH: withStore(Component)
       // MODE_WITH: withStore.cart.price(Component, 0)
       if (mode === MODE_WITH) {
-        return this.getHoC(args[0], path, param);
+        return this.getHoC(args[0], path, args[1]);
       }
 
       // ALL STORE (unfragmented):
@@ -116,6 +116,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       if (initializeValue) {
         value = param;
         initialStore = setField(initialStore, path, value);
+        allStore = setField(allStore, path, value);
       }
 
       // subscribe to the fragmented store

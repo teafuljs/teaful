@@ -61,14 +61,14 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    */
   const validator = {
     path: [],
-    subscribe(prop, value, update, initializeValue) {
-      useEffect(() => initializeValue && update(value), []);
-      useSubscription(prop ? `store.${prop}` : 'store');
-    },
-    getHoC(Comp, store, path, initializeValue) {
+    getHoC(Comp, path, initValue) {
       const componentName = Comp.displayName || Comp.name || 'Component';
       const WithStore = (props) => {
-        this.subscribe(path, store[0], store[1], initializeValue);
+        const last = path.length - 1;
+        const store = path.reduce(
+            (a, c, index) => index === last ? a[c](initValue) : a[c],
+            useStore,
+        );
         return <Comp {...props} store={store} />;
       };
       WithStore.displayName = `withStore(${componentName})`;
@@ -84,24 +84,19 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       const path = this.path.slice();
       this.path = [];
 
-      // .........................
+      // MODE_WITH: withStore(Component)
+      // MODE_WITH: withStore.cart.price(Component, 0)
+      if (mode === MODE_WITH) {
+        return this.getHoC(args[0], path, param);
+      }
+
       // ALL STORE (unfragmented):
-      // .........................
+      //
+      // MODE_GET: const [store, update, reset] = useStore()
+      // MODE_USE: const [store, update, reset] = getStore()
       if (path.length === 0) {
-        // subscribe to the store
-        if (mode === MODE_USE) this.subscribe();
-
-        const store = [allStore, updateAllStore, resetAllStore];
-
-        return mode === MODE_WITH ?
-         //
-         // MODE_WITH: withStore(Component)
-         this.getHoC(args[0], store) :
-         //
-         // MODE_USE: const [store, update, reset] = useStore()
-         //
-         // MODE_GET: const [store, update, reset] = getStore()
-         store;
+        if (mode === MODE_USE) useSubscription('store');
+        return [allStore, updateAllStore, resetAllStore];
       }
 
       // .................
@@ -125,23 +120,13 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
 
       // subscribe to the fragmented store
       if (mode === MODE_USE) {
-        this.subscribe(prop, value, update, initializeValue);
+        useEffect(() => initializeValue && update(value), []);
+        useSubscription(`store.${prop}`);
       }
 
-      const store = [value, update, reset];
-
-      return mode === MODE_WITH ?
-        //
-        // MODE_WITH: Similar to useStore but in a HoC
-        // withStore.cart.price(Component)
-        this.getHoC(args[0], store, prop, initializeValue) :
-        //
-        // MODE_USE: hook with subscription, rerender component after an update:
-        // const [price, setPrice, resetPrice] = useStore.cart.price()
-        //
-        // MODE_GET: without subscription, to use outside components:
-        // const [price, setPrice, resetPrice] = getStore.cart.price()
-        store;
+      // MODE_GET: const [price, setPrice] = useStore.cart.price()
+      // MODE_USE: const [price, setPrice] = getStore.cart.price()
+      return [value, update, reset];
     },
   };
   const useStore = new Proxy(() => MODE_USE, validator);

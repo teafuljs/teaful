@@ -1,3 +1,4 @@
+import {Component} from 'react';
 import {render, waitFor, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -31,6 +32,70 @@ describe('Examples', () => {
           <Counter />
           <DisplayCounter />
         </Store>,
+    );
+
+    expect(screen.getByRole('heading').textContent).toBe('0');
+
+    // Inc
+    userEvent.click(screen.getByText('+'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('1');
+    expect(screen.getByTestId('number').textContent).toContain('1');
+
+    // Inc again
+    userEvent.click(screen.getByText('+'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('2');
+    expect(screen.getByTestId('number').textContent).toContain('2');
+
+    // Dec
+    userEvent.click(screen.getByText('-'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('1');
+    expect(screen.getByTestId('number').textContent).toContain('1');
+
+    // Inc again
+    userEvent.click(screen.getByText('+'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('2');
+    expect(screen.getByTestId('number').textContent).toContain('2');
+
+    // Reset
+    userEvent.click(screen.getByText('reset'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('0');
+    expect(screen.getByTestId('number').textContent).toContain('0');
+  });
+
+  it('should work with a counter in a class component', async () => {
+    const {useStore, withStore} = createStore({count: 0});
+
+    class Counter extends Component {
+      render() {
+        const [count, setCount, resetCount] = this.props.store;
+        return (
+          <div>
+            <h1>{count}</h1>
+            <button onClick={() => setCount((v) => v + 1)}>+</button>
+            <button onClick={() => setCount((v) => v - 1)}>-</button>
+            <button onClick={resetCount}>reset</button>
+          </div>
+        );
+      }
+    }
+
+    const CounterWithStore = withStore.count(Counter);
+
+    function DisplayCounter() {
+      const [count] = useStore.count();
+      return <p data-testid="number">{count}</p>;
+    }
+
+    render(
+        <>
+          <CounterWithStore />
+          <DisplayCounter />
+        </>,
     );
 
     expect(screen.getByRole('heading').textContent).toBe('0');

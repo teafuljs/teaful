@@ -10,7 +10,15 @@
     "require": "./dist/index.js",
     "default": "./dist/index.modern.js"
   },
-  "types": "dist/index.d.ts" ,
+  "bundlewatch": {
+    "files": [
+      {
+        "path": "./dist/index.js",
+        "maxSize": "1 kB"
+      }
+    ]
+  },
+  "types": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint ./package",
     "format": "eslint --fix ./package",
@@ -46,6 +54,7 @@
     "@testing-library/react": "12.1.2",
     "@testing-library/user-event": "13.4.1",
     "babel-jest": "27.2.5",
+    "bundlewatch": "^0.3.2",
     "eslint": "7.32.0",
     "eslint-config-google": "0.14.0",
     "eslint-plugin-jest": "25.2.2",

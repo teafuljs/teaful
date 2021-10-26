@@ -65,10 +65,10 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       const componentName = Comp.displayName || Comp.name || 'Component';
       const WithStore = (props) => {
         const last = path.length - 1;
-        const store = path.reduce(
+        const store = path.length ? path.reduce(
             (a, c, index) => index === last ? a[c](initValue) : a[c],
             useStore,
-        );
+        ) : useStore(initValue);
         return <Comp {...props} store={store} />;
       };
       WithStore.displayName = `withStore(${componentName})`;
@@ -94,7 +94,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       //
       // MODE_GET: const [store, update, reset] = useStore()
       // MODE_USE: const [store, update, reset] = getStore()
-      if (path.length === 0) {
+      if (!path.length) {
         if (mode === MODE_USE) useSubscription('store');
         return [allStore, updateAllStore, resetAllStore];
       }

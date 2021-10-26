@@ -131,6 +131,150 @@ describe('Examples', () => {
     expect(screen.getByTestId('number').textContent).toContain('0');
   });
 
+  it('should work with a counter in a class component: with all store', async () => {
+    const {useStore, withStore} = createStore({count: 0});
+
+    class Counter extends Component {
+      render() {
+        const [store, setStore, resetStore] = this.props.store;
+        return (
+          <div>
+            <h1>{store.count}</h1>
+            <button
+              onClick={() => setStore((s) => ({...s, count: s.count + 1}))}
+            >
+              +
+            </button>
+            <button
+              onClick={() => setStore((s) => ({...s, count: s.count - 1}))}
+            >
+              -
+            </button>
+            <button onClick={resetStore}>reset</button>
+          </div>
+        );
+      }
+    }
+
+    const CounterWithStore = withStore(Counter);
+
+    function DisplayCounter() {
+      const [count] = useStore.count();
+      return <p data-testid="number">{count}</p>;
+    }
+
+    render(
+        <>
+          <CounterWithStore />
+          <DisplayCounter />
+        </>,
+    );
+
+    expect(screen.getByRole('heading').textContent).toBe('0');
+
+    // Inc
+    userEvent.click(screen.getByText('+'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('1');
+    expect(screen.getByTestId('number').textContent).toContain('1');
+
+    // Inc again
+    userEvent.click(screen.getByText('+'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('2');
+    expect(screen.getByTestId('number').textContent).toContain('2');
+
+    // Dec
+    userEvent.click(screen.getByText('-'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('1');
+    expect(screen.getByTestId('number').textContent).toContain('1');
+
+    // Inc again
+    userEvent.click(screen.getByText('+'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('2');
+    expect(screen.getByTestId('number').textContent).toContain('2');
+
+    // Reset
+    userEvent.click(screen.getByText('reset'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('0');
+    expect(screen.getByTestId('number').textContent).toContain('0');
+  });
+
+  it('should work with a counter in a class component: with all store defined inside Store', async () => {
+    const {useStore, withStore, Store} = createStore();
+
+    class Counter extends Component {
+      render() {
+        const [store, setStore, resetStore] = this.props.store;
+        return (
+          <div>
+            <h1>{store.count}</h1>
+            <button
+              onClick={() => setStore((s) => ({...s, count: s.count + 1}))}
+            >
+              +
+            </button>
+            <button
+              onClick={() => setStore((s) => ({...s, count: s.count - 1}))}
+            >
+              -
+            </button>
+            <button onClick={resetStore}>reset</button>
+          </div>
+        );
+      }
+    }
+
+    const CounterWithStore = withStore(Counter);
+
+    function DisplayCounter() {
+      const [count] = useStore.count();
+      return <p data-testid="number">{count}</p>;
+    }
+
+    render(
+        <Store store={{count: 0}}>
+          <CounterWithStore />
+          <DisplayCounter />
+        </Store>,
+    );
+
+    expect(screen.getByRole('heading').textContent).toBe('0');
+
+    // Inc
+    userEvent.click(screen.getByText('+'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('1');
+    expect(screen.getByTestId('number').textContent).toContain('1');
+
+    // Inc again
+    userEvent.click(screen.getByText('+'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('2');
+    expect(screen.getByTestId('number').textContent).toContain('2');
+
+    // Dec
+    userEvent.click(screen.getByText('-'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('1');
+    expect(screen.getByTestId('number').textContent).toContain('1');
+
+    // Inc again
+    userEvent.click(screen.getByText('+'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('2');
+    expect(screen.getByTestId('number').textContent).toContain('2');
+
+    // Reset
+    userEvent.click(screen.getByText('reset'));
+    await waitFor(() => screen.getByRole('heading'));
+    expect(screen.getByRole('heading').textContent).toBe('0');
+    expect(screen.getByTestId('number').textContent).toContain('0');
+  });
+
   it('should work with a counter: as a new value (not defined on the store)',
       async () => {
         const {useStore} = createStore({anotherValue: ''});

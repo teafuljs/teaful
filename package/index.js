@@ -139,7 +139,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    * @param {string} key
    */
   function useSubscription(key) {
-    let [, forceRender] = useReducer((v) => v + 1, 0);
+    let [, forceRender] = useReducer(() => ({}), 0);
 
     useEffect(() => {
       subscription._subscribe(key, forceRender);

@@ -1,5 +1,6 @@
 <h1 align="center">
-Fragstore
+<div><b>Fragstore</b></div>
+<small>Fragmented store</small>
 </h1>
 
 <p align="center">
@@ -7,46 +8,155 @@ Fragstore
 </p>
 
 <p align="center">
-    Tiny (~800 B), easy and simple (P)React <b>state management library</b>
+    Tiny, easy and powerful <b>React state management</b> library
 </p>
-<p align="center">
-    After a store update -> <b>only</b> components that use the <b>updated property</b> are rendered.
-</p>
+
 
 <div align="center">
 
 [![npm version](https://badge.fury.io/js/fragstore.svg)](https://badge.fury.io/js/fragstore)
 [![gzip size](https://img.badgesize.io/https://unpkg.com/fragstore?compression=gzip&label=gzip)](https://unpkg.com/fragstore)
+[![CI Status](https://github.com/aralroca/fragstore/actions/workflows/test.yml/badge.svg)](https://github.com/aralroca/fragstore/actions/workflows/test.yml)
+[![Maintenance Status](https://badgen.net/badge/maintenance/active/green)](https://github.com/aralroca/fragstore#maintenance-status)
+[![Weekly downloads](https://badgen.net/npm/dw/fragstore?color=blue)](https://www.npmjs.com/package/fragstore)
+[![GitHub Discussions: Chat With Us](https://badgen.net/badge/discussions/chat%20with%20us/purple)](https://github.com/aralroca/fragstore/discussions)
 [![PRs Welcome][badge-prwelcome]][prwelcome]
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 
-<a href="https://twitter.com/intent/follow?screen_name=aralroca">
-<img src="https://img.shields.io/twitter/follow/aralroca?style=social&logo=twitter"
-            alt="follow me on Twitter"></a>
 
 </div>
 
 [badge-prwelcome]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
 [prwelcome]: http://makeapullrequest.com
 
-## Getting started:
+## ✨ What advantages does it have?
 
-Install it with Yarn:
+<ul>
+    <li>📦 <b>Tiny</b>: Less than 1kb package to manage your state in React and Preact.</li>
+    <li>🌱 <b>Easy</b>: You don't need actions, reducers, selectors, connect, providers, etc. Everything can be done in the simplest and most comfortable way.</li>
+    <li>🚀 <b>Powerful</b>: When a store property is updated, only its components are re-rendered. It's not re-rendering components that use other store properties.</li>
+</ul>
 
-```
+<hr />
+
+## Content
+
+- [Installation](#installation)
+- [Init your store](#init-your-store)
+  - [createStore](#createstore)
+  - [How to export](#how-to-export)
+- [Manage the Store](#manage-the-store)
+  - [useStore hook](#todo)
+  - [getStore helper](#todo)
+  - [withStore HoC](#todo)
+  - [Store component](#store)
+- [Callbacks](#callbacks)
+- [How to...](@todo)
+  - [Add a new store property](#adding-new-properties-to-the-store)
+  - [Reset a store property](#todo)
+  - [Reset all the store](#todo)
+- [Demos](#demos)
+- [Contributors ✨](#contributors-)
+
+
+## Installation
+
+```sh
 yarn add fragstore
-```
-
-Or install it with Npm:
-
-```
+# or
 npm install fragstore --save
 ```
 
-## Usage:
+## Init your store
+
+Each store has to be created with the `createStore` function. This function returns all the methods that you can use to consume and update the store properties.
+
+### createStore
+
+```js
+import createStore from "fragstore";
+
+const { useStore } = createStore();
+```
+
+Or also with an initial store:
+
+```js
+const initialStore = { 
+  cart: { price: 0, items: [] }
+}
+const { useStore } = createStore(initialStore);
+```
+
+Or also with callbacks:
+
+```js
+const initialStore = { 
+  cart: { price: 0, items: [] }
+}
+const callbacks = { 
+  cart({ value }){ 
+    console.log('This callback is executed after a cart update')
+  }
+}
+const { useStore } = createStore(initialStore, callbacks);
+```
+
+_Input:_
+
+| name 	        | type 	            | required | description 	|
+|------	        |------	            |------ |-------------	|
+| `initialStore`  | `object<any>`    	| `false`      |Object with your initial store.          	|
+| `callbacks`     | `object<function>`| `false`      |Object with functions that are executed after each property change. If `cart.price` is changed is executed on `cart` callback (first level). See [here](#callbacks) more details about callbacks.           	|
+
+_Output:_
+
+| name 	    | type 	 | description 	| example |
+|------	    |------	 |-------------	|-----|
+| `useStore`  | `Proxy` | Proxy hook to consume and update store properties inside your components. Each time the value changes, the component is rendered again with the new value. | `const [price, setPrice] = useStore.cart.price()` |
+| `getStore`  | `Proxy` | Similar to `useStore` but without subscription. You can use it as a helper outside (or inside) components. Note that if the value changes, it does not cause a rerender.| `const [price, setPrice] = getStore.cart.price()` |
+| `withStore` | `Proxy` | HoC with `useStore` inside. Useful for components that are not functional.| `withStore.cart.price(MyComponent)`|
+| `Store`     | `Component` | If in the `createStore` you don't define the initial store or the callbacks you can do it later using this component. It is likely that you want the callbacks to change the internal logic of the component or anything else.| `<Store store={initialStore} callbacks={callbacks}>...</Store>`  |
+
+### How to export
+
+We recommend using this type of export:
+
+```js
+// ✅
+export const { 
+  useStore, 
+  getStore, 
+  withStore, 
+  Store 
+} = createStore({ cart: { price: 0, items: [] }});
+```
+
+This way you can import it with:
+
+```js
+// ✅
+import { useStore } from '../store
+```
+
+Avoid using a default export with all:
+
+```js
+// ❌
+export default createStore({ cart: { price: 0, items: [] }});
+```
+
+Because then you won't be able to do this:
+
+```js
+// ❌  It's not working well with proxies 
+import { useStore } from '../store
+```
+
+## Manage the Store:
 ### Store
 
 The `Store` is an optional component where you can send the same parameters than the `createStore`. Sometimes can be useful, for example, when the initial store is defined by an API, or also if you want to change some component state (not store) after some callback.

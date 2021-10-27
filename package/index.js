@@ -59,7 +59,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    * - withStore HoC proxy
    */
   let validator = {
-    path: [],
+    _path: [],
     _getHoC(Comp, path, initValue) {
       let componentName = Comp.displayName || Comp.name || 'Component';
       let WithStore = (props) => {
@@ -74,15 +74,15 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       return WithStore;
     },
     get(target, path) {
-      if (path === 'isReactComponent') return;
-      this.path.push(path);
+      if (path === 'prototype') return {};
+      this._path.push(path);
       return new Proxy(target, validator);
     },
     apply(getMode, _, args) {
       let mode = getMode();
       let param = args[0];
-      let path = this.path.slice();
-      this.path = [];
+      let path = this._path.slice();
+      this._path = [];
 
       // MODE_WITH: withStore(Component)
       // MODE_WITH: withStore.cart.price(Component, 0)

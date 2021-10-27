@@ -16,6 +16,7 @@ Fragstore
 <div align="center">
 
 [![npm version](https://badge.fury.io/js/fragstore.svg)](https://badge.fury.io/js/fragstore)
+[![gzip size](https://img.badgesize.io/https://unpkg.com/fragstore?compression=gzip&label=gzip)](https://unpkg.com/fragstore)
 [![PRs Welcome][badge-prwelcome]][prwelcome]
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)

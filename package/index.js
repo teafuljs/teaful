@@ -75,6 +75,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       return WithStore;
     },
     get(target, path) {
+      if (path === 'prototype') return;
       this._path.push(path);
       return new Proxy(target, validator);
     },
@@ -102,7 +103,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       // .................
       // FRAGMENTED STORE:
       // .................
-      let prop = path.join('.');
+      let prop = path.join(DOT);
       let update = updateField(prop);
       let reset = resetField(prop);
       let value = getField(allStore, prop);
@@ -185,7 +186,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    * @return {any}
    */
   function updateField(path, callCallback = true) {
-    let fieldPath = Array.isArray(path) ? path : path.split('.');
+    let fieldPath = Array.isArray(path) ? path : path.split(DOT);
     let [firstKey] = fieldPath;
     let isCb = callCallback && typeof allCallbacks[firstKey] === 'function';
     let prevValue = isCb ? getField(allStore, fieldPath) : undefined;
@@ -202,7 +203,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
 
       if (isCb) {
         allCallbacks[firstKey]({
-          path: fieldPath.join('.'),
+          path: fieldPath.join(DOT),
           value,
           prevValue,
           updateValue: updateField(path, false),
@@ -239,7 +240,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
 // ##########################################################
 
 function getField(store, path) {
-  return (Array.isArray(path) ? path : path.split('.')).reduce(
+  return (Array.isArray(path) ? path : path.split(DOT)).reduce(
       (a, c) => a?.[c],
       store,
   );

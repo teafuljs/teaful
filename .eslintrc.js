@@ -25,6 +25,7 @@ module.exports = {
   'rules': {
     'require-jsdoc': 0,
     'react/prop-types': 0,
+    'prefer-const': 0,
     'max-len': [
       'error',
       {'code': 80, 'ignoreStrings': true},

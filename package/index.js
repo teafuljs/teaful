@@ -1,12 +1,11 @@
 import {useEffect, useReducer, useRef} from 'react';
 
-const MODE_GET = 1;
-const MODE_USE = 2;
-const MODE_WITH = 3;
-const DISCARD = new Set(['prototype', 'isReactComponent']);
+let MODE_GET = 1;
+let MODE_USE = 2;
+let MODE_WITH = 3;
 
 export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
-  const subscription = createSubscription();
+  let subscription = createSubscription();
 
   // Initialize the store and callbacks
   let allStore = defaultStore;
@@ -19,17 +18,17 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    * @example
    *
    * // Default usage
-   * const { Store } = createStore({ count: 0 })
+   * let { Store } = createStore({ count: 0 })
    * // ...
    * <Store>{children}</Store>
    *
    * // Creating the default store in the Store
-   * const { Store } = createStore()
+   * let { Store } = createStore()
    * // ...
    * <Store store={{ count: 0 }}>{children}</Store>
    *
    * // Defining callbacks
-   * const { Store } = createStore({ count: 0 })
+   * let { Store } = createStore({ count: 0 })
    * // ...
    * <Store callbacks={{ count: (v) => console.log(v) }}>
    *  {children}
@@ -37,7 +36,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    * @return {React.ReactNode} children
    */
   function Store({store = {}, callbacks = {}, children}) {
-    const initialized = useRef();
+    let initialized = useRef();
 
     if (!initialized.current) {
       initialStore = allStore = {...allStore, ...store};
@@ -59,13 +58,13 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    * - getStore helper proxy
    * - withStore HoC proxy
    */
-  const validator = {
+  let validator = {
     path: [],
-    getHoC(Comp, path, initValue) {
-      const componentName = Comp.displayName || Comp.name || 'Component';
-      const WithStore = (props) => {
-        const last = path.length - 1;
-        const store = path.length ? path.reduce(
+    _getHoC(Comp, path, initValue) {
+      let componentName = Comp.displayName || Comp.name || 'Component';
+      let WithStore = (props) => {
+        let last = path.length - 1;
+        let store = path.length ? path.reduce(
             (a, c, index) => index === last ? a[c](initValue) : a[c],
             useStore,
         ) : useStore(initValue);
@@ -75,25 +74,26 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       return WithStore;
     },
     get(target, path) {
-      if (!DISCARD.has(path)) this.path.push(path);
+      if (path === 'isReactComponent') return;
+      this.path.push(path);
       return new Proxy(target, validator);
     },
     apply(getMode, _, args) {
-      const mode = getMode();
-      const param = args[0];
-      const path = this.path.slice();
+      let mode = getMode();
+      let param = args[0];
+      let path = this.path.slice();
       this.path = [];
 
       // MODE_WITH: withStore(Component)
       // MODE_WITH: withStore.cart.price(Component, 0)
       if (mode === MODE_WITH) {
-        return this.getHoC(args[0], path, args[1]);
+        return this._getHoC(args[0], path, args[1]);
       }
 
       // ALL STORE (unfragmented):
       //
-      // MODE_GET: const [store, update, reset] = useStore()
-      // MODE_USE: const [store, update, reset] = getStore()
+      // MODE_GET: let [store, update, reset] = useStore()
+      // MODE_USE: let [store, update, reset] = getStore()
       if (!path.length) {
         if (mode === MODE_USE) useSubscription('store');
         return [allStore, updateAllStore, resetAllStore];
@@ -102,12 +102,12 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       // .................
       // FRAGMENTED STORE:
       // .................
-      const prop = path.join('.');
-      const update = updateField(prop);
-      const reset = resetField(prop);
+      let prop = path.join('.');
+      let update = updateField(prop);
+      let reset = resetField(prop);
       let value = getField(allStore, prop);
 
-      const initializeValue =
+      let initializeValue =
         param !== undefined &&
         value === undefined &&
         getField(initialStore, prop) === undefined;
@@ -125,14 +125,14 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
         useSubscription(`store.${prop}`);
       }
 
-      // MODE_GET: const [price, setPrice] = useStore.cart.price()
-      // MODE_USE: const [price, setPrice] = getStore.cart.price()
+      // MODE_GET: let [price, setPrice] = useStore.cart.price()
+      // MODE_USE: let [price, setPrice] = getStore.cart.price()
       return [value, update, reset];
     },
   };
-  const useStore = new Proxy(() => MODE_USE, validator);
-  const getStore = new Proxy(() => MODE_GET, validator);
-  const withStore = new Proxy(() => MODE_WITH, validator);
+  let useStore = new Proxy(() => MODE_USE, validator);
+  let getStore = new Proxy(() => MODE_GET, validator);
+  let withStore = new Proxy(() => MODE_WITH, validator);
 
   /**
    * Hook to register a listener to force a render when the
@@ -140,11 +140,11 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    * @param {string} key
    */
   function useSubscription(key) {
-    const [, forceRender] = useReducer((v) => v + 1, 0);
+    let [, forceRender] = useReducer((v) => v + 1, 0);
 
     useEffect(() => {
-      subscription.subscribe(key, forceRender);
-      return () => subscription.unsubscribe(key, forceRender);
+      subscription._subscribe(key, forceRender);
+      return () => subscription._unsubscribe(key, forceRender);
     }, []);
   }
 
@@ -162,7 +162,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
 
     allStore = {...allStore, ...fields};
     Object.keys(fields).forEach((field) =>
-      subscription.notify(`store.${field}`),
+      subscription._notify(`store.${field}`),
     );
   }
 
@@ -185,10 +185,10 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
    * @return {any}
    */
   function updateField(path, callCallback = true) {
-    const fieldPath = Array.isArray(path) ? path : path.split('.');
-    const [firstKey] = fieldPath;
-    const isCb = callCallback && typeof allCallbacks[firstKey] === 'function';
-    const prevValue = isCb ? getField(allStore, fieldPath) : undefined;
+    let fieldPath = Array.isArray(path) ? path : path.split('.');
+    let [firstKey] = fieldPath;
+    let isCb = callCallback && typeof allCallbacks[firstKey] === 'function';
+    let prevValue = isCb ? getField(allStore, fieldPath) : undefined;
 
     return (newValue) => {
       let value = newValue;
@@ -198,7 +198,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       }
 
       allStore = setField(allStore, fieldPath, value);
-      subscription.notify(`store.${path}`);
+      subscription._notify(`store.${path}`);
 
       if (isCb) {
         allCallbacks[firstKey]({
@@ -246,27 +246,27 @@ function getField(store, path) {
 }
 
 function setField(store = {}, [prop, ...rest], value) {
-  const newObj = Array.isArray(store) ? [...store] : {...store};
+  let newObj = Array.isArray(store) ? [...store] : {...store};
   newObj[prop] = rest.length ? setField(store[prop], rest, value) : value;
   return newObj;
 }
 
 function createSubscription() {
-  const listeners = {};
+  let listeners = {};
 
   return {
-    subscribe(key, listener) {
+    _subscribe(key, listener) {
       if (!listeners[key]) listeners[key] = new Set();
       listeners[key].add(listener);
     },
-    notify(key) {
+    _notify(key) {
       Object.keys(listeners).forEach((listenersKey) => {
         if (key.startsWith(listenersKey) || listenersKey.startsWith(key)) {
           listeners[listenersKey].forEach((listener) => listener());
         }
       });
     },
-    unsubscribe(key, listener) {
+    _unsubscribe(key, listener) {
       listeners[key].delete(listener);
       if (listeners[key].size === 0) delete listeners[key];
     },

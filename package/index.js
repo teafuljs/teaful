@@ -3,6 +3,7 @@ import {useEffect, useReducer, useRef} from 'react';
 let MODE_GET = 1;
 let MODE_USE = 2;
 let MODE_WITH = 3;
+let DOT = '.';
 
 export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
   let subscription = createSubscription();
@@ -94,7 +95,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       // MODE_GET: let [store, update, reset] = useStore()
       // MODE_USE: let [store, update, reset] = getStore()
       if (!path.length) {
-        if (mode === MODE_USE) useSubscription('store');
+        if (mode === MODE_USE) useSubscription(DOT);
         return [allStore, updateAllStore, resetAllStore];
       }
 
@@ -121,7 +122,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       // subscribe to the fragmented store
       if (mode === MODE_USE) {
         useEffect(() => initializeValue && update(value), []);
-        useSubscription(`store.${prop}`);
+        useSubscription(DOT+prop);
       }
 
       // MODE_GET: let [price, setPrice] = useStore.cart.price()
@@ -136,14 +137,14 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
   /**
    * Hook to register a listener to force a render when the
    * subscribed field changes.
-   * @param {string} key
+   * @param {string} path
    */
-  function useSubscription(key) {
+  function useSubscription(path) {
     let [, forceRender] = useReducer(() => ({}), 0);
 
     useEffect(() => {
-      subscription._subscribe(key, forceRender);
-      return () => subscription._unsubscribe(key, forceRender);
+      subscription._subscribe(path, forceRender);
+      return () => subscription._unsubscribe(path, forceRender);
     }, []);
   }
 
@@ -160,8 +161,8 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
     if (typeof newStore === 'function') fields = newStore(allStore);
 
     allStore = {...allStore, ...fields};
-    Object.keys(fields).forEach((field) =>
-      subscription._notify(`store.${field}`),
+    Object.keys(fields).forEach((path) =>
+      subscription._notify(DOT+path),
     );
   }
 
@@ -197,7 +198,7 @@ export default function createStore(defaultStore = {}, defaultCallbacks = {}) {
       }
 
       allStore = setField(allStore, fieldPath, value);
-      subscription._notify(`store.${path}`);
+      subscription._notify(DOT+path);
 
       if (isCb) {
         allCallbacks[firstKey]({
@@ -254,20 +255,20 @@ function createSubscription() {
   let listeners = {};
 
   return {
-    _subscribe(key, listener) {
-      if (!listeners[key]) listeners[key] = new Set();
-      listeners[key].add(listener);
+    _subscribe(path, listener) {
+      if (!listeners[path]) listeners[path] = new Set();
+      listeners[path].add(listener);
     },
-    _notify(key) {
+    _notify(path) {
       Object.keys(listeners).forEach((listenersKey) => {
-        if (key.startsWith(listenersKey) || listenersKey.startsWith(key)) {
+        if (path.startsWith(listenersKey) || listenersKey.startsWith(path)) {
           listeners[listenersKey].forEach((listener) => listener());
         }
       });
     },
-    _unsubscribe(key, listener) {
-      listeners[key].delete(listener);
-      if (listeners[key].size === 0) delete listeners[key];
+    _unsubscribe(path, listener) {
+      listeners[path].delete(listener);
+      if (listeners[path].size === 0) delete listeners[path];
     },
   };
 }

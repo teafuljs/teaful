@@ -351,6 +351,78 @@ describe('Callbacks', () => {
   });
 });
 
+it('Updating another value using the getStore should work', () => {
+  const initialStore = {cart: {price: 0}, limit: false};
+  const {useStore, Store, getStore} = createStore(initialStore);
+  const renderTestApp = jest.fn();
+  const renderTest = jest.fn();
+
+  function Test() {
+    const [price, setPrice] = useStore.cart.price();
+    const [limit] = useStore.limit();
+    renderTest();
+    return (
+      <button data-testid="click" onClick={() => setPrice((v) => v + 1)}>
+        {limit ? 'No more than 4!! :)' : price}
+      </button>
+    );
+  }
+
+  function TestApp() {
+    const [, setLimit] = getStore.limit();
+
+    function cart({path, prevValue, value, updateValue}) {
+      if (path !== 'cart.price') return;
+      if (value > 4) {
+        updateValue(prevValue);
+        setLimit(true);
+      } else {
+        setLimit(false);
+      }
+    }
+    renderTestApp();
+    return (
+      <Store callbacks={{cart}}>
+        <Test />
+      </Store>
+    );
+  }
+
+  render(<TestApp />);
+
+  const btn = screen.getByTestId('click');
+
+  expect(renderTest).toHaveBeenCalledTimes(1);
+  expect(renderTestApp).toHaveBeenCalledTimes(1);
+  expect(btn.textContent).toBe('0');
+  userEvent.click(btn);
+  expect(renderTest).toHaveBeenCalledTimes(2);
+  expect(renderTestApp).toHaveBeenCalledTimes(1);
+  expect(btn.textContent).toBe('1');
+  userEvent.click(btn);
+  expect(renderTest).toHaveBeenCalledTimes(3);
+  expect(renderTestApp).toHaveBeenCalledTimes(1);
+  expect(btn.textContent).toBe('2');
+  userEvent.click(btn);
+  expect(renderTest).toHaveBeenCalledTimes(4);
+  expect(renderTestApp).toHaveBeenCalledTimes(1);
+  expect(btn.textContent).toBe('3');
+  userEvent.click(btn);
+  expect(renderTest).toHaveBeenCalledTimes(5);
+  expect(renderTestApp).toHaveBeenCalledTimes(1);
+  expect(btn.textContent).toBe('4');
+
+  // No more than 4 (logic inside callback)
+  userEvent.click(btn);
+  expect(renderTest).toHaveBeenCalledTimes(6);
+  expect(renderTestApp).toHaveBeenCalledTimes(1);
+  expect(btn.textContent).toBe('No more than 4!! :)');
+  userEvent.click(btn);
+  expect(renderTest).toHaveBeenCalledTimes(7);
+  expect(renderTestApp).toHaveBeenCalledTimes(1);
+  expect(btn.textContent).toBe('No more than 4!! :)');
+});
+
 function testItem(fn) {
   return ({path, prevValue, value, times}) => {
     expect(fn).toHaveBeenCalledTimes(times);

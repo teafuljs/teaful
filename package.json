@@ -15,6 +15,18 @@
       {
         "path": "./dist/index.js",
         "maxSize": "1 kB"
+      },
+      {
+        "path": "./dist/index.modern.js",
+        "maxSize": "1 kB"
+      },
+      {
+        "path": "./dist/index.m.js",
+        "maxSize": "1 kB"
+      },
+      {
+        "path": "./dist/index.umd.js",
+        "maxSize": "1 kB"
       }
     ]
   },

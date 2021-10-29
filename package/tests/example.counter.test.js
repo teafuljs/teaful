@@ -1,4 +1,4 @@
-import {Component} from 'react';
+import {Component, useState} from 'react';
 import {render, waitFor, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -7,7 +7,7 @@ import '@babel/polyfill';
 import createStore from '../index';
 
 describe('Example: Counter', () => {
-  it('should work with a simple counter', async () => {
+  it('should work with a simple counter', () => {
     const {useStore, Store} = createStore({count: 0});
 
     function Counter() {
@@ -38,31 +38,26 @@ describe('Example: Counter', () => {
 
     // Inc
     userEvent.click(screen.getByText('+'));
-    await waitFor(() => screen.getByRole('heading'));
     expect(screen.getByRole('heading').textContent).toBe('1');
     expect(screen.getByTestId('number').textContent).toContain('1');
 
     // Inc again
     userEvent.click(screen.getByText('+'));
-    await waitFor(() => screen.getByRole('heading'));
     expect(screen.getByRole('heading').textContent).toBe('2');
     expect(screen.getByTestId('number').textContent).toContain('2');
 
     // Dec
     userEvent.click(screen.getByText('-'));
-    await waitFor(() => screen.getByRole('heading'));
     expect(screen.getByRole('heading').textContent).toBe('1');
     expect(screen.getByTestId('number').textContent).toContain('1');
 
     // Inc again
     userEvent.click(screen.getByText('+'));
-    await waitFor(() => screen.getByRole('heading'));
     expect(screen.getByRole('heading').textContent).toBe('2');
     expect(screen.getByTestId('number').textContent).toContain('2');
 
     // Reset
     userEvent.click(screen.getByText('reset'));
-    await waitFor(() => screen.getByRole('heading'));
     expect(screen.getByRole('heading').textContent).toBe('0');
     expect(screen.getByTestId('number').textContent).toContain('0');
   });
@@ -414,4 +409,63 @@ describe('Example: Counter', () => {
         expect(screen.getByRole('heading').textContent).toBe('0');
         expect(screen.getByTestId('number').textContent).toContain('0');
       });
+
+  it('Should increase the value using a form with getStore', async () => {
+    const {useStore, getStore} = createStore({count: 0});
+
+    function CountForm() {
+      const [newCount, setNewCount] = useState(0);
+
+      function saveIncreasedCount(e) {
+        e.preventDefault();
+        const [count, setCount] = getStore.count();
+        if (newCount > count) setCount(newCount);
+      }
+
+      return (
+        <form onSubmit={saveIncreasedCount}>
+          <input
+            value={newCount}
+            min={0}
+            max={10}
+            data-testid="input"
+            onChange={(e) => setNewCount(e.target.valueAsNumber)}
+            type="number"
+          />
+          <button>Save</button>
+        </form>
+      );
+    }
+
+    function CountValue() {
+      const [count] = useStore.count();
+      return <p data-testid="number">{count}</p>;
+    }
+
+    render(
+        <>
+          <CountValue />
+          <CountForm />
+        </>,
+    );
+
+    // Increase to 1 using the form
+    userEvent.type(screen.getByTestId('input'), '1');
+    expect(screen.getByTestId('number').textContent).toContain('0');
+    userEvent.click(screen.getByText('Save'));
+    expect(screen.getByTestId('number').textContent).toContain('1');
+
+    // Increase to 10 using the form
+    userEvent.type(screen.getByTestId('input'), '10');
+    expect(screen.getByTestId('number').textContent).toContain('1');
+    userEvent.click(screen.getByText('Save'));
+    expect(screen.getByTestId('number').textContent).toContain('10');
+
+    // Decrease should not work (the component only allows to increase)
+    userEvent.type(screen.getByTestId('input'), '9');
+    expect(screen.getByTestId('number').textContent).toContain('10');
+    userEvent.click(screen.getByText('Save'));
+    // not saved
+    expect(screen.getByTestId('number').textContent).toContain('10');
+  });
 });

@@ -106,13 +106,13 @@ export default function createStore(defaultStore = {}, callback) {
    * @param {function} callback
    */
   function useSubscription(path, callback) {
-    let listener = useReducer(() => ({}), 0)[1];
+    let forceRender = useReducer(() => ({}), 0)[1];
 
     useEffect(() => {
-      subscription._subscribe(path, listener);
+      subscription._subscribe(path, forceRender);
       subscription._subscribe(path, callback);
       return () => {
-        subscription._unsubscribe(path, listener);
+        subscription._unsubscribe(path, forceRender);
         subscription._unsubscribe(path, callback);
       };
     }, []);

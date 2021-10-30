@@ -42,7 +42,7 @@
 
 <hr />
 
-## Content 🎒 
+## Guide 🗺
 
 - [1. Installation 🧑🏻‍💻](#installation-)
 - [2. Init your store 👩🏽‍🎨](#init-your-store-)
@@ -59,7 +59,8 @@
   - [Reset all the store](#todo)
   - [Use more than one store](#todo)
 - [6. Examples 🖥](#examples--)
-- [7. Contributors ✨](#contributors-)
+- [7. Roadmap 🛣](#roadmap-)
+- [8. Contributors ✨](#contributors-)
 
 ## Installation 🧑🏻‍💻
 
@@ -367,6 +368,12 @@ The **only difference** with the `useStore` is that instead of having 2 paramete
 
 ## Examples  🖥
 
+## Roadmap 🛣
+
+- [x] React support
+- [x] TypeScript support
+- [ ] Svelte support
+- [ ] Vue support
 
 ## Contributors ✨
 

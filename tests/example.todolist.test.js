@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 
 import '@babel/polyfill';
 
-import createStore from '../index';
+import createStore from '../package/index';
 
 describe('Example: Todo list', () => {
   it('should work with a simple todo list app', () => {

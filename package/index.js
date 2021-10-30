@@ -1,4 +1,4 @@
-import {useEffect, useReducer, useRef} from 'react';
+import {useEffect, useReducer} from 'react';
 
 let MODE_GET = 1;
 let MODE_USE = 2;
@@ -14,46 +14,6 @@ export default function createStore(defaultStore = {}, callback) {
 
   // Add callback subscription
   subscription._subscribe(DOT, callback);
-
-  /**
-   * Store of the store
-   *
-   * @example
-   *
-   * // Default usage
-   * let { Store } = createStore({ count: 0 })
-   * // ...
-   * <Store>{children}</Store>
-   *
-   * // Creating the default store in the Store
-   * let { Store } = createStore()
-   * // ...
-   * <Store store={{ count: 0 }}>{children}</Store>
-   *
-   * // Defining onSet callback
-   * let { Store } = createStore({ count: 0 })
-   * // ...
-   * <Store onSet={(v) => console.log(v)}>
-   *  {children}
-   * </Store>
-   * @return {React.ReactNode} children
-   */
-  function Store({store = {}, onSet, children}) {
-    let initialized = useRef();
-
-    if (!initialized.current) {
-      initialStore = allStore = {...allStore, ...store};
-    }
-
-    useEffect(() => {
-      if (!initialized.current) return initialized.current = true;
-      updateField()(store);
-    }, [store]);
-
-    useSubscription(DOT, onSet);
-
-    return children;
-  }
 
   /**
    * Proxy validator that implements:
@@ -84,13 +44,14 @@ export default function createStore(defaultStore = {}, callback) {
     apply(getMode, _, args) {
       let mode = getMode();
       let param = args[0];
+      let callback = args[1];
       let path = this._path.slice();
       this._path = [];
 
       // MODE_WITH: withStore(Component)
       // MODE_WITH: withStore.cart.price(Component, 0)
       if (mode === MODE_WITH) {
-        return this._getHoC(args[0], path, args[1]);
+        return this._getHoC(args[0], path, args[1], args[2]);
       }
 
       // ALL STORE (unfragmented):
@@ -99,7 +60,7 @@ export default function createStore(defaultStore = {}, callback) {
       // MODE_USE: let [store, update, reset] = getStore()
       if (!path.length) {
         let updateAll = updateField();
-        if (mode === MODE_USE) useSubscription(DOT);
+        if (mode === MODE_USE) useSubscription(DOT, callback);
         return [allStore, updateAll, resetField()];
       }
 
@@ -126,7 +87,7 @@ export default function createStore(defaultStore = {}, callback) {
       // subscribe to the fragmented store
       if (mode === MODE_USE) {
         useEffect(() => initializeValue && update(value), []);
-        useSubscription(DOT+prop);
+        useSubscription(DOT+prop, callback);
       }
 
       // MODE_GET: let [price, setPrice] = useStore.cart.price()
@@ -142,14 +103,18 @@ export default function createStore(defaultStore = {}, callback) {
    * Hook to register a listener to force a render when the
    * subscribed field changes.
    * @param {string} path
-   * @param {function} fn
+   * @param {function} callback
    */
-  function useSubscription(path, fn) {
-    let listener = fn || useReducer(() => ({}), 0)[1];
+  function useSubscription(path, callback) {
+    let listener = useReducer(() => ({}), 0)[1];
 
     useEffect(() => {
       subscription._subscribe(path, listener);
-      return () => subscription._unsubscribe(path, listener);
+      subscription._subscribe(path, callback);
+      return () => {
+        subscription._unsubscribe(path, listener);
+        subscription._unsubscribe(path, callback);
+      };
     }, []);
   }
 
@@ -199,14 +164,13 @@ export default function createStore(defaultStore = {}, callback) {
   }
 
   /**
-   * createStore function returns the Store component with:
-   * - Store component
+   * createStore function returns:
    * - useStore hook
    * - getStore helper
    * - withStore HoC
    * @returns {object}
    */
-  return {Store, useStore, getStore, withStore};
+  return {useStore, getStore, withStore};
 }
 
 // ##########################################################
@@ -244,6 +208,7 @@ function createSubscription() {
       });
     },
     _unsubscribe(path, listener) {
+      if (typeof listener !== 'function') return;
       listeners[path].delete(listener);
       if (listeners[path].size === 0) delete listeners[path];
     },

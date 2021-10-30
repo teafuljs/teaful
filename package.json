@@ -15,6 +15,10 @@
     "name": "Aral Roca Gòmez",
     "email": "contact@aralroca.com"
   },
+  "files": [
+    "dist",
+    "package"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/aralroca/fragstore.git"
@@ -49,8 +53,8 @@
   },
   "types": "dist/index.d.ts",
   "scripts": {
-    "lint": "eslint ./package",
-    "format": "eslint --fix ./package",
+    "lint": "eslint ./package ./tests",
+    "format": "eslint --fix ./package ./tests",
     "test": "jest",
     "test:watch": "jest --watch",
     "build": "microbundle --jsx React.createElement",

@@ -32,37 +32,36 @@
 [badge-prwelcome]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
 [prwelcome]: http://makeapullrequest.com
 
-## ✨ What advantages does it have?
+## What advantages does it have? ✨ 
 
 <ul>
-    <li>📦 <b>Tiny</b>: Less than 1kb package to manage your state in React and Preact.</li>
-    <li>🌱 <b>Easy</b>: You don't need actions, reducers, selectors, connect, providers, etc. Everything can be done in the simplest and most comfortable way.</li>
-    <li>🚀 <b>Powerful</b>: When a store property is updated, only its components are re-rendered. It's not re-rendering components that use other store properties.</li>
+    <li>📦  ・<b>Tiny</b>: Less than 1kb package to manage your state in React and Preact.</li>
+    <li>🌱  ・<b>Easy</b>: You don't need actions, reducers, selectors, connect, providers, etc. Everything can be done in the simplest and most comfortable way.</li>
+    <li>🚀  ・<b>Powerful</b>: When a store property is updated, only its components are re-rendered. It's not re-rendering components that use other store properties.</li>
 </ul>
 
 <hr />
 
-## Content
+## Content 🎒 
 
-- [Installation](#installation)
-- [Init your store](#init-your-store)
+- [1. Installation 🧑🏻‍💻](#installation-)
+- [2. Init your store 👩🏽‍🎨](#init-your-store-)
   - [createStore](#createstore)
   - [How to export](#how-to-export)
-- [Manage the Store](#manage-the-store)
-  - [useStore hook](#todo)
-  - [getStore helper](#todo)
-  - [withStore HoC](#todo)
-  - [Store component](#store)
-- [Callbacks](#callbacks)
-- [How to...](@todo)
+- [3. Manage the store 🕹](#manage-the-store-)
+  - [useStore hook](#usestore-hook)
+  - [getStore helper](#getstore-helper)
+  - [withStore HoC](#withstore-hoc)
+- [4. Register events after an update 🚦](#register-events-after-an-update-)
+- [5. How to... 🧑‍🎓](#how-to-)
   - [Add a new store property](#adding-new-properties-to-the-store)
   - [Reset a store property](#todo)
   - [Reset all the store](#todo)
   - [Use more than one store](#todo)
-- [Demos](#demos)
-- [Contributors ✨](#contributors-)
+- [6. Examples 🖥](#examples--)
+- [7. Contributors ✨](#contributors-)
 
-## Installation
+## Installation 🧑🏻‍💻
 
 ```sh
 yarn add fragstore
@@ -70,7 +69,7 @@ yarn add fragstore
 npm install fragstore --save
 ```
 
-## Init your store
+## Init your store 👩🏽‍🎨
 
 Each store has to be created with the `createStore` function. This function returns all the methods that you can use to consume and update the store properties.
 
@@ -119,7 +118,7 @@ _Output:_
 | `useStore`  | `Proxy`     | Proxy hook to consume and update store properties inside your components. Each time the value changes, the component is rendered again with the new value.                                                                     | `const [price, setPrice] = useStore.cart.price()`               |
 | `getStore`  | `Proxy`     | Similar to `useStore` but without subscription. You can use it as a helper outside (or inside) components. Note that if the value changes, it does not cause a rerender.                                                       | `const [price, setPrice] = getStore.cart.price()`               |
 | `withStore` | `Proxy`     | HoC with `useStore` inside. Useful for components that are not functional.                                                                                                                                                     | `withStore.cart.price(MyComponent)`                             |
-| `Store`     | `Component` | If in the `createStore` you don't define the initial store or the callbacks you can do it later using this component. It is likely that you want the callbacks to change the internal logic of the component or anything else. | `<Store store={initialStore} callbacks={callbacks}>...</Store>` |
+
 
 ### How to export
 
@@ -127,7 +126,7 @@ We recommend using this type of export:
 
 ```js
 // ✅
-export const { useStore, getStore, withStore, Store } = createStore({
+export const { useStore, getStore, withStore } = createStore({
   cart: { price: 0, items: [] },
 });
 ```
@@ -153,7 +152,7 @@ Because then you won't be able to do this:
 import { useStore } from '../store
 ```
 
-## Manage the Store:
+## Manage the store 🕹
 
 ### useStore hook
 
@@ -198,10 +197,12 @@ function Example() {
   return (
     <>
       <button
-        onClick={() => setStore((s) => ({ 
-          ...s,
-          username: "AnotherUserName" 
-        }))}
+        onClick={() =>
+          setStore((s) => ({
+            ...s,
+            username: "AnotherUserName",
+          }))
+        }
       >
         Update {store.username}
       </button>
@@ -224,7 +225,8 @@ _Input:_
 
 | name          | type  | description                                                                                                                                                                                                                                                      | example                                            |
 | ------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| Initial value | `any` | This parameter is not mandatory. It only makes sense for new store properties that have not been defined before within the `createStore` or `Store`. If the value has already been initialized inside the `createStore` or `Store` this parameter has no effect. | `const [price, setPrice] = useStore.cart.price(0)` |
+| Initial value | `any` | This parameter is **not mandatory**. It only makes sense for new store properties that have not been defined before within the `createStore`. If the value has already been initialized inside the `createStore` this parameter has no effect. | `const [price, setPrice] = useStore.cart.price(0)` |
+| event after an update| `function`|This parameter is **not mandatory**. Adds an event that is executed every time there is a change inside the indicated store portion.| `const [price, setPrice] = useStore.cart.price(0, onAfterUpdate)`<div><small>And the function:</small></div><div>`function onAfterUpdate({ path, value, prevValue, getStore }){ console.log({ prevValue, value }) }`</div>
 
 _Output:_
 
@@ -238,9 +240,29 @@ Is an `Array` with **3** items:
 
 ### getStore helper
 
-It works exactly like `useStore` but with **one difference**:
+It works exactly like `useStore` but with **some differences**:
 
-- It **does not make a subscription**.
+- It **does not make a subscription**. So it is no longer a hook and you can use it as a helper wherever you want.
+- It's **not possible to register events** that are executed after a change.
+    ```js
+    getStore.cart.price(0, onAfterPriceChange) // ❌
+
+    function onAfterPriceChange({ path, value, prevValue }) {
+      const [,setErrorMsg] = getStore.errorMsg()
+      setErrorMsg(value > 99 ? 'price should be lower than $99')
+    }
+    ```
+    - If the intention is to register events that last forever, it has to be done within the `createStore`: 
+    ```js
+     const { useStore } = createStore(initialStore, onAfterUpdate) // ✅
+
+     function onAfterUpdate({ path, value, prevValue, getStore }) {
+       if(path === 'cart.price') {
+         const [,setErrorMsg] = getStore.errorMsg()
+         setErrorMsg(value > 99 ? 'price should be lower than $99')
+       }
+     }
+    ```
 
 Very useful to use it:
 
@@ -284,272 +306,67 @@ function Example2() {
 
 ### withStore HoC
 
-### Store
+It's a wrapper of the `useStore` for non-functional components. Where you receive the same thing that the `useStore` hook returns inside `this.props.store`.
 
-The `Store` is an optional component where you can send the same parameters than the `createStore`. Sometimes can be useful, for example, when the initial store is defined by an API, or also if you want to change some component state (not store) after some callback.
-
-```js
-import createStore from "fragstore";
-
-const { Store } = createStore();
-
-function App() {
-  return (
-    <Store
-      store={{
-        username: "Aral",
-        age: 31,
-      }}
-    >
-      {/* rest */}
-    </Store>
-  );
-}
-```
-
-### Fragmented store (meaning of Fragstore)
-
-### Unfragmented store
-
-The advantage of this library is to use the store in a fragmented way. Even so, there are cases when we want to reset the whole store or do more complex things. For these cases, we can use the hook `useStore` directly.
+Example with a store portion:
 
 ```js
-import createStore from "fragstore";
+const { withStore } = createStore();
 
-const { useStore } = createStore({
-  username: "Aral",
-  age: 31,
-});
-
-function UnfragmentedExample() {
-  const [store, update] = useStore();
-
-  return (
-    <>
-      <h1>
-        {state.username}, {state.age}
-      </h1>
-      <button
-        onClick={() => update({ age: 32, cart: { price: 0, items: [] } })}
-      >
-        Update store
-      </button>
-    </>
-  );
+class Counter extends Component {
+  render() {
+    const [count, setCount, resetCount] = this.props.store;
+    return (
+      <div>
+        <h1>{count}</h1>
+        <button onClick={() => setCount((v) => v + 1)}>+</button>
+        <button onClick={() => setCount((v) => v - 1)}>-</button>
+        <button onClick={resetCount}>reset</button>
+      </div>
+    );
+  }
 }
+
+// Similar to useStore.counter.count(0)
+const CounterWithStore = withStore.counter.count(Counter, 0);
 ```
 
-### Adding new properties to the store
-
-There are 3 ways to add a new property to the store:
-
-#### 1. Adding a new property on the Store
+Example with all store:
 
 ```js
-import createStore from "fragstore";
+const { withStore } = createStore({ count: 0 });
 
-const { Store } = createStore({ username: "Aral" });
-
-function App() {
-  return <Store store={{ count: 0 }}>{/* rest */}</Store>;
+class Counter extends Component {
+  render() {
+    const [store, setStore, resetStore] = this.props.store;
+    return (
+      <div>
+        <h1>{store.count}</h1>
+        <button onClick={() => setStore({ count: store.count + 1 })}>+</button>
+        <button onClick={() => setStore({ count: store.count - 1 })}>-</button>
+        <button onClick={resetStore}>reset</button>
+      </div>
+    );
+  }
 }
+
+// Similar to useStore()
+const CounterWithStore = withStore(Counter);
 ```
 
-#### 2. Using the `useStore` to consume to a new property
+The **only difference** with the `useStore` is that instead of having 2 parameters (initial value, callback), it has 3 where the **first one is mandatory** and the other 2 are not (**Component**, **initial value**, **callback**).
 
-```js
-const { Store } = createStore({ username: "Aral" });
-// ...
-const [newProp, setNewProp] = useStore.newProp("Initial value of newProp");
-const [anotherProp, setAnotherProp] = useStore.anotherProp();
-// ...
-setAnotherProp("Initial value of anotherProp");
-setNewProp("Next value of newProp");
-```
+## Register events after an update 🚦
 
-The hook argument works to define the initial value. It doesn't work when the initial value is already defined in `createStore` or `Store`:
+## How to... 🧑‍🎓
 
-```js
-const { Store } = createStore({ username: "Aral" });
-// ...
-const [username, setUsername] = useStore.username("Another name");
-console.log(username); // -> Aral
-```
+### Add a new store property
+### Reset a store property
 
-In this case, if you want to update the value you should use the `setUsername` method.
+### Use more than one store
 
-#### 3. Using all the store with `useStore` directly _(not recommended)_
+## Examples  🖥
 
-```js
-const [store, setStore] = useStore();
-
-// ...
-setStore({
-  newProp: "I'm a new property",
-  anotherProp: "I'm another new property",
-});
-```
-
-The problem with using the entire store is that the component will re-render whenever any property in the store is updated.
-
-### Callbacks
-
-The second param of `createStore` is **callbacks** `Object<function>`. It's useful for example to fetch data to an endpoint after the state change, and roll back the state if the request fails. Callbacks can only be created at the first level. That is, if we have an update in `cart.items[0].price`, only the callback of the cart `{ cart() {} }` will be called. However you receive the updated `path` and you can implement the logic inside the callback:
-
-Example:
-
-```js
-const initialState = {
-  quantity: 2,
-  userName: "Aral",
-  age: 31,
-  cart: {
-    items: [{ name: "example", price: 10 }],
-  },
-};
-
-// Every callback is executed after a property change
-const callbacks = {
-  quantity({ value, prevValue, updateValue }) {
-    // Update quantity on API
-    fetch("/api/quantity", { method: "POST", body: value })
-      // Revert state change if it fails
-      .catch((e) => updateValue(prevValue));
-  },
-  age({ value, prevValue, updateValue }) {
-    if (value > 100) {
-      alert("Sorry, no more than 100 😜");
-      updateValue(prevValue);
-    }
-  },
-  cart({ path, value, prevValue, updateValue }) {
-    if (path === "cart.items.0" && value.price > 10) {
-      alert(`Price of ${value.name} should be lower than 10`);
-      updateValue(prevValue);
-    }
-  },
-};
-
-const { Store, useQuantity } = createStore(initialState, callbacks);
-```
-
-Also you can overwrite or define callbacks on the `Store`:
-
-```js
-<Store
-  store={{ newProperty: 'Another value'}}
-  callbacks={{
-    newProperty(value) {
-      console.log(value)
-    }
-  }}>
-```
-
-## Example
-
-```js
-import createStore from "fragstore";
-
-const { Store, useStore } = createStore({
-  username: "Aral",
-  age: 31,
-  cart: {
-    price: 0,
-    items: [],
-  },
-});
-
-export default function App() {
-  return (
-    <Store>
-      <AllStore />
-      <Username />
-      <CartPrice />
-      <CartFirstItem />
-      <Age />
-      <NewProperty />
-    </Store>
-  );
-}
-
-function AllStore() {
-  const [store, update] = useStore();
-
-  console.log({ store }); // all store
-
-  return (
-    <button onClick={() => update({ age: 31, username: "Aral" })}>Reset</button>
-  );
-}
-
-function Username() {
-  const [username, setUsername, resetUsername] = useStore.username();
-
-  return (
-    <>
-      <h1>Username: {username}</h1>
-      <button onClick={() => setUsername("Another name")}>
-        Update username
-      </button>
-      <button onClick={resetUsername}>Reset username</button>
-    </>
-  );
-}
-
-function CartPrice() {
-  const [price, setPrice, resetPrice] = useStore.cart.price();
-
-  return (
-    <>
-      <h1>Price: {price}€</h1>
-      <button onClick={() => setPrice((v) => v + 1)}>Inc price</button>
-      <button onClick={resetPrice}>Reset username</button>
-    </>
-  );
-}
-
-function CartFirstItem() {
-  const [item, setItem, resetItem] = useStore.cart.items[0]();
-
-  return (
-    <>
-      <h1>Item: {JSON.stringify(item)}</h1>
-      <button onClick={() => setItem({ name: "new Item" })}>Update item</button>
-      <button onClick={resetItem}>Reset item</button>
-    </>
-  );
-}
-
-function Age() {
-  const [age, setAge, resetAge] = useStore.age();
-
-  console.log("render age", age);
-
-  return (
-    <div>
-      <div>{age}</div>
-      <button onClick={() => setAge((s) => s + 1)}>Inc age</button>
-      <button onClick={resetAge}>Reset age</button>
-    </div>
-  );
-}
-
-function NewProperty() {
-  const [newProperty, setNewProperty] = useStore.newProperty();
-
-  return (
-    <>
-      {newProperty ? (
-        <div>{newProperty}</div>
-      ) : (
-        <button onClick={() => setNewProperty("I'm a new property")}>
-          Create new property
-        </button>
-      )}
-    </>
-  );
-}
-```
 
 ## Contributors ✨
 

@@ -1,4 +1,4 @@
-import {useEffect, useReducer} from 'react';
+import {useEffect, useReducer, createElement} from 'react';
 
 let MODE_GET = 1;
 let MODE_USE = 2;
@@ -31,7 +31,7 @@ export default function createStore(defaultStore = {}, callback) {
             (a, c, index) => index === last ? a[c](initValue) : a[c],
             useStore,
         ) : useStore(initValue);
-        return <Comp {...props} store={store} />;
+        return createElement(Comp, {...props, store});
       };
       WithStore.displayName = `withStore(${componentName})`;
       return WithStore;

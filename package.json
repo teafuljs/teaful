@@ -47,7 +47,7 @@
       },
       {
         "path": "./dist/index.umd.js",
-        "maxSize": "1 kB"
+        "maxSize": "1.1 kB"
       }
     ]
   },
@@ -90,5 +90,6 @@
   },
   "mangle": {
     "regex": "^_"
-  }
+  },
+  "bugs": "https://github.com/aralroca/fragstore/issues"
 }

@@ -91,18 +91,18 @@ const initialStore = {
 const { useStore } = createStore(initialStore);
 ```
 
-Or also with callbacks:
+Or also with an event that is executed after every update:
 
 ```js
 const initialStore = {
   cart: { price: 0, items: [] },
 };
-const callbacks = {
-  cart({ value }) {
-    console.log("This callback is executed after a cart update");
-  },
-};
-const { useStore } = createStore(initialStore, callbacks);
+
+function onAfterUpdate({ path, value, prevValue, getStore })
+  console.log("This callback is executed after an update");
+}
+
+const { useStore } = createStore(initialStore, onAfterUpdate);
 ```
 
 _Input:_
@@ -110,7 +110,7 @@ _Input:_
 | name           | type               | required | description                                                                                                                                                                                       |
 | -------------- | ------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `initialStore` | `object<any>`      | `false`  | Object with your initial store.                                                                                                                                                                   |
-| `callbacks`    | `object<function>` | `false`  | Object with functions that are executed after each property change. If `cart.price` is changed is executed on `cart` callback (first level). See [here](#callbacks) more details about callbacks. |
+| `onAfterUpdate`    | `function` | `false`  | Function that is executed after each property change. See [here](#register-events-after-an-update-) more details. |
 
 _Output:_
 
@@ -355,7 +355,7 @@ class Counter extends Component {
 const CounterWithStore = withStore(Counter);
 ```
 
-The **only difference** with the `useStore` is that instead of having 2 parameters (initial value, callback), it has 3 where the **first one is mandatory** and the other 2 are not (**Component**, **initial value**, **callback**).
+The **only difference** with the `useStore` is that instead of having 2 parameters (initialValue, onAfterUpdate), it has 3 where the **first one is mandatory** and the other 2 are not (**Component**, **initialValue**, **onAfterUpdate**).
 
 ## Register events after an update 🚦
 

@@ -1,6 +1,6 @@
 {
   "name": "fragstore",
-  "version": "0.5.0",
+  "version": "0.6.0-canary.1",
   "description": "Tiny, easy and powerful React state management (less than 1kb)",
   "license": "MIT",
   "keywords": [

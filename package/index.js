@@ -139,7 +139,7 @@ export default function createStore(defaultStore = {}, callback) {
        // Update a field
        setField(allStore, fieldPath, value) :
        // Update all the store
-       {...allStore, ...value};
+       value;
 
       // Notifying to all subscribers
       subscription._notify(DOT+path, {

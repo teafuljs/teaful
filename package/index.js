@@ -37,7 +37,7 @@ export default function createStore(defaultStore = {}, callback) {
       return WithStore;
     },
     get(target, path) {
-      if (path === 'prototype') return;
+      if (path === 'prototype') return {};
       this._path.push(path);
       return new Proxy(target, validator);
     },

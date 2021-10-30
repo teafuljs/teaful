@@ -110,15 +110,15 @@ _Input:_
 | name           | type               | required | description                                                                                                                                                                                       |
 | -------------- | ------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `initialStore` | `object<any>`      | `false`  | Object with your initial store.                                                                                                                                                                   |
-| `onAfterUpdate`    | `function` | `false`  | Function that is executed after each property change. See [here](#register-events-after-an-update-) more details. |
+| `onAfterUpdate`    | `function` | `false`  | Function that is executed after each property change. More [details](#register-events-after-an-update-). |
 
 _Output:_
 
 | name        | type        | description                                                                                                                                                                                                                    | example                                                         |
 | ----------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
-| `useStore`  | `Proxy`     | Proxy hook to consume and update store properties inside your components. Each time the value changes, the component is rendered again with the new value.                                                                     | `const [price, setPrice] = useStore.cart.price()`               |
-| `getStore`  | `Proxy`     | Similar to `useStore` but without subscription. You can use it as a helper outside (or inside) components. Note that if the value changes, it does not cause a rerender.                                                       | `const [price, setPrice] = getStore.cart.price()`               |
-| `withStore` | `Proxy`     | HoC with `useStore` inside. Useful for components that are not functional.                                                                                                                                                     | `withStore.cart.price(MyComponent)`                             |
+| `useStore`  | `Proxy`     | Proxy hook to consume and update store properties inside your components. Each time the value changes, the component is rendered again with the new value. More [info](#usestore-hook).                                                                     | `const [price, setPrice] = useStore.cart.price()`               |
+| `getStore`  | `Proxy`     | Similar to `useStore` but without subscription. You can use it as a helper outside (or inside) components. Note that if the value changes, it does not cause a rerender. More [info](#getstore-helper).                                                       | `const [price, setPrice] = getStore.cart.price()`               |
+| `withStore` | `Proxy`     | HoC with `useStore` inside. Useful for components that are not functional. More [info](#withstore-hoc).                                                                                                                                                     | `withStore.cart.price(MyComponent)`                             |
 
 
 ### How to export
@@ -372,6 +372,7 @@ The **only difference** with the `useStore` is that instead of having 2 paramete
 
 - [x] React support
 - [x] TypeScript support
+- [ ] Vanilla JavaScript support
 - [ ] Svelte support
 - [ ] Vue support
 

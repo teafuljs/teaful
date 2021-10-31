@@ -32,7 +32,7 @@
 [badge-prwelcome]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
 [prwelcome]: http://makeapullrequest.com
 
-## What advantages does it have? ✨ 
+## What advantages does it have? ✨
 
 <ul>
     <li>📦  ・<b>Tiny</b>: Less than 1kb package to manage your state in React and Preact.</li>
@@ -55,9 +55,10 @@
 - [4. Register events after an update 🚦](#register-events-after-an-update-)
 - [5. How to... 🧑‍🎓](#how-to-)
   - [Add a new store property](#adding-new-properties-to-the-store)
-  - [Reset a store property](#todo)
-  - [Reset all the store](#todo)
-  - [Use more than one store](#todo)
+  - [Reset a store property](#reset-a-store-property)
+  - [Reset all the store](#reset-all-the-store)
+  - [Use more than one store](#use-more-than-one-store)
+  - [Update several portions avoiding rerenders in the rest](#update-several-portions-avoiding-rerenders-in-the-rest)
 - [6. Examples 🖥](#examples--)
 - [7. Roadmap 🛣](#roadmap-)
 - [8. Contributors ✨](#contributors-)
@@ -107,19 +108,18 @@ const { useStore } = createStore(initialStore, onAfterUpdate);
 
 _Input:_
 
-| name           | type               | required | description                                                                                                                                                                                       |
-| -------------- | ------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `initialStore` | `object<any>`      | `false`  | Object with your initial store.                                                                                                                                                                   |
-| `onAfterUpdate`    | `function` | `false`  | Function that is executed after each property change. More [details](#register-events-after-an-update-). |
+| name            | type          | required | description                                                                                              |
+| --------------- | ------------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `initialStore`  | `object<any>` | `false`  | Object with your initial store.                                                                          |
+| `onAfterUpdate` | `function`    | `false`  | Function that is executed after each property change. More [details](#register-events-after-an-update-). |
 
 _Output:_
 
-| name        | type        | description                                                                                                                                                                                                                    | example                                                         |
-| ----------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
-| `useStore`  | `Proxy`     | Proxy hook to consume and update store properties inside your components. Each time the value changes, the component is rendered again with the new value. More [info](#usestore-hook).                                                                     | `const [price, setPrice] = useStore.cart.price()`               |
-| `getStore`  | `Proxy`     | Similar to `useStore` but without subscription. You can use it as a helper outside (or inside) components. Note that if the value changes, it does not cause a rerender. More [info](#getstore-helper).                                                       | `const [price, setPrice] = getStore.cart.price()`               |
-| `withStore` | `Proxy`     | HoC with `useStore` inside. Useful for components that are not functional. More [info](#withstore-hoc).                                                                                                                                                     | `withStore.cart.price(MyComponent)`                             |
-
+| name        | type    | description                                                                                                                                                                                             | example                                           |
+| ----------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `useStore`  | `Proxy` | Proxy hook to consume and update store properties inside your components. Each time the value changes, the component is rendered again with the new value. More [info](#usestore-hook).                 | `const [price, setPrice] = useStore.cart.price()` |
+| `getStore`  | `Proxy` | Similar to `useStore` but without subscription. You can use it as a helper outside (or inside) components. Note that if the value changes, it does not cause a rerender. More [info](#getstore-helper). | `const [price, setPrice] = getStore.cart.price()` |
+| `withStore` | `Proxy` | HoC with `useStore` inside. Useful for components that are not functional. More [info](#withstore-hoc).                                                                                                 | `withStore.cart.price(MyComponent)`               |
 
 ### How to export
 
@@ -224,10 +224,10 @@ function Example() {
 
 _Input:_
 
-| name          | type  | description                                                                                                                                                                                                                                                      | example                                            |
-| ------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| Initial value | `any` | This parameter is **not mandatory**. It only makes sense for new store properties that have not been defined before within the `createStore`. If the value has already been initialized inside the `createStore` this parameter has no effect. | `const [price, setPrice] = useStore.cart.price(0)` |
-| event after an update| `function`|This parameter is **not mandatory**. Adds an event that is executed every time there is a change inside the indicated store portion.| `const [price, setPrice] = useStore.cart.price(0, onAfterUpdate)`<div><small>And the function:</small></div><div>`function onAfterUpdate({ path, value, prevValue, getStore }){ console.log({ prevValue, value }) }`</div>
+| name                  | type       | description                                                                                                                                                                                                                                    | example                                                                                                                                                                                                                    |
+| --------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Initial value         | `any`      | This parameter is **not mandatory**. It only makes sense for new store properties that have not been defined before within the `createStore`. If the value has already been initialized inside the `createStore` this parameter has no effect. | `const [price, setPrice] = useStore.cart.price(0)`                                                                                                                                                                         |
+| event after an update | `function` | This parameter is **not mandatory**. Adds an event that is executed every time there is a change inside the indicated store portion.                                                                                                           | `const [price, setPrice] = useStore.cart.price(0, onAfterUpdate)`<div><small>And the function:</small></div><div>`function onAfterUpdate({ path, value, prevValue, getStore }){ console.log({ prevValue, value }) }`</div> |
 
 _Output:_
 
@@ -245,25 +245,28 @@ It works exactly like `useStore` but with **some differences**:
 
 - It **does not make a subscription**. So it is no longer a hook and you can use it as a helper wherever you want.
 - It's **not possible to register events** that are executed after a change.
-    ```js
-    getStore.cart.price(0, onAfterPriceChange) // ❌
 
-    function onAfterPriceChange({ path, value, prevValue }) {
-      const [,setErrorMsg] = getStore.errorMsg()
-      setErrorMsg(value > 99 ? 'price should be lower than $99')
-    }
-    ```
-    - If the intention is to register events that last forever, it has to be done within the `createStore`: 
-    ```js
-     const { useStore } = createStore(initialStore, onAfterUpdate) // ✅
+  ```js
+  getStore.cart.price(0, onAfterPriceChange) // ❌
 
-     function onAfterUpdate({ path, value, prevValue, getStore }) {
-       if(path === 'cart.price') {
-         const [,setErrorMsg] = getStore.errorMsg()
-         setErrorMsg(value > 99 ? 'price should be lower than $99')
-       }
+  function onAfterPriceChange({ path, value, prevValue }) {
+    const [,setErrorMsg] = getStore.errorMsg()
+    setErrorMsg(value > 99 ? 'price should be lower than $99')
+  }
+  ```
+
+  - If the intention is to register events that last forever, it has to be done within the `createStore`:
+
+  ```js
+   const { useStore } = createStore(initialStore, onAfterUpdate) // ✅
+
+   function onAfterUpdate({ path, value, prevValue, getStore }) {
+     if(path === 'cart.price') {
+       const [,setErrorMsg] = getStore.errorMsg()
+       setErrorMsg(value > 99 ? 'price should be lower than $99')
      }
-    ```
+   }
+  ```
 
 Very useful to use it:
 
@@ -335,7 +338,7 @@ const CounterWithStore = withStore.counter.count(Counter, 0);
 Example with all store:
 
 ```js
-const { withStore } = createStore({ count: 0 });
+const { withStore } = createStore({ count: 0 });
 
 class Counter extends Component {
   render() {
@@ -359,14 +362,72 @@ The **only difference** with the `useStore` is that instead of having 2 paramete
 
 ## Register events after an update 🚦
 
+It is possible to register an event after each update. This can be useful for validating properties, storing error messages, optimistic updates...
+
+There are 2 ways to register:
+
+- **Permanent** events: Inside `createStore`. This event will always be executed for each change made within the store.
+
+  ```js
+  export const { useStore } = createStore(initialStore, onAfterUpdate);
+
+  function onAfterUpdate({ path, prevValue, value, getStore }) {
+    if (path !== "count") return;
+
+    const [, setCount] = getStore.count();
+    const [errorMsg, setErrorMsg] = getStore.errorMsg();
+
+    if (value > 99) {
+      setCount(prevValue);
+      setErrorMsg("The count value should be lower than 100");
+    } else if (errorMsg) {
+      setErrorMsg();
+    }
+  }
+  ```
+
+- **Temporal** events: Inside `useStore` / `withStore`. These events will be executed for each change in the store (or indicated portion) **only during the life of the component**, when the component is unmounted the event is removed.
+
+  ```js
+  function Count() {
+    const [count, setCount] = useStore.count(0, onAfterUpdate);
+    const [errorMsg, setErrorMsg] = useStore.errorMsg();
+
+    // The event lasts as long as this component lives, but 
+    // it's also executed if the "count" property is updated 
+    // elsewhere.
+    function onAfterUpdate({ value, prevValue }) {
+      if (value > 99) {
+        setCount(prevValue);
+        setErrorMsg("The count value should be lower than 100");
+      } else if (errorMsg) {
+        setErrorMsg();
+      }
+    }
+
+    return (
+      <>
+        {errorMsg && <div className="erorMsg">{errorMsg}</div>}
+        <div className="count">{count}</div>
+        <button onClick={() => setCount((v) => v + 1)}>Increment</button>
+      </>
+    );
+  }
+  ```
+
 ## How to... 🧑‍🎓
 
 ### Add a new store property
+
 ### Reset a store property
+
+### Reset all the store
 
 ### Use more than one store
 
-## Examples  🖥
+### Update several portions avoiding rerenders in the rest
+
+## Examples 🖥
 
 ## Roadmap 🛣
 

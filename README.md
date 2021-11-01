@@ -1,6 +1,5 @@
 <h1 align="center">
 <div><b>Fragstore</b></div>
-<small>Fragmented store</small>
 </h1>
 
 <p align="center">

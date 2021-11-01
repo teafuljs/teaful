@@ -1,7 +1,28 @@
 {
   "name": "fragstore",
-  "version": "0.5.0",
-  "description": "Small library to manage the (P)React state",
+  "version": "0.6.0",
+  "description": "Tiny, easy and powerful React state management (less than 1kb)",
+  "license": "MIT",
+  "keywords": [
+    "react",
+    "preact",
+    "state",
+    "state management",
+    "store",
+    "javascript"
+  ],
+  "author": {
+    "name": "Aral Roca Gòmez",
+    "email": "contact@aralroca.com"
+  },
+  "files": [
+    "dist",
+    "package"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aralroca/fragstore.git"
+  },
   "source": "package/index.js",
   "main": "dist/index.js",
   "umd:main": "dist/index.umd.js",
@@ -10,28 +31,36 @@
     "require": "./dist/index.js",
     "default": "./dist/index.modern.js"
   },
-  "types": "dist/index.d.ts" ,
+  "bundlewatch": {
+    "files": [
+      {
+        "path": "./dist/index.js",
+        "maxSize": "1 kB"
+      },
+      {
+        "path": "./dist/index.modern.js",
+        "maxSize": "1 kB"
+      },
+      {
+        "path": "./dist/index.m.js",
+        "maxSize": "1 kB"
+      },
+      {
+        "path": "./dist/index.umd.js",
+        "maxSize": "1 kB"
+      }
+    ]
+  },
+  "types": "dist/index.d.ts",
   "scripts": {
-    "lint": "eslint ./package",
-    "format": "eslint --fix ./package",
+    "lint": "eslint ./package ./tests",
+    "format": "eslint --fix ./package ./tests",
     "test": "jest",
     "test:watch": "jest --watch",
     "build": "microbundle --jsx React.createElement",
     "dev": "microbundle watch",
     "prepublish": "yarn build"
   },
-  "keywords": [
-    "react",
-    "preact",
-    "state",
-    "state manager",
-    "javascript"
-  ],
-  "author": {
-    "name": "Aral Roca Gòmez",
-    "email": "contact@aralroca.com"
-  },
-  "license": "MIT",
   "peerDependencies": {
     "react": ">= 16.8.0"
   },
@@ -46,6 +75,7 @@
     "@testing-library/react": "12.1.2",
     "@testing-library/user-event": "13.4.1",
     "babel-jest": "27.2.5",
+    "bundlewatch": "0.3.2",
     "eslint": "7.32.0",
     "eslint-config-google": "0.14.0",
     "eslint-plugin-jest": "25.2.2",
@@ -57,5 +87,9 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-test-renderer": "17.0.2"
-  }
+  },
+  "mangle": {
+    "regex": "^_"
+  },
+  "bugs": "https://github.com/aralroca/fragstore/issues"
 }

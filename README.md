@@ -419,15 +419,152 @@ There are 2 ways to register:
 
 ### Add a new store property
 
+You can use `useStore` / `getStore` / `withStore` even if the property does not exist inside the store, and create it on the fly.
+
+```js
+const { useStore } = createStore({ username: 'Aral' })
+
+function CreateProperty() {
+  const [price, setPrice] = useStore.cart.price(0) // 0 as initial value
+
+  return <div>Price: {price}</div>
+}
+
+function OtherComponent() {
+  // store now is { username: 'Aral', cart: { price: 0 } }
+  const [store] = useStore()
+  console.log(store.cart.price) // 0
+  // ...
+}
+```
+
+It's **not mandatory to indicate the initial value**, you can create the property in a following step with the updater.
+
+```js
+const { useStore } = createStore({ username: 'Aral' })
+
+function CreateProperty() {
+  const [cart, setCart] = useStore.cart()
+
+  useEffect(() => { initCart() }, [])
+  async function initCart() {
+    const newCart = await fetch('/api/cart')
+    setCart(newCart)
+  }
+
+  if(!cart) return null
+
+  return <div>Price: {cart.price}</div>
+}
+```
+
 ### Reset a store property
+
+You can use the 3th array item from `useStore` / `getStore` / `withStore`. It's a function to return the value to its initial value.
+
+```js
+const [item, setItem, resetItem] = useStore.item()
+// ...
+resetItem()
+```
+
+If you only want the reset function and not the value, we recommend using the `getStore` to avoid creating a subscription and avoid unnecessary rerenders.
+
+```js
+const [,, resetItem] = getStore.item()
+// or...
+const resetItem = getStore.item()[2]
+```
 
 ### Reset all the store
 
+The [same thing](#reset-a-store-property) works to reset the entire store to its initial value.
+
+```js
+const [store, setStore, resetStore] = useStore()
+// ...
+resetStore()
+```
+
 ### Use more than one store
+
+You can have as many stores as you want. The only thing you have to do is to use as many `createStore` as stores you want.
+
+
+store.js
+```js
+import createStore from 'fragstore'
+
+export const { useStore: useCart } = createStore({ price: 0, items: [] })
+export const { useStore: useCounter } = createStore({ count: 0 })
+```
+
+Cart.js
+```js
+import { useCart } from './store'
+
+export default function Cart() {
+  const [price, setPrice] = useCart.price()
+  // ... rest
+}
+```
+
+Counter.js
+```js
+import { useCounter } from './store'
+
+export default function Counter() {
+  const [count, setCount] = useCount.count()
+  // ... rest
+}
+```
 
 ### Update several portions avoiding rerenders in the rest
 
+If you do this it causes a rerender to all the properties of the store:
+
+```js
+// 😡
+const [store, setStore] = useStore()
+setStore({ ...store, count: 10, username: ''  })
+```
+
+And if you do the next, you convert the whole store into only 2 properties (`{ count: 10, username: '' }`), and you will remove the rest:
+
+```js
+// 🥵
+const [store, setStore] = useStore()
+setStore({ count: 10, username: '' })
+```
+
+If you have to update several properties and you don't want to disturb the rest of the components that are using other store properties you can create a helper with `getStore`.
+
+```js
+export const { useStore, getStore } = createStore(initialStore)
+
+export function setStore(fields) {
+  Object.keys(fields).forEach((key) => {
+    const setStoreField = getStore[key]()[1]
+    setStoreField(fields[key]);
+  });
+}
+```
+
+And use it wherever you want:
+
+```js
+// 🤩
+import { setStore } from './store'
+
+// ...
+setStore({ count: 10, username: '' })
+```
+
 ## Examples 🖥
+
+We will expand the examples over time. For now you can use this Codesandbox:
+
+- https://codesandbox.io/s/fragmented-store-example-4p5dv
 
 ## Roadmap 🛣
 

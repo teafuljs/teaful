@@ -4,8 +4,43 @@ import userEvent from '@testing-library/user-event';
 import '@babel/polyfill';
 
 import createStore from '../package/index';
+import {act} from 'react-dom/test-utils';
 
-describe('onSet callback', () => {
+describe('onAfterUpdate callback', () => {
+  it('should be possible to remove an onAfterUpdate event when a component with useStore is unmounted', () => {
+    const callback = jest.fn();
+    const {useStore, getStore} = createStore({mount: true});
+
+    function RegisterCallback() {
+      useStore.test(undefined, callback);
+      return null;
+    }
+
+    function Test() {
+      const [mount] = useStore.mount();
+      if (!mount) return null;
+      return <RegisterCallback />;
+    }
+
+    render(<Test />);
+
+    const update = getStore.test()[1];
+    const unmount = () => getStore.mount()[1](false);
+
+    expect(callback).toHaveBeenCalledTimes(0);
+
+    act(() => update({}));
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    act(() => update({}));
+    expect(callback).toHaveBeenCalledTimes(2);
+
+    act(() => unmount());
+    act(() => update({}));
+    act(() => update({}));
+    expect(callback).toHaveBeenCalledTimes(2);
+  });
+
   it('should work via createStore', () => {
     const callback = jest.fn();
     const initialStore = {cart: {price: 0, items: []}, username: 'Aral'};

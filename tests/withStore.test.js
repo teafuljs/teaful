@@ -7,7 +7,7 @@ import '@babel/polyfill';
 
 import createStore from '../package/index';
 
-describe('useStore', () => {
+describe('withStore', () => {
   it('should rerender the last value', () => {
     const {withStore, getStore} = createStore({items: []});
 

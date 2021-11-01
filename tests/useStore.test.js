@@ -106,4 +106,35 @@ describe('useStore', () => {
     act(reset);
     expect(screen.getByTestId('test').textContent).toBe('');
   });
+
+  it('should be possible to create more than one store', () => {
+    const {useStore: useCart, getStore: getCart} = createStore({items: []});
+    const {useStore: useCounter} = createStore({count: 0});
+
+    function Test() {
+      const [count] = useCounter.count();
+      const [items] = useCart.items();
+      return (
+        <>
+          <div data-testid="counter">{count}</div>
+          <div data-testid="cart">
+            {items.map((item) => <div key={item}>{item}</div>)}
+          </div>
+        </>
+      );
+    }
+
+    render(<Test />);
+
+    const update = getCart.items()[1];
+
+    expect(screen.getByTestId('counter').textContent).toBe('0');
+    expect(screen.getByTestId('cart').textContent).toBe('');
+
+    act(() => update((v) => [...v, 'a']));
+    expect(screen.getByTestId('cart').textContent).toBe('a');
+
+    act(() => update((v) => [...v, 'b']));
+    expect(screen.getByTestId('cart').textContent).toBe('ab');
+  });
 });

@@ -1,16 +1,11 @@
-<h1 align="center">
+ <img src="logo.svg" width="200" alt="Fragstore" align="right" />
+
+<h1>
 <div><b>Fragstore</b></div>
 </h1>
 
-<p align="center">
-    <img src="logo.svg" width="200" alt="Fragstore" />
-</p>
+_Tiny, easy and powerful **React state management** library_
 
-<p align="center">
-    Tiny, easy and powerful <b>React state management</b> library
-</p>
-
-<div align="center">
 
 [![npm version](https://badge.fury.io/js/fragstore.svg)](https://badge.fury.io/js/fragstore)
 [![gzip size](https://img.badgesize.io/https://unpkg.com/fragstore?compression=gzip&label=gzip)](https://unpkg.com/fragstore)
@@ -18,15 +13,10 @@
 [![Maintenance Status](https://badgen.net/badge/maintenance/active/green)](https://github.com/aralroca/fragstore#maintenance-status)
 [![Weekly downloads](https://badgen.net/npm/dw/fragstore?color=blue)](https://www.npmjs.com/package/fragstore)
 [![GitHub Discussions: Chat With Us](https://badgen.net/badge/discussions/chat%20with%20us/purple)](https://github.com/aralroca/fragstore/discussions)
-[![PRs Welcome][badge-prwelcome]][prwelcome]
-
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-
+[![PRs Welcome][badge-prwelcome]][prwelcome]<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
-
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-</div>
 
 [badge-prwelcome]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
 [prwelcome]: http://makeapullrequest.com

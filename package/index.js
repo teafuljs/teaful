@@ -23,14 +23,14 @@ export default function createStore(defaultStore = {}, callback) {
    */
   let validator = {
     _path: [],
-    _getHoC(Comp, path, initValue) {
+    _getHoC(Comp, path, initValue, callback) {
       let componentName = Comp.displayName || Comp.name || 'Component';
       let WithStore = (props) => {
         let last = path.length - 1;
         let store = path.length ? path.reduce(
-            (a, c, index) => index === last ? a[c](initValue) : a[c],
+            (a, c, index) => index === last ? a[c](initValue, callback) : a[c],
             useStore,
-        ) : useStore(initValue);
+        ) : useStore(initValue, callback);
         return createElement(Comp, {...props, store});
       };
       WithStore.displayName = `withStore(${componentName})`;

@@ -5,6 +5,7 @@ import '@babel/polyfill';
 
 import createStore from '../package/index';
 import {act} from 'react-dom/test-utils';
+import {Component} from 'react';
 
 describe('onAfterUpdate callback', () => {
   it('should be possible to remove an onAfterUpdate event when a component with useStore is unmounted', () => {
@@ -15,6 +16,43 @@ describe('onAfterUpdate callback', () => {
       useStore.test(undefined, callback);
       return null;
     }
+
+    function Test() {
+      const [mount] = useStore.mount();
+      if (!mount) return null;
+      return <RegisterCallback />;
+    }
+
+    render(<Test />);
+
+    const update = getStore.test()[1];
+    const unmount = () => getStore.mount()[1](false);
+
+    expect(callback).toHaveBeenCalledTimes(0);
+
+    act(() => update({}));
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    act(() => update({}));
+    expect(callback).toHaveBeenCalledTimes(2);
+
+    act(() => unmount());
+    act(() => update({}));
+    act(() => update({}));
+    expect(callback).toHaveBeenCalledTimes(2);
+  });
+
+  it('should be possible to remove an onAfterUpdate event when a component with withStore is unmounted', () => {
+    const callback = jest.fn();
+    const {useStore, withStore, getStore} = createStore({mount: true});
+    class RegisterCallbackComponent extends Component {
+      render() {
+        return null;
+      }
+    }
+
+    const RegisterCallback = withStore
+        .test(RegisterCallbackComponent, undefined, callback);
 
     function Test() {
       const [mount] = useStore.mount();
@@ -98,7 +136,7 @@ describe('onAfterUpdate callback', () => {
     });
   });
 
-  it('Should be possible to register more than 1 onSet (createStore + useStore)', () => {
+  it('Should be possible to register more than 1 onAfterUpdate (createStore + useStore)', () => {
     const callbackCreateStore = jest.fn();
     const callbackUseStore = jest.fn();
     const initialStore = {cart: {price: 0, items: []}, username: 'Aral'};
@@ -188,11 +226,11 @@ describe('onAfterUpdate callback', () => {
 
   it('Updating another value using the getStore should work', () => {
     const initialStore = {cart: {price: 0}, limit: false};
-    const {useStore} = createStore(initialStore, onSet);
+    const {useStore} = createStore(initialStore, onAfterUpdate);
     const renderTestApp = jest.fn();
     const renderTest = jest.fn();
 
-    function onSet({path, prevValue, value, getStore}) {
+    function onAfterUpdate({path, prevValue, value, getStore}) {
       if (path !== 'cart.price') return;
       const [, setLimit] = getStore.limit();
       const [, setPrice] = getStore.cart.price();

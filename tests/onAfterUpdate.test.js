@@ -224,6 +224,66 @@ describe('onAfterUpdate callback', () => {
     expect(btn.textContent).toBe('4');
   });
 
+  it('Should be possible to create calculated variables', () => {
+    const renderTest = jest.fn();
+    const initialStore = {cart: {price: 0, items: []}};
+    const {useStore, getStore} = createStore(initialStore, onAfterUpdate);
+
+    function onAfterUpdate({path}) {
+      if (path === 'cart' || path.startsWith('cart.')) onUpdateCart();
+    }
+
+    function onUpdateCart() {
+      const [items] = getStore.cart.items();
+      const [price, setPrice] = getStore.cart.price();
+      const calculatedPrice = items.length * 3;
+      if (price !== calculatedPrice) setPrice(calculatedPrice);
+    }
+
+    function Test() {
+      const [cart, setCart] = useStore.cart();
+      renderTest();
+      return (
+        <>
+          <div data-testid="price">{cart.price}</div>
+          <button
+            data-testid="click"
+            onClick={() => setCart((v) => ({
+              ...v,
+              items: [...v.items, {name: 'newItem'}],
+            }))}>
+            {cart.items.length} items
+          </button>
+        </>
+      );
+    }
+
+    render(<Test />);
+
+    const btn = screen.getByTestId('click');
+    const price = screen.getByTestId('price');
+
+    expect(renderTest).toHaveBeenCalledTimes(1);
+    expect(price.textContent).toBe('0');
+    expect(btn.textContent).toBe('0 items');
+
+    userEvent.click(btn);
+    expect(renderTest).toHaveBeenCalledTimes(2);
+    expect(price.textContent).toBe('3');
+    expect(btn.textContent).toBe('1 items');
+
+    userEvent.click(btn);
+    expect(renderTest).toHaveBeenCalledTimes(3);
+    expect(price.textContent).toBe('6');
+    expect(btn.textContent).toBe('2 items');
+
+    // No possible to modifiy a calculated value
+    act(() => getStore.cart.price()[1](0));
+    expect(renderTest).toHaveBeenCalledTimes(4);
+    expect(price.textContent).toBe('6');
+    expect(btn.textContent).toBe('2 items');
+  });
+
   it('Updating another value using the getStore should work', () => {
     const initialStore = {cart: {price: 0}, limit: false};
     const {useStore} = createStore(initialStore, onAfterUpdate);

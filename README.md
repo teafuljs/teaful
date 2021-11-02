@@ -6,7 +6,6 @@
 
 _Tiny, easy and powerful **React state management** library_
 
-
 [![npm version](https://badge.fury.io/js/fragstore.svg)](https://badge.fury.io/js/fragstore)
 [![gzip size](https://img.badgesize.io/https://unpkg.com/fragstore?compression=gzip&label=gzip)](https://unpkg.com/fragstore)
 [![CI Status](https://github.com/aralroca/fragstore/actions/workflows/test.yml/badge.svg)](https://github.com/aralroca/fragstore/actions/workflows/test.yml)
@@ -15,8 +14,8 @@ _Tiny, easy and powerful **React state management** library_
 [![GitHub Discussions: Chat With Us](https://badgen.net/badge/discussions/chat%20with%20us/purple)](https://github.com/aralroca/fragstore/discussions)
 [![PRs Welcome][badge-prwelcome]][prwelcome]<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [badge-prwelcome]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
 [prwelcome]: http://makeapullrequest.com
@@ -43,12 +42,13 @@ _Tiny, easy and powerful **React state management** library_
   - [withStore HoC](#withstore-hoc)
 - [4. Register events after an update 🚦](#register-events-after-an-update-)
 - [5. How to... 🧑‍🎓](#how-to-)
-  - [Add a new store property](#adding-new-properties-to-the-store)
+  - [Add a new store property](#add-a-new-store-property)
   - [Reset a store property](#reset-a-store-property)
   - [Reset all the store](#reset-all-the-store)
   - [Use more than one store](#use-more-than-one-store)
   - [Update several portions avoiding rerenders in the rest](#update-several-portions-avoiding-rerenders-in-the-rest)
-- [6. Examples 🖥](#examples--)
+  - [Define calculated properties](#define-calculated-properties)
+- [6. Examples 🖥](#examples-)
 - [7. Roadmap 🛣](#roadmap-)
 - [8. Contributors ✨](#contributors-)
 
@@ -382,8 +382,8 @@ There are 2 ways to register:
     const [count, setCount] = useStore.count(0, onAfterUpdate);
     const [errorMsg, setErrorMsg] = useStore.errorMsg();
 
-    // The event lasts as long as this component lives, but 
-    // it's also executed if the "count" property is updated 
+    // The event lasts as long as this component lives, but
+    // it's also executed if the "count" property is updated
     // elsewhere.
     function onAfterUpdate({ value, prevValue }) {
       if (value > 99) {
@@ -411,18 +411,18 @@ There are 2 ways to register:
 You can use `useStore` / `getStore` / `withStore` even if the property does not exist inside the store, and create it on the fly.
 
 ```js
-const { useStore } = createStore({ username: 'Aral' })
+const { useStore } = createStore({ username: "Aral" });
 
 function CreateProperty() {
-  const [price, setPrice] = useStore.cart.price(0) // 0 as initial value
+  const [price, setPrice] = useStore.cart.price(0); // 0 as initial value
 
-  return <div>Price: {price}</div>
+  return <div>Price: {price}</div>;
 }
 
 function OtherComponent() {
   // store now is { username: 'Aral', cart: { price: 0 } }
-  const [store] = useStore()
-  console.log(store.cart.price) // 0
+  const [store] = useStore();
+  console.log(store.cart.price); // 0
   // ...
 }
 ```
@@ -430,20 +430,22 @@ function OtherComponent() {
 It's **not mandatory to indicate the initial value**, you can create the property in a following step with the updater.
 
 ```js
-const { useStore } = createStore({ username: 'Aral' })
+const { useStore } = createStore({ username: "Aral" });
 
 function CreateProperty() {
-  const [cart, setCart] = useStore.cart()
+  const [cart, setCart] = useStore.cart();
 
-  useEffect(() => { initCart() }, [])
+  useEffect(() => {
+    initCart();
+  }, []);
   async function initCart() {
-    const newCart = await fetch('/api/cart')
-    setCart(newCart)
+    const newCart = await fetch("/api/cart");
+    setCart(newCart);
   }
 
-  if(!cart) return null
+  if (!cart) return null;
 
-  return <div>Price: {cart.price}</div>
+  return <div>Price: {cart.price}</div>;
 }
 ```
 
@@ -452,17 +454,17 @@ function CreateProperty() {
 You can use the 3th array item from `useStore` / `getStore` / `withStore`. It's a function to return the value to its initial value.
 
 ```js
-const [item, setItem, resetItem] = useStore.item()
+const [item, setItem, resetItem] = useStore.item();
 // ...
-resetItem()
+resetItem();
 ```
 
 If you only want the reset function and not the value, we recommend using the `getStore` to avoid creating a subscription and avoid unnecessary rerenders.
 
 ```js
-const [,, resetItem] = getStore.item()
+const [, , resetItem] = getStore.item();
 // or...
-const resetItem = getStore.item()[2]
+const resetItem = getStore.item()[2];
 ```
 
 ### Reset all the store
@@ -470,40 +472,42 @@ const resetItem = getStore.item()[2]
 The [same thing](#reset-a-store-property) works to reset the entire store to its initial value.
 
 ```js
-const [store, setStore, resetStore] = useStore()
+const [store, setStore, resetStore] = useStore();
 // ...
-resetStore()
+resetStore();
 ```
 
 ### Use more than one store
 
 You can have as many stores as you want. The only thing you have to do is to use as many `createStore` as stores you want.
 
-
 store.js
-```js
-import createStore from 'fragstore'
 
-export const { useStore: useCart } = createStore({ price: 0, items: [] })
-export const { useStore: useCounter } = createStore({ count: 0 })
+```js
+import createStore from "fragstore";
+
+export const { useStore: useCart } = createStore({ price: 0, items: [] });
+export const { useStore: useCounter } = createStore({ count: 0 });
 ```
 
 Cart.js
+
 ```js
-import { useCart } from './store'
+import { useCart } from "./store";
 
 export default function Cart() {
-  const [price, setPrice] = useCart.price()
+  const [price, setPrice] = useCart.price();
   // ... rest
 }
 ```
 
 Counter.js
+
 ```js
-import { useCounter } from './store'
+import { useCounter } from "./store";
 
 export default function Counter() {
-  const [count, setCount] = useCount.count()
+  const [count, setCount] = useCount.count();
   // ... rest
 }
 ```
@@ -514,26 +518,26 @@ If you do this it causes a rerender to all the properties of the store:
 
 ```js
 // 😡
-const [store, setStore] = useStore()
-setStore({ ...store, count: 10, username: ''  })
+const [store, setStore] = useStore();
+setStore({ ...store, count: 10, username: "" });
 ```
 
 And if you do the next, you convert the whole store into only 2 properties (`{ count: 10, username: '' }`), and you will remove the rest:
 
 ```js
 // 🥵
-const [store, setStore] = useStore()
-setStore({ count: 10, username: '' })
+const [store, setStore] = useStore();
+setStore({ count: 10, username: "" });
 ```
 
 If you have to update several properties and you don't want to disturb the rest of the components that are using other store properties you can create a helper with `getStore`.
 
 ```js
-export const { useStore, getStore } = createStore(initialStore)
+export const { useStore, getStore } = createStore(initialStore);
 
 export function setStore(fields) {
   Object.keys(fields).forEach((key) => {
-    const setStoreField = getStore[key]()[1]
+    const setStoreField = getStore[key]()[1];
     setStoreField(fields[key]);
   });
 }
@@ -543,10 +547,40 @@ And use it wherever you want:
 
 ```js
 // 🤩
-import { setStore } from './store'
+import { setStore } from "./store";
 
 // ...
-setStore({ count: 10, username: '' })
+setStore({ count: 10, username: "" });
+```
+
+### Define calculated properties
+
+It's possible to use the `getStore` together with the function that is executed after each update to have store properties calculated from others.
+
+In this example the cart price value will always be a value calculated according to the array of items:
+
+```js
+export const { useStore, getStore } = createStore(
+  {
+    cart: {
+      price: 0,
+      items: [],
+    },
+  },
+  onAfterUpdate
+);
+
+function onAfterUpdate({ path }) {
+  if (path === "cart" || path.startsWith("cart.")) updateCalculatedCartProps();
+}
+
+// Price always will be items.length * 3
+function updateCalculatedCartProps() {
+  const [items] = getStore.cart.items();
+  const [price, setPrice] = getStore.cart.price();
+  const calculatedPrice = items.length * 3;
+  if (price !== calculatedPrice) setPrice(calculatedPrice);
+}
 ```
 
 ## Examples 🖥

@@ -110,10 +110,10 @@ export default function createStore(defaultStore = {}, callback) {
 
     useEffect(() => {
       subscription._subscribe(path, forceRender);
-      subscription._subscribe(path, callback);
+      subscription._subscribe(DOT, callback);
       return () => {
         subscription._unsubscribe(path, forceRender);
-        subscription._unsubscribe(path, callback);
+        subscription._unsubscribe(DOT, callback);
       };
     }, []);
   }
@@ -126,7 +126,7 @@ export default function createStore(defaultStore = {}, callback) {
    */
   function updateField(path = '') {
     let fieldPath = Array.isArray(path) ? path : path.split(DOT);
-    let prevValue = getField(allStore, fieldPath);
+    let prevStore = allStore;
 
     return (newValue) => {
       let value = newValue;
@@ -143,10 +143,8 @@ export default function createStore(defaultStore = {}, callback) {
 
       // Notifying to all subscribers
       subscription._notify(DOT+path, {
-        path: fieldPath.join(DOT),
-        value,
-        prevValue,
-        getStore,
+        prevStore,
+        store: allStore,
       });
     };
   }
@@ -200,10 +198,10 @@ function createSubscription() {
       if (!listeners[path]) listeners[path] = new Set();
       listeners[path].add(listener);
     },
-    _notify(path, param) {
-      Object.keys(listeners).forEach((listenersKey) => {
-        if (path.startsWith(listenersKey) || listenersKey.startsWith(path)) {
-          listeners[listenersKey].forEach((listener) => listener(param));
+    _notify(path, params) {
+      Object.keys(listeners).forEach((listenerKey) => {
+        if (path.startsWith(listenerKey) || listenerKey.startsWith(path)) {
+          listeners[listenerKey].forEach((listener) => listener(params));
         }
       });
     },

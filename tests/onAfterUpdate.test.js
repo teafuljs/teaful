@@ -1,11 +1,11 @@
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {act} from 'react-dom/test-utils';
+import {Component} from 'react';
 
 import '@babel/polyfill';
 
 import createStore from '../package/index';
-import {act} from 'react-dom/test-utils';
-import {Component} from 'react';
 
 describe('onAfterUpdate callback', () => {
   it('should be possible to remove an onAfterUpdate event when a component with useStore is unmounted', () => {
@@ -26,7 +26,6 @@ describe('onAfterUpdate callback', () => {
     render(<Test />);
 
     const update = getStore.test()[1];
-    const unmount = () => getStore.mount()[1](false);
 
     expect(callback).toHaveBeenCalledTimes(0);
 
@@ -36,10 +35,12 @@ describe('onAfterUpdate callback', () => {
     act(() => update({}));
     expect(callback).toHaveBeenCalledTimes(2);
 
-    act(() => unmount());
+    act(() => getStore.mount()[1](false));
+    expect(callback).toHaveBeenCalledTimes(3);
+
     act(() => update({}));
     act(() => update({}));
-    expect(callback).toHaveBeenCalledTimes(2);
+    expect(callback).toHaveBeenCalledTimes(3);
   });
 
   it('should be possible to remove an onAfterUpdate event when a component with withStore is unmounted', () => {
@@ -63,7 +64,6 @@ describe('onAfterUpdate callback', () => {
     render(<Test />);
 
     const update = getStore.test()[1];
-    const unmount = () => getStore.mount()[1](false);
 
     expect(callback).toHaveBeenCalledTimes(0);
 
@@ -73,17 +73,18 @@ describe('onAfterUpdate callback', () => {
     act(() => update({}));
     expect(callback).toHaveBeenCalledTimes(2);
 
-    act(() => unmount());
+    act(() => getStore.mount()[1](false));
+    expect(callback).toHaveBeenCalledTimes(3);
+
     act(() => update({}));
     act(() => update({}));
-    expect(callback).toHaveBeenCalledTimes(2);
+    expect(callback).toHaveBeenCalledTimes(3);
   });
 
   it('should work via createStore', () => {
     const callback = jest.fn();
     const initialStore = {cart: {price: 0, items: []}, username: 'Aral'};
     const {useStore} = createStore(initialStore, callback);
-    const testCallback = testItem(callback);
 
     function Test() {
       const [, setPrice] = useStore.cart.price();
@@ -105,35 +106,14 @@ describe('onAfterUpdate callback', () => {
 
     userEvent.click(screen.getByTestId('click'));
     expect(callback).toHaveBeenCalledTimes(2);
-    testCallback({value: 1, prevValue: 0, times: 1, path: 'cart.price'});
-    testCallback({
-      value: 'Arala',
-      prevValue: 'Aral',
-      times: 2,
-      path: 'username',
-    });
 
     userEvent.click(screen.getByTestId('click'));
     expect(callback).toHaveBeenCalledTimes(4);
-    testCallback({value: 2, prevValue: 1, times: 3, path: 'cart.price'});
-    testCallback({
-      value: 'Aralaa',
-      prevValue: 'Arala',
-      times: 4,
-      path: 'username',
-    });
 
     userEvent.click(screen.getByTestId('click'));
     userEvent.click(screen.getByTestId('click'));
     userEvent.click(screen.getByTestId('click'));
     expect(callback).toHaveBeenCalledTimes(10);
-    testCallback({value: 5, prevValue: 4, times: 9, path: 'cart.price'});
-    testCallback({
-      value: 'Aralaaaaa',
-      prevValue: 'Aralaaaa',
-      times: 10,
-      path: 'username',
-    });
   });
 
   it('Should be possible to register more than 1 onAfterUpdate (createStore + useStore)', () => {
@@ -141,8 +121,6 @@ describe('onAfterUpdate callback', () => {
     const callbackUseStore = jest.fn();
     const initialStore = {cart: {price: 0, items: []}, username: 'Aral'};
     const {useStore} = createStore(initialStore, callbackCreateStore);
-    const testCallbackCreateStore = testItem(callbackCreateStore);
-    const testCallbackUseStore = testItem(callbackUseStore);
 
     function Test() {
       const [, setPrice] = useStore.cart.price(0, callbackUseStore);
@@ -164,29 +142,50 @@ describe('onAfterUpdate callback', () => {
 
     userEvent.click(screen.getByTestId('click'));
     expect(callbackCreateStore).toHaveBeenCalledTimes(2);
-    testCallbackCreateStore({value: 1, prevValue: 0, times: 1, path: 'cart.price'});
-    testCallbackCreateStore({
-      value: 'Arala',
-      prevValue: 'Aral',
-      times: 2,
-      path: 'username',
-    });
-    expect(callbackUseStore).toHaveBeenCalledTimes(1);
-    testCallbackUseStore({value: 1, prevValue: 0, times: 1, path: 'cart.price'});
+    expect(callbackUseStore).toHaveBeenCalledTimes(2);
+  });
+
+  it('Should return the prevStore and store', () => {
+    const initialStore = {cart: {price: 0}};
+    const onAfterUpdate = jest.fn();
+    const {useStore} = createStore(initialStore, onAfterUpdate);
+
+    function Test() {
+      const [, setPrice] = useStore.cart.price(0);
+
+      return (
+        <button data-testid="click" onClick={() => setPrice((v) => v + 1)}>
+          Test
+        </button>
+      );
+    }
+
+    render(<Test />);
+
+    userEvent.click(screen.getByTestId('click'));
+    expect(onAfterUpdate).toHaveBeenCalledTimes(1);
+    const params = onAfterUpdate.mock.calls[0][0];
+    expect(params.store).toMatchObject({cart: {price: 1}});
+    expect(params.prevStore).toMatchObject({cart: {price: 0}});
+
+    userEvent.click(screen.getByTestId('click'));
+    expect(onAfterUpdate).toHaveBeenCalledTimes(2);
+    const params2 = onAfterUpdate.mock.calls[1][0];
+    expect(params2.store).toMatchObject({cart: {price: 2}});
+    expect(params2.prevStore).toMatchObject({cart: {price: 1}});
   });
 
   it('Updating the prevValue should work as limit | via createStore', () => {
-    const callback = ({path, prevValue, value, getStore}) => {
-      if (
-        (path === 'cart.price' && value > 4) ||
-        (path === 'cart' && value.price > 4)
-      ) {
-        const [, setPrice] = getStore.cart.price();
-        setPrice(prevValue);
-      }
-    };
     const initialStore = {cart: {price: 0}};
-    const {useStore} = createStore(initialStore, callback);
+    const {useStore, getStore} = createStore(initialStore, callback);
+
+    function callback({prevStore, store}) {
+      const {price} = store.cart;
+      if (price > 4) {
+        const [, setPrice] = getStore.cart.price();
+        setPrice(prevStore.cart.price);
+      }
+    }
 
     function Test() {
       const [price, setPrice] = useStore.cart.price();
@@ -229,15 +228,13 @@ describe('onAfterUpdate callback', () => {
     const initialStore = {cart: {price: 0, items: []}};
     const {useStore, getStore} = createStore(initialStore, onAfterUpdate);
 
-    function onAfterUpdate({path}) {
-      if (path === 'cart' || path.startsWith('cart.')) onUpdateCart();
-    }
-
-    function onUpdateCart() {
-      const [items] = getStore.cart.items();
-      const [price, setPrice] = getStore.cart.price();
+    function onAfterUpdate({store}) {
+      const {items, price} = store.cart;
       const calculatedPrice = items.length * 3;
-      if (price !== calculatedPrice) setPrice(calculatedPrice);
+      if (price !== calculatedPrice) {
+        const [, setPrice] = getStore.cart.price();
+        setPrice(calculatedPrice);
+      }
     }
 
     function Test() {
@@ -286,16 +283,20 @@ describe('onAfterUpdate callback', () => {
 
   it('Updating another value using the getStore should work', () => {
     const initialStore = {cart: {price: 0}, limit: false};
-    const {useStore} = createStore(initialStore, onAfterUpdate);
+    const {useStore, getStore} = createStore(initialStore, onAfterUpdate);
     const renderTestApp = jest.fn();
     const renderTest = jest.fn();
 
-    function onAfterUpdate({path, prevValue, value, getStore}) {
-      if (path !== 'cart.price') return;
+    function onAfterUpdate({prevStore, store}) {
+      const price = store.cart.price;
+      const prevPrice = prevStore.cart.price;
       const [, setLimit] = getStore.limit();
-      const [, setPrice] = getStore.cart.price();
-      if (value > 4) setPrice(prevValue);
-      setLimit(value > 4);
+
+      if (price > 4) {
+        const [, setPrice] = getStore.cart.price();
+        setPrice(prevPrice);
+        setLimit(true);
+      }
     }
 
     function Test() {
@@ -349,14 +350,3 @@ describe('onAfterUpdate callback', () => {
     expect(btn.textContent).toBe('No more than 4!! :)');
   });
 });
-
-function testItem(fn) {
-  return ({path, prevValue, value, times}) => {
-    const params = fn.mock.calls[times - 1][0];
-    expect(params.path).toBe(path);
-    expect(params.prevValue).toBe(prevValue);
-    expect(params.value).toBe(value);
-    expect(typeof params.getStore !== 'undefined').toBeTruthy();
-    return params.getStore;
-  };
-}

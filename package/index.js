@@ -126,9 +126,9 @@ export default function createStore(defaultStore = {}, callback) {
    */
   function updateField(path = '') {
     let fieldPath = Array.isArray(path) ? path : path.split(DOT);
-    let prevStore = allStore;
 
     return (newValue) => {
+      let prevStore = allStore;
       let value = newValue;
 
       if (typeof newValue === 'function') {

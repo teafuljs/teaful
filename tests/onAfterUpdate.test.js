@@ -8,12 +8,47 @@ import '@babel/polyfill';
 import createStore from '../package/index';
 
 describe('onAfterUpdate callback', () => {
-  it('should be possible to remove an onAfterUpdate event when a component with useStore is unmounted', () => {
+  it('should be possible to remove an onAfterUpdate event when a component with useStore.test is unmounted', () => {
     const callback = jest.fn();
     const {useStore, getStore} = createStore({mount: true});
 
     function RegisterCallback() {
       useStore.test(undefined, callback);
+      return null;
+    }
+
+    function Test() {
+      const [mount] = useStore.mount();
+      if (!mount) return null;
+      return <RegisterCallback />;
+    }
+
+    render(<Test />);
+
+    const update = getStore.test()[1];
+
+    expect(callback).toHaveBeenCalledTimes(0);
+
+    act(() => update({}));
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    act(() => update({}));
+    expect(callback).toHaveBeenCalledTimes(2);
+
+    act(() => getStore.mount()[1](false));
+    expect(callback).toHaveBeenCalledTimes(3);
+
+    act(() => update({}));
+    act(() => update({}));
+    expect(callback).toHaveBeenCalledTimes(3);
+  });
+
+  it('should be possible to remove an onAfterUpdate event when a component with useStore is unmounted', () => {
+    const callback = jest.fn();
+    const {useStore, getStore} = createStore({mount: true});
+
+    function RegisterCallback() {
+      useStore(undefined, callback);
       return null;
     }
 
@@ -116,7 +151,7 @@ describe('onAfterUpdate callback', () => {
     expect(callback).toHaveBeenCalledTimes(10);
   });
 
-  it('Should be possible to register more than 1 onAfterUpdate (createStore + useStore)', () => {
+  it('Should be possible to register more than 1 onAfterUpdate (createStore + useStore.cart.price)', () => {
     const callbackCreateStore = jest.fn();
     const callbackUseStore = jest.fn();
     const initialStore = {cart: {price: 0, items: []}, username: 'Aral'};
@@ -143,6 +178,39 @@ describe('onAfterUpdate callback', () => {
     userEvent.click(screen.getByTestId('click'));
     expect(callbackCreateStore).toHaveBeenCalledTimes(2);
     expect(callbackUseStore).toHaveBeenCalledTimes(2);
+  });
+
+  it('Should be possible to register more than 1 onAfterUpdate (createStore + useStore)', () => {
+    const callbackCreateStore = jest.fn();
+    const callbackUseStore = jest.fn();
+    const initialStore = {cart: {price: 0, items: []}, username: 'Aral'};
+    const {useStore} = createStore(initialStore, callbackCreateStore);
+
+    function Test() {
+      const [, setStore] = useStore(undefined, callbackUseStore);
+
+      function onClick() {
+        setStore((store) => ({
+          ...store,
+          cart: {
+            ...store.cart,
+            price: store.cart.price + 1,
+          },
+        }));
+      }
+
+      return (
+        <button data-testid="click" onClick={onClick}>
+          Test
+        </button>
+      );
+    }
+
+    render(<Test />);
+
+    userEvent.click(screen.getByTestId('click'));
+    expect(callbackCreateStore).toHaveBeenCalledTimes(1);
+    expect(callbackUseStore).toHaveBeenCalledTimes(1);
   });
 
   it('Should return the prevStore and store', () => {

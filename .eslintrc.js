@@ -26,6 +26,7 @@ module.exports = {
     'require-jsdoc': 0,
     'react/prop-types': 0,
     'prefer-const': 0,
+    'linebreak-style': ['error', process.platform === 'win32' ? 'windows' : 'unix'],
     'max-len': [
       'error',
       {'code': 80, 'ignoreStrings': true},

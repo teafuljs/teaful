@@ -125,7 +125,7 @@ This way you can import it with:
 
 ```js
 // ✅
-import { useStore } from '../store
+import { useStore } from '../store'
 ```
 
 Avoid using a default export with all:
@@ -139,7 +139,7 @@ Because then you won't be able to do this:
 
 ```js
 // ❌  It's not working well with proxies
-import { useStore } from '../store
+import { useStore } from '../store'
 ```
 
 ## Manage the store 🕹

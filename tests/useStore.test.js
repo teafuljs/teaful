@@ -107,6 +107,33 @@ describe('useStore', () => {
     expect(screen.getByTestId('test').textContent).toBe('');
   });
 
+  it('should allow to reset the value to the initial value with useStore without path', () => {
+    const {useStore, getStore} = createStore();
+
+    function Test() {
+      const [store, setStore] = useStore({items: []});
+      return (
+        <div onClick={() => setStore((store) => ({...store, items: [...store.items, store.items.length]}))} data-testid="test">
+          {store.items.map((item) => <div key={item}>{item}</div>)}
+        </div>
+      );
+    }
+
+    render(<Test />);
+
+    expect(screen.getByTestId('test').textContent).toBe('');
+
+    userEvent.click(screen.getByTestId('test'));
+    expect(screen.getByTestId('test').textContent).toBe('0');
+
+    userEvent.click(screen.getByTestId('test'));
+    expect(screen.getByTestId('test').textContent).toBe('01');
+
+    const reset = getStore()[2];
+    act(reset);
+    expect(screen.getByTestId('test').textContent).toBe('');
+  });
+
   it('should be possible to create more than one store', () => {
     const {useStore: useCart, getStore: getCart} = createStore({items: []});
     const {useStore: useCounter} = createStore({count: 0});

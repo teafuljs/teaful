@@ -24,7 +24,7 @@ export default function createStore(defaultStore = {}, callback) {
   let validator = {
     _path: [],
     _getHoC(Comp, path, initValue, callback) {
-      let componentName = Comp.displayName || Comp.name || 'Component';
+      let componentName = Comp.displayName || Comp.name || '';
       let WithStore = (props) => {
         let last = path.length - 1;
         let store = path.length ? path.reduce(
@@ -60,7 +60,14 @@ export default function createStore(defaultStore = {}, callback) {
       // MODE_USE: let [store, update, reset] = getStore()
       if (!path.length) {
         let updateAll = updateField();
+
         if (mode === MODE_USE) useSubscription(DOT, callback);
+
+        if (typeof param === 'object') {
+          allStore = {...param, ...allStore};
+          initialStore = {...param, ...initialStore};
+        }
+
         return [allStore, updateAll, resetField()];
       }
 

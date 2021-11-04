@@ -1,0 +1,83 @@
+# useStore Hook
+
+Use the `useStore` hook to subscribe to changes for any part of the store.
+
+It's recommended to use the useStore hook as a proxy to indicate exactly what portion of the store you want.
+
+This way you only subscribe to this part of the store avoiding unnecessary re-renders.
+
+```jsx
+import createStore from 'fragstore';
+
+const { useStore } = createStore({
+  username: 'Max',
+  age: 22,
+  cart: {
+    price: 0,
+    items: [],
+  },
+});
+
+function Example() {
+  // subscribes to changes for the `username` portion of the store
+  const [username, setUsername] = useStore.username();
+  // subscribes to changes for the `cart.price` portion of the store
+  // won't re-render if the `cart.items` changes
+  const [cartPrice, setCartPrice] = useStore.cart.price();
+
+  // to see if and when the component re-renders
+  console.log('This component re-redered');
+
+  return (
+    <>
+      <button onClick={() => setUsername('Lando')}>
+        Update {username}
+      </button>
+      <button onClick={() => setCartPrice((v) => v + 1)}>
+        Increment price: 💵 {cartPrice}
+      </button>
+    </>
+  );
+}
+```
+
+However, it's also possible to use the useStore hook to access the store as a whole.
+
+import Callout from 'nextra-theme-docs/callout';
+
+<Callout type="warning" emoji="⚠️">
+  This will cause a re-render whenever any property of the store changes.
+</Callout>
+
+```jsx
+function Example() {
+  // subscribe to the whole store
+  const [store, setStore] = useStore();
+
+  return (
+    <>
+      <button
+        onClick={() =>
+          setStore((s) => ({
+            ...s,
+            username: 'Lando',
+          }))
+        }
+      >
+        Update {store.username}
+      </button>
+      <button
+        onClick={() =>
+          setStore((s) => ({
+            ...s,
+            cart: { ...s.cart, price: s.cart.price + 1 },
+          }))
+        }
+      >
+        Increment price: 💵 {store.cart.price}
+      </button>
+    </>
+  );
+}
+```
+

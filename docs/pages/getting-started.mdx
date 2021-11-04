@@ -45,3 +45,35 @@ function onAfterUpdate({ path, value, prevValue }) {
 
 const { useStore } = createStore(initialState, onAfterUpdate);
 ```
+
+import Callout from 'nextra-theme-docs/callout';
+
+## How to export correctly? 
+
+Export the function(s) you want to use as constants from the file
+
+```js
+export const { useStore, getStore, withStore } = createStore();
+```
+
+Or you can have a default export like this:
+
+```js
+const { useStore } = createStore();
+
+export default useStore;
+```
+
+<Callout type="error" emoji="🚫">
+Do no use a default export like the following one
+</Callout>
+
+```js
+export default createStore();
+```
+
+If you export the store in the above mentioned way, the following import will not work:
+
+```js
+import { useStore } from '../store';
+```

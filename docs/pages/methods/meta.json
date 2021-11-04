@@ -1,5 +1,5 @@
 {
-  "use-store": "useStore",
-  "get-store": "getStore",
-  "with-store": "withStore"
+  "use-store": "useStore Hook",
+  "get-store": "getStore Helper",
+  "with-store": "withStore HOC"
 }

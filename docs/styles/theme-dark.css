@@ -34,7 +34,6 @@
 }
 .dark pre[class*="language-"] {
   padding: 1em;
-  margin: .5em 0;
   overflow: auto;
   background: #2d3748;
 }
@@ -97,6 +96,7 @@
 }
 .dark .token.regex,
 .dark .token.important,
+.dark .token.script,
 .dark .token.variable {
   color: #000000;
 }

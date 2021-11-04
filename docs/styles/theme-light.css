@@ -31,7 +31,6 @@
 }
 .light pre[class*="language-"] {
   padding: 1em;
-  margin: .5em 0;
   overflow: auto;
   background: #edf2f7;
 }
@@ -64,8 +63,8 @@
 .light .token.deleted {
   color: #000000;
 }
-.dark .token.tag,
-.dark .token.tag > .punctuation {
+.light .token.tag,
+.light .token.tag > .punctuation {
 	color: #1e86ff;
 }
 .light .token.selector,
@@ -94,6 +93,7 @@
 }
 .light .token.regex,
 .light .token.important,
+.light .token.script,
 .light .token.variable {
   color: #000000;
 }

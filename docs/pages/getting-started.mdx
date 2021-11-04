@@ -1,0 +1,47 @@
+# Getting Started
+
+## Installation
+
+```sh
+yarn add fragstore
+```
+
+## Create your store
+
+A store can be created using the `createStore` function. It returns all the methods you need to consume and update the store properties.
+
+```js
+import createStore from 'fragstore';
+
+const { useStore } = createStore();
+```
+
+Or define an initial state for your store:
+
+```js
+const initialState = {
+  cart: {
+    price: 0,
+    items: [],
+  }
+};
+
+const { useStore } = createStore(initialState);
+```
+
+Or also with a function that is called every time a store property is updated:
+
+```js
+const initialState = {
+  cart: {
+    price: 0,
+    items: [],
+  }
+};
+
+function onAfterUpdate({ path, value, prevValue }) {
+  console.log(`${path} changed from ${prevValue} to ${value}`);
+}
+
+const { useStore } = createStore(initialState, onAfterUpdate);
+```

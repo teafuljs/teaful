@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { useRouter } from 'next/router';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-jsx';
 
@@ -8,14 +7,26 @@ import '../styles/theme-light.css';
 import '../styles/theme-dark.css';
 import '../styles/globals.css';
 
-(typeof global !== "undefined" ? global : window).Prism = Prism;
+(typeof global !== 'undefined' ? global : window).Prism = Prism;
 
 export default function DocsApp({ Component, pageProps }) {
-  const { pathname } = useRouter();
+  useEffect(Prism.highlightAll);
   
   useEffect(() => {
-    Prism.highlightAll();
-  }, [pathname]);
+    const listener = (event) => {
+      if (document.location.pathname === event.target.getAttribute('href')) {
+        event.preventDefault();
+      }
+    };
+    
+    document
+      .querySelectorAll('a')
+      .forEach(a => a.addEventListener('click', listener));
+    
+    return () => document
+      .querySelectorAll('a')
+      .forEach(a => a.removeEventListener('click', listener));
+  }, []);
 
   return <Component {...pageProps} />
 }

@@ -1,0 +1,5 @@
+{
+  "use-store": "useStore",
+  "get-store": "getStore",
+  "with-store": "withStore"
+}

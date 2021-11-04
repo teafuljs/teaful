@@ -38,6 +38,8 @@ describe('onAfterUpdate callback', () => {
     act(() => getStore.mount()[1](false));
     expect(callback).toHaveBeenCalledTimes(3);
 
+    // Updating twice to confirm that updates don't call the callback when the
+    // component with the useStore is unmounted
     act(() => update({}));
     act(() => update({}));
     expect(callback).toHaveBeenCalledTimes(3);

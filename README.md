@@ -506,7 +506,7 @@ Counter.js
 import { useCounter } from "./store";
 
 export default function Counter() {
-  const [count, setCount] = useCount.count();
+  const [count, setCount] = useCounter.count();
   // ... rest
 }
 ```

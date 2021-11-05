@@ -87,7 +87,7 @@ const initialStore = {
   cart: { price: 0, items: [] },
 };
 
-function onAfterUpdate({ path, value, prevValue })
+function onAfterUpdate({ store, prevStore })
   console.log("This callback is executed after an update");
 }
 
@@ -212,10 +212,10 @@ function Example() {
 
 _Input:_
 
-| name                  | type       | description                                                                                                                                                                                                                                    | example                                                                                                                                                                                                                    |
-| --------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Initial value         | `any`      | This parameter is **not mandatory**. It only makes sense for new store properties that have not been defined before within the `createStore`. If the value has already been initialized inside the `createStore` this parameter has no effect. | `const [price, setPrice] = useStore.cart.price(0)`                                                                                                                                                                         |
-| event after an update | `function` | This parameter is **not mandatory**. Adds an event that is executed every time there is a change inside the indicated store portion.                                                                                                           | `const [price, setPrice] = useStore.cart.price(0, onAfterUpdate)`<div><small>And the function:</small></div><div>`function onAfterUpdate({ path, value, prevValue }){ console.log({ prevValue, value }) }`</div> |
+| name                  | type       | description                                                                                                                                                                                                                                    | example                                                                                                                                                                                                    |
+| --------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Initial value         | `any`      | This parameter is **not mandatory**. It only makes sense for new store properties that have not been defined before within the `createStore`. If the value has already been initialized inside the `createStore` this parameter has no effect. | `const [price, setPrice] = useStore.cart.price(0)`                                                                                                                                                         |
+| event after an update | `function` | This parameter is **not mandatory**. Adds an event that is executed every time there is a change inside the indicated store portion.                                                                                                           | `const [price, setPrice] = useStore.cart.price(0, onAfterUpdate)`<div><small>And the function:</small></div><div>`function onAfterUpdate({ store, prevStore }){ console.log({ store, prevStore }) }`</div> |
 
 _Output:_
 
@@ -235,25 +235,21 @@ It works exactly like `useStore` but with **some differences**:
 - It's **not possible to register events** that are executed after a change.
 
   ```js
-  getStore.cart.price(0, onAfterPriceChange) // ❌
+  getStore.cart.price(0, onAfterPriceChange); // ❌
 
-  function onAfterPriceChange({ path, value, prevValue }) {
-    const [,setErrorMsg] = getStore.errorMsg()
-    setErrorMsg(value > 99 ? 'price should be lower than $99')
+  function onAfterPriceChange({ store, prevStore }) {
+    // ...
   }
   ```
 
   - If the intention is to register events that last forever, it has to be done within the `createStore`:
 
   ```js
-   const { getStore } = createStore(initialStore, onAfterUpdate) // ✅
+  const { getStore } = createStore(initialStore, onAfterUpdate); // ✅
 
-   function onAfterUpdate({ path, value, prevValue }) {
-     if(path === 'cart.price') {
-       const [,setErrorMsg] = getStore.errorMsg()
-       setErrorMsg(value > 99 ? 'price should be lower than $99')
-     }
-   }
+  function onAfterUpdate({ store, prevStore }) {
+    // ..
+  }
   ```
 
 Very useful to use it:
@@ -357,18 +353,21 @@ There are 2 ways to register:
 - **Permanent** events: Inside `createStore`. This event will always be executed for each change made within the store.
 
   ```js
-  export const { useStore, getStore } = createStore(initialStore, onAfterUpdate);
+  export const { useStore, getStore } = createStore(
+    initialStore,
+    onAfterUpdate
+  );
 
-  function onAfterUpdate({ path, prevValue, value }) {
-    if (path !== "count") return;
-
-    const [, setCount] = getStore.count();
-    const [errorMsg, setErrorMsg] = getStore.errorMsg();
-
-    if (value > 99) {
-      setCount(prevValue);
+  function onAfterUpdate({ store, prevStore }) {
+    // Add an error msg
+    if (store.count > 99 && !store.errorMsg) {
+      const [, setErrorMsg] = getStore.errorMsg();
       setErrorMsg("The count value should be lower than 100");
-    } else if (errorMsg) {
+      return;
+    }
+    // Remove error msg
+    if (store.count >= 99 && store.errorMsg) {
+      const [, setErrorMsg] = getStore.errorMsg();
       setErrorMsg();
     }
   }
@@ -381,14 +380,15 @@ There are 2 ways to register:
     const [count, setCount] = useStore.count(0, onAfterUpdate);
     const [errorMsg, setErrorMsg] = useStore.errorMsg();
 
-    // The event lasts as long as this component lives, but
-    // it's also executed if the "count" property is updated
-    // elsewhere.
-    function onAfterUpdate({ value, prevValue }) {
-      if (value > 99) {
-        setCount(prevValue);
+    // The event lasts as long as this component lives
+    function onAfterUpdate({ store, prevStore }) {
+      // Add an error msg
+      if (store.count > 99 && !store.errorMsg) {
         setErrorMsg("The count value should be lower than 100");
-      } else if (errorMsg) {
+        return;
+      }
+      // Remove error msg
+      if (store.count >= 99 && store.errorMsg) {
         setErrorMsg();
       }
     }
@@ -569,16 +569,15 @@ export const { useStore, getStore } = createStore(
   onAfterUpdate
 );
 
-function onAfterUpdate({ path }) {
-  if (path === "cart" || path.startsWith("cart.")) updateCalculatedCartProps();
-}
-
-// Price always will be items.length * 3
-function updateCalculatedCartProps() {
-  const [items] = getStore.cart.items();
-  const [price, setPrice] = getStore.cart.price();
+function onAfterUpdate({ store }) {
+  const { items, price } = store.cart;
   const calculatedPrice = items.length * 3;
-  if (price !== calculatedPrice) setPrice(calculatedPrice);
+
+  // Price always will be items.length * 3
+  if (price !== calculatedPrice) {
+    const [, setPrice] = getStore.cart.price();
+    setPrice(calculatedPrice);
+  }
 }
 ```
 

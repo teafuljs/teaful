@@ -21,7 +21,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/aralroca/teaful.git"
+    "url": "https://github.com/teafuljs/teaful.git"
   },
   "source": "package/index.js",
   "main": "dist/index.js",
@@ -91,5 +91,5 @@
   "mangle": {
     "regex": "^_"
   },
-  "bugs": "https://github.com/aralroca/teaful/issues"
+  "bugs": "https://github.com/teafuljs/teaful/issues"
 }

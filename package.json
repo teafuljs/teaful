@@ -1,5 +1,5 @@
 {
-  "name": "fragstore",
+  "name": "teaful",
   "version": "0.7.0",
   "description": "Tiny, easy and powerful React state management (less than 1kb)",
   "license": "MIT",
@@ -21,7 +21,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/aralroca/fragstore.git"
+    "url": "https://github.com/aralroca/teaful.git"
   },
   "source": "package/index.js",
   "main": "dist/index.js",
@@ -91,5 +91,5 @@
   "mangle": {
     "regex": "^_"
   },
-  "bugs": "https://github.com/aralroca/fragstore/issues"
+  "bugs": "https://github.com/aralroca/teaful/issues"
 }

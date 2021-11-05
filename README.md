@@ -10,7 +10,7 @@ _Tiny, easy and powerful **React state management** library_
 [![gzip size](https://img.badgesize.io/https://unpkg.com/teaful?compression=gzip&label=gzip)](https://unpkg.com/teaful)
 [![CI Status](https://github.com/teafuljs/teaful/actions/workflows/test.yml/badge.svg)](https://github.com/teafuljs/teaful/actions/workflows/test.yml)
 [![Maintenance Status](https://badgen.net/badge/maintenance/active/green)](https://github.com/teafuljs/teaful#maintenance-status)
-[![Weekly downloads](https://badgen.net/npm/dw/teaful?color=blue)](https://www.npmjs.com/package/teaful)
+[![Weekly downloads](https://badgen.net/npm/dw/fragstore?color=blue)](https://www.npmjs.com/package/teaful)
 [![GitHub Discussions: Chat With Us](https://badgen.net/badge/discussions/chat%20with%20us/purple)](https://github.com/teafuljs/teaful/discussions)
 [![PRs Welcome][badge-prwelcome]][prwelcome]<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)

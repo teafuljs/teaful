@@ -585,7 +585,7 @@ function onAfterUpdate({ store }) {
 
 We will expand the examples over time. For now you can use this Codesandbox:
 
-- https://codesandbox.io/s/fragmented-store-example-4p5dv
+- https://codesandbox.io/s/teaful-example-4p5dv?file=/src/store.js
 
 ## Roadmap 🛣
 

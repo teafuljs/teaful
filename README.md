@@ -1,17 +1,17 @@
- <img src="logo.svg" width="200" alt="Fragstore" align="right" />
+ <img src="logo.svg" width="200" alt="Teaful" align="right" />
 
 <h1>
-<div><b>Fragstore</b></div>
+<div><b>Teaful</b></div>
 </h1>
 
 _Tiny, easy and powerful **React state management** library_
 
-[![npm version](https://badge.fury.io/js/fragstore.svg)](https://badge.fury.io/js/fragstore)
-[![gzip size](https://img.badgesize.io/https://unpkg.com/fragstore?compression=gzip&label=gzip)](https://unpkg.com/fragstore)
-[![CI Status](https://github.com/aralroca/fragstore/actions/workflows/test.yml/badge.svg)](https://github.com/aralroca/fragstore/actions/workflows/test.yml)
-[![Maintenance Status](https://badgen.net/badge/maintenance/active/green)](https://github.com/aralroca/fragstore#maintenance-status)
-[![Weekly downloads](https://badgen.net/npm/dw/fragstore?color=blue)](https://www.npmjs.com/package/fragstore)
-[![GitHub Discussions: Chat With Us](https://badgen.net/badge/discussions/chat%20with%20us/purple)](https://github.com/aralroca/fragstore/discussions)
+[![npm version](https://badge.fury.io/js/teaful.svg)](https://badge.fury.io/js/teaful)
+[![gzip size](https://img.badgesize.io/https://unpkg.com/teaful?compression=gzip&label=gzip)](https://unpkg.com/teaful)
+[![CI Status](https://github.com/teafuljs/teaful/actions/workflows/test.yml/badge.svg)](https://github.com/teafuljs/teaful/actions/workflows/test.yml)
+[![Maintenance Status](https://badgen.net/badge/maintenance/active/green)](https://github.com/teafuljs/teaful#maintenance-status)
+[![Weekly downloads](https://badgen.net/npm/dw/fragstore?color=blue)](https://www.npmjs.com/package/teaful)
+[![GitHub Discussions: Chat With Us](https://badgen.net/badge/discussions/chat%20with%20us/purple)](https://github.com/teafuljs/teaful/discussions)
 [![PRs Welcome][badge-prwelcome]][prwelcome]<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
@@ -54,9 +54,9 @@ _Tiny, easy and powerful **React state management** library_
 ## Installation 🧑🏻‍💻
 
 ```sh
-yarn add fragstore
+yarn add teaful
 # or
-npm install fragstore --save
+npm install teaful --save
 ```
 
 ## Init your store 👩🏽‍🎨
@@ -66,7 +66,7 @@ Each store has to be created with the `createStore` function. This function retu
 ### createStore
 
 ```js
-import createStore from "fragstore";
+import createStore from "teaful";
 
 const { useStore } = createStore();
 ```
@@ -87,7 +87,7 @@ const initialStore = {
   cart: { price: 0, items: [] },
 };
 
-function onAfterUpdate({ path, value, prevValue })
+function onAfterUpdate({ store, prevStore })
   console.log("This callback is executed after an update");
 }
 
@@ -148,7 +148,7 @@ import { useStore } from '../store'
 It's recommended to use the `useStore` hook as a proxy to indicate exactly what **portion of the store** you want. This way you only subscribe to this part of the store avoiding unnecessary re-renders.
 
 ```js
-import createStore from "fragstore";
+import createStore from "teaful";
 
 const { useStore } = createStore({
   username: "Aral",
@@ -212,10 +212,10 @@ function Example() {
 
 _Input:_
 
-| name                  | type       | description                                                                                                                                                                                                                                    | example                                                                                                                                                                                                                    |
-| --------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Initial value         | `any`      | This parameter is **not mandatory**. It only makes sense for new store properties that have not been defined before within the `createStore`. If the value has already been initialized inside the `createStore` this parameter has no effect. | `const [price, setPrice] = useStore.cart.price(0)`                                                                                                                                                                         |
-| event after an update | `function` | This parameter is **not mandatory**. Adds an event that is executed every time there is a change inside the indicated store portion.                                                                                                           | `const [price, setPrice] = useStore.cart.price(0, onAfterUpdate)`<div><small>And the function:</small></div><div>`function onAfterUpdate({ path, value, prevValue }){ console.log({ prevValue, value }) }`</div> |
+| name                  | type       | description                                                                                                                                                                                                                                    | example                                                                                                                                                                                                    |
+| --------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Initial value         | `any`      | This parameter is **not mandatory**. It only makes sense for new store properties that have not been defined before within the `createStore`. If the value has already been initialized inside the `createStore` this parameter has no effect. | `const [price, setPrice] = useStore.cart.price(0)`                                                                                                                                                         |
+| event after an update | `function` | This parameter is **not mandatory**. Adds an event that is executed every time there is a change inside the indicated store portion.                                                                                                           | `const [price, setPrice] = useStore.cart.price(0, onAfterUpdate)`<div><small>And the function:</small></div><div>`function onAfterUpdate({ store, prevStore }){ console.log({ store, prevStore }) }`</div> |
 
 _Output:_
 
@@ -235,25 +235,21 @@ It works exactly like `useStore` but with **some differences**:
 - It's **not possible to register events** that are executed after a change.
 
   ```js
-  getStore.cart.price(0, onAfterPriceChange) // ❌
+  getStore.cart.price(0, onAfterPriceChange); // ❌
 
-  function onAfterPriceChange({ path, value, prevValue }) {
-    const [,setErrorMsg] = getStore.errorMsg()
-    setErrorMsg(value > 99 ? 'price should be lower than $99')
+  function onAfterPriceChange({ store, prevStore }) {
+    // ...
   }
   ```
 
   - If the intention is to register events that last forever, it has to be done within the `createStore`:
 
   ```js
-   const { getStore } = createStore(initialStore, onAfterUpdate) // ✅
+  const { getStore } = createStore(initialStore, onAfterUpdate); // ✅
 
-   function onAfterUpdate({ path, value, prevValue }) {
-     if(path === 'cart.price') {
-       const [,setErrorMsg] = getStore.errorMsg()
-       setErrorMsg(value > 99 ? 'price should be lower than $99')
-     }
-   }
+  function onAfterUpdate({ store, prevStore }) {
+    // ..
+  }
   ```
 
 Very useful to use it:
@@ -357,18 +353,21 @@ There are 2 ways to register:
 - **Permanent** events: Inside `createStore`. This event will always be executed for each change made within the store.
 
   ```js
-  export const { useStore, getStore } = createStore(initialStore, onAfterUpdate);
+  export const { useStore, getStore } = createStore(
+    initialStore,
+    onAfterUpdate
+  );
 
-  function onAfterUpdate({ path, prevValue, value }) {
-    if (path !== "count") return;
-
-    const [, setCount] = getStore.count();
-    const [errorMsg, setErrorMsg] = getStore.errorMsg();
-
-    if (value > 99) {
-      setCount(prevValue);
+  function onAfterUpdate({ store, prevStore }) {
+    // Add an error msg
+    if (store.count > 99 && !store.errorMsg) {
+      const [, setErrorMsg] = getStore.errorMsg();
       setErrorMsg("The count value should be lower than 100");
-    } else if (errorMsg) {
+      return;
+    }
+    // Remove error msg
+    if (store.count >= 99 && store.errorMsg) {
+      const [, setErrorMsg] = getStore.errorMsg();
       setErrorMsg();
     }
   }
@@ -381,14 +380,15 @@ There are 2 ways to register:
     const [count, setCount] = useStore.count(0, onAfterUpdate);
     const [errorMsg, setErrorMsg] = useStore.errorMsg();
 
-    // The event lasts as long as this component lives, but
-    // it's also executed if the "count" property is updated
-    // elsewhere.
-    function onAfterUpdate({ value, prevValue }) {
-      if (value > 99) {
-        setCount(prevValue);
+    // The event lasts as long as this component lives
+    function onAfterUpdate({ store, prevStore }) {
+      // Add an error msg
+      if (store.count > 99 && !store.errorMsg) {
         setErrorMsg("The count value should be lower than 100");
-      } else if (errorMsg) {
+        return;
+      }
+      // Remove error msg
+      if (store.count >= 99 && store.errorMsg) {
         setErrorMsg();
       }
     }
@@ -483,7 +483,7 @@ You can have as many stores as you want. The only thing you have to do is to use
 store.js
 
 ```js
-import createStore from "fragstore";
+import createStore from "teaful";
 
 export const { useStore: useCart } = createStore({ price: 0, items: [] });
 export const { useStore: useCounter } = createStore({ count: 0 });
@@ -506,7 +506,7 @@ Counter.js
 import { useCounter } from "./store";
 
 export default function Counter() {
-  const [count, setCount] = useCount.count();
+  const [count, setCount] = useCounter.count();
   // ... rest
 }
 ```
@@ -569,16 +569,15 @@ export const { useStore, getStore } = createStore(
   onAfterUpdate
 );
 
-function onAfterUpdate({ path }) {
-  if (path === "cart" || path.startsWith("cart.")) updateCalculatedCartProps();
-}
-
-// Price always will be items.length * 3
-function updateCalculatedCartProps() {
-  const [items] = getStore.cart.items();
-  const [price, setPrice] = getStore.cart.price();
+function onAfterUpdate({ store }) {
+  const { items, price } = store.cart;
   const calculatedPrice = items.length * 3;
-  if (price !== calculatedPrice) setPrice(calculatedPrice);
+
+  // Price always will be items.length * 3
+  if (price !== calculatedPrice) {
+    const [, setPrice] = getStore.cart.price();
+    setPrice(calculatedPrice);
+  }
 }
 ```
 
@@ -586,7 +585,7 @@ function updateCalculatedCartProps() {
 
 We will expand the examples over time. For now you can use this Codesandbox:
 
-- https://codesandbox.io/s/fragmented-store-example-4p5dv
+- https://codesandbox.io/s/teaful-example-4p5dv?file=/src/store.js
 
 ## Roadmap 🛣
 
@@ -605,11 +604,11 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://aralroca.com"><img src="https://avatars3.githubusercontent.com/u/13313058?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Aral Roca Gomez</b></sub></a><br /><a href="#maintenance-aralroca" title="Maintenance">🚧</a> <a href="https://github.com/aralroca/fragstore/commits?author=aralroca" title="Code">💻</a></td>
+    <td align="center"><a href="https://aralroca.com"><img src="https://avatars3.githubusercontent.com/u/13313058?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Aral Roca Gomez</b></sub></a><br /><a href="#maintenance-aralroca" title="Maintenance">🚧</a> <a href="https://github.com/teafuljs/teaful/commits?author=aralroca" title="Code">💻</a></td>
     <td align="center"><a href="https://twitter.com/danielofair"><img src="https://avatars.githubusercontent.com/u/4655428?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Danielo Artola</b></sub></a><br /><a href="#infra-danielart" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     <td align="center"><a href="https://shinshin86.com"><img src="https://avatars.githubusercontent.com/u/8216064?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Yuki Shindo</b></sub></a><br /><a href="#infra-shinshin86" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
-    <td align="center"><a href="https://github.com/dididy"><img src="https://avatars.githubusercontent.com/u/16266103?v=4?s=100" width="100px;" alt=""/><br /><sub><b>YONGJAE LEE(이용재)</b></sub></a><br /><a href="https://github.com/aralroca/fragstore/issues?q=author%3Adididy" title="Bug reports">🐛</a></td>
-    <td align="center"><a href="https://juejin.cn/user/4318537404123688/posts"><img src="https://avatars.githubusercontent.com/u/16329407?v=4?s=100" width="100px;" alt=""/><br /><sub><b>niexq</b></sub></a><br /><a href="https://github.com/aralroca/fragstore/commits?author=niexq" title="Documentation">📖</a> <a href="#infra-niexq" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+    <td align="center"><a href="https://github.com/dididy"><img src="https://avatars.githubusercontent.com/u/16266103?v=4?s=100" width="100px;" alt=""/><br /><sub><b>YONGJAE LEE(이용재)</b></sub></a><br /><a href="https://github.com/teafuljs/teaful/issues?q=author%3Adididy" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://juejin.cn/user/4318537404123688/posts"><img src="https://avatars.githubusercontent.com/u/16329407?v=4?s=100" width="100px;" alt=""/><br /><sub><b>niexq</b></sub></a><br /><a href="https://github.com/teafuljs/teaful/commits?author=niexq" title="Documentation">📖</a> <a href="#infra-niexq" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
   </tr>
 </table>
 

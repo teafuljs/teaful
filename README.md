@@ -366,7 +366,7 @@ There are 2 ways to register:
       return;
     }
     // Remove error msg
-    if (store.count >= 99 && store.errorMsg) {
+    if (store.count <= 99 && store.errorMsg) {
       const [, setErrorMsg] = getStore.errorMsg();
       setErrorMsg();
     }

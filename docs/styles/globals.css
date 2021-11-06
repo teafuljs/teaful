@@ -12,6 +12,15 @@ pre, code {
   font-size: 1rem;
 }
 
+small pre,
+small code {
+  font-size: 0.8rem;
+}
+
 * {
   box-sizing: border-box;
+}
+
+table {
+  margin-top: 1.5rem;
 }

@@ -3,7 +3,7 @@
 ## Installation
 
 ```sh
-yarn add fragstore
+yarn add teaful
 ```
 
 ## Create your store
@@ -11,7 +11,7 @@ yarn add fragstore
 A store can be created using the `createStore` function. It returns all the methods you need to consume and update the store properties.
 
 ```js
-import createStore from 'fragstore';
+import createStore from 'teaful';
 
 const { useStore } = createStore();
 ```
@@ -39,8 +39,8 @@ const initialState = {
   }
 };
 
-function onAfterUpdate({ path, value, prevValue }) {
-  console.log(`${path} changed from ${prevValue} to ${value}`);
+function onAfterUpdate({ store, prevStore }) {
+  console.log(`${prevValue} changed to ${value}`);
 }
 
 const { useStore } = createStore(initialState, onAfterUpdate);
@@ -48,7 +48,7 @@ const { useStore } = createStore(initialState, onAfterUpdate);
 
 import Callout from 'nextra-theme-docs/callout';
 
-## How to export correctly? 
+## How to export correctly?
 
 Export the function(s) you want to use as constants from the file
 
@@ -65,7 +65,7 @@ export default useStore;
 ```
 
 <Callout type="error" emoji="🚫">
-Do no use a default export like the following one
+Do not use a default export like the following one
 </Callout>
 
 ```js
@@ -77,3 +77,18 @@ If you export the store in the above mentioned way, the following import will no
 ```js
 import { useStore } from '../store';
 ```
+
+### Input Parameters
+
+| name            | type          | required | description                                                                                              |
+| --------------- | ------------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `initialStore`  | `object<any>` | `false`  | Object with your initial store.                                                                          |
+| `onAfterUpdate` | `function`    | `false`  | Function that is executed after each property change. More [details](#register-events-after-an-update-). |
+
+### Return Value
+
+| name        | type    | description                                                                                                                                                                                             | example                                           |
+| ----------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `useStore`  | `Proxy` | Proxy hook to consume and update store properties inside your components. Each time the value changes, the component is rendered again with the new value. More [info](#usestore-hook).                 | `const [price, setPrice] = useStore.cart.price()` |
+| `getStore`  | `Proxy` | Similar to `useStore` but without subscription. You can use it as a helper outside (or inside) components. Note that if the value changes, it does not cause a rerender. More [info](#getstore-helper). | `const [price, setPrice] = getStore.cart.price()` |
+| `withStore` | `Proxy` | HoC with `useStore` inside. Useful for components that are not functional. More [info](#withstore-hoc).                                                                                                 | `withStore.cart.price(MyComponent)`               |

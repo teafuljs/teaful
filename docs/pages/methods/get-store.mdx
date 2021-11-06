@@ -1,0 +1,42 @@
+import Callout from 'nextra-theme-docs/callout';
+
+# getStore Helper
+
+The `getStore` function works exactly like `useStore` except for a few differences:
+
+- It **does not make a subscription** to updates for any property.
+- It is **not possible to register update listeners** on the store or any property.
+
+```jsx
+const { getStore } = createStore({ count: 0 });
+
+function ResetButton() {
+  // the component won't re-render when the count property changes
+  // because there is no subscription created
+  const [,,resetCount] = getStore.count();
+
+  const onClick = () => {
+    getStore().count = 0;
+  };
+
+  return <button onClick={onClick}>Reset</button>;
+}
+```
+
+This function is very handy to use:
+- **Outside Components**: helpers, services, etc.
+- **Inside Components**: When you only want to update the values, use getStore to avoid unnecessary re-renders.
+
+It gives you the value of the store at the moment this function is called. Hence, it is **no longer a hook** and you can use it as a normal function anywhere you want.
+
+<Callout type="error" emoji="🚫">
+  The following "onAfterPriceChange" listener won't be registered.
+</Callout>
+
+```js
+getStore.cart.price(0, onAfterPriceChange);
+
+function onAfterPriceChange({ store, prevStore }) {
+  // ...
+}
+```

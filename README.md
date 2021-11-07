@@ -87,7 +87,7 @@ const initialStore = {
   cart: { price: 0, items: [] },
 };
 
-function onAfterUpdate({ store, prevStore })
+function onAfterUpdate({ store, prevStore }) {
   console.log("This callback is executed after an update");
 }
 

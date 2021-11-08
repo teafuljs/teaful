@@ -1,6 +1,6 @@
 {
   "name": "teaful",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Tiny, easy and powerful React state management (less than 1kb)",
   "license": "MIT",
   "keywords": [

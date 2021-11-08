@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import {render, screen} from '@testing-library/react';
 import {act} from 'react-dom/test-utils';
 import userEvent from '@testing-library/user-event';
@@ -136,5 +137,69 @@ describe('useStore', () => {
 
     act(() => update((v) => [...v, 'b']));
     expect(screen.getByTestId('cart').textContent).toBe('ab');
+  });
+
+  it('should work changing the index of an array on fly', () => {
+    const onAfterUpdate = jest.fn();
+    const {useStore} = createStore({
+      cart: {
+        items: [],
+      },
+    }, onAfterUpdate);
+
+    function Test() {
+      const [state, setState] = useState(0);
+      const [item, setItem, resetItem] = useStore.cart.items[state]();
+
+      return (
+        <>
+          <h2 data-testid="item">Item: {JSON.stringify(item)}</h2>
+          <button
+            data-testid="update-item"
+            onClick={async () => {
+              await setItem({
+                name: 'new Item',
+                price: (item?.price || 0) + 1,
+              });
+            }}
+          >
+            Update item
+          </button>
+          <button data-testid="update-index" onClick={() => setState(2)}>change Index</button>
+          <button onClick={resetItem}>Reset item</button>
+        </>
+      );
+    }
+
+    render(<Test />);
+
+    expect(screen.getByTestId('item').textContent).toBe('Item: ');
+
+    // Updating the item with index 0
+    userEvent.click(screen.getByTestId('update-item'));
+    expect(screen.getByTestId('item').textContent).toBe('Item: {"name":"new Item","price":1}');
+    expect(onAfterUpdate.mock.calls[0][0].prevStore)
+        .toMatchObject({cart: {items: []}});
+    expect(onAfterUpdate.mock.calls[0][0].store)
+        .toMatchObject({cart: {items: [{name: 'new Item', price: 1}]}});
+
+    // Updating again the item with index 0
+    userEvent.click(screen.getByTestId('update-item'));
+    expect(screen.getByTestId('item').textContent).toBe('Item: {"name":"new Item","price":2}');
+    expect(onAfterUpdate.mock.calls[1][0].prevStore)
+        .toMatchObject({cart: {items: [{name: 'new Item', price: 1}]}});
+    expect(onAfterUpdate.mock.calls[1][0].store)
+        .toMatchObject({cart: {items: [{name: 'new Item', price: 2}]}});
+
+    userEvent.click(screen.getByTestId('update-index'));
+    expect(screen.getByTestId('item').textContent).toBe('Item: ');
+
+    // Updating the item with index 2
+    userEvent.click(screen.getByTestId('update-item'));
+    expect(onAfterUpdate.mock.calls[2][0].prevStore)
+        .toMatchObject({cart: {items: [{name: 'new Item', price: 2}]}});
+    expect(onAfterUpdate.mock.calls[2][0].store)
+        .toMatchObject({cart: {items: [{name: 'new Item', price: 2}, undefined, {name: 'new Item', price: 1}]}});
+    expect(screen.getByTestId('item').textContent).toBe('Item: {"name":"new Item","price":1}');
   });
 });

@@ -117,7 +117,7 @@ export default function createStore(defaultStore = {}, callback) {
         subscription._unsubscribe(path, forceRender);
         subscription._unsubscribe(DOT, callback);
       };
-    }, []);
+    }, [path]);
   }
 
   /**

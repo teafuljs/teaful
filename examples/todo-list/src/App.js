@@ -1,6 +1,6 @@
-import AddTodoTask from "./AddTodoTask";
-import TodoList from "./TodoList";
-import "./styles.css";
+import AddTodoTask from './AddTodoTask';
+import TodoList from './TodoList';
+import './styles.css';
 
 export function App() {
   return (

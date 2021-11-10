@@ -1,3 +1,3 @@
-import createStore from "teaful";
+import createStore from 'teaful';
 
-export const { useStore } = createStore({ todo: {}, done: {} });
+export const {useStore} = createStore({todo: {}, done: {}});

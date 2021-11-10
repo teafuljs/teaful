@@ -1,6 +1,6 @@
-import { useStore } from "./store";
+import {useStore} from './store';
 
-import Task from "./Task";
+import Task from './Task';
 
 export default function TodoList() {
   const [todo, setTodo, resetTodo] = useStore.todo();
@@ -8,31 +8,31 @@ export default function TodoList() {
   const [error] = useStore.error();
 
   const resolve = (task) => {
-    deleteTask(task.id)
-    setDone({ ...done, [task.id]: { ...task } });
+    deleteTask(task.id);
+    setDone({...done, [task.id]: {...task}});
   };
 
   const unresolve = (task) => {
-    deleteTask(task.id, true)
-    setTodo({ ...todo, [task.id]: { ...task } });
+    deleteTask(task.id, true);
+    setTodo({...todo, [task.id]: {...task}});
   };
 
   const deleteTask = (id, resolved) => {
     if (resolved) {
-      const newDoneList = { ...done };
+      const newDoneList = {...done};
       delete newDoneList[id];
       setDone(newDoneList);
     } else {
-      const newTodoList = { ...todo };
+      const newTodoList = {...todo};
       delete newTodoList[id];
       setTodo(newTodoList);
     }
-  }
+  };
 
   const resetAll = () => {
     resetTodo();
     resetDone();
-  }
+  };
 
   return (
     <>

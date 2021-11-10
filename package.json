@@ -54,9 +54,10 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint ./package ./tests",
-    "format": "eslint --fix ./package ./tests",
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "format": "eslint --fix ./package ./tests ./examples",
+    "test": "jest ./package ./tests",
+    "test:examples": "jest ./examples",
+    "test:watch": "jest ./package ./tests --watch",
     "build": "microbundle --jsx React.createElement",
     "dev": "microbundle watch",
     "prepublish": "yarn build"
@@ -65,7 +66,11 @@
     "react": ">= 16.8.0"
   },
   "jest": {
-    "testEnvironment": "jsdom"
+    "testEnvironment": "jsdom",
+     "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
+      "\\.(css|less)$": "identity-obj-proxy"
+    }
   },
   "devDependencies": {
     "@babel/polyfill": "7.12.1",

@@ -1,0 +1,82 @@
+body  {
+  background: aliceblue;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+}
+
+h2 {
+    display: flex;    
+    width: 100%;
+    background-color: rgb(168 231 163);
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    margin-top:  0;
+}
+
+button {
+  border-radius: 3px;
+  background-color: rgb(168 231 163); 
+  border: 0;
+  font-weight: bold;
+  padding: 10px;
+  height: 40px;  
+  font-size: large;
+  text-transform: uppercase;
+  
+}
+
+
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.AddTodoTask {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin:10px;
+}
+
+.TodoList {
+  min-width: 500px;
+  background-color: white;
+  max-width: 800px;
+  min-height: 400px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.Task {
+  display: flex;
+  justify-content: space-between;  
+  align-items: center;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.list {
+  padding: 10px 30px;
+  list-style: none;
+}
+
+.resolved {
+  color: rgb(136, 136, 136);
+  text-decoration: line-through;
+}
+
+.textBox {
+  height: 35px;
+  margin: 0 15px;
+}
+
+.errorLabel {
+  color:red;
+}

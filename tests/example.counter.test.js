@@ -1,4 +1,4 @@
-import {Component, useState} from 'react';
+import {Component, useEffect, useRef, useState} from 'react';
 import {render, waitFor, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -8,16 +8,17 @@ import createStore from '../package/index';
 
 describe('Example: Counter', () => {
   it('should work with a simple counter', () => {
-    const {useStore} = createStore({count: 0});
+    const initialStore = {count: 0};
+    const {useStore} = createStore(initialStore);
 
     function Counter() {
-      const [count, setCount, resetCount] = useStore.count();
+      const [count, setCount] = useStore.count();
       return (
         <div>
           <h1>{count}</h1>
           <button onClick={() => setCount((v) => v + 1)}>+</button>
           <button onClick={() => setCount((v) => v - 1)}>-</button>
-          <button onClick={resetCount}>reset</button>
+          <button onClick={() => setCount(initialStore.count)}>reset</button>
         </div>
       );
     }
@@ -63,17 +64,18 @@ describe('Example: Counter', () => {
   });
 
   it('should work with a counter in a class component', async () => {
-    const {useStore, withStore} = createStore({count: 0});
+    const initialStore = {count: 0};
+    const {useStore, withStore} = createStore(initialStore);
 
     class Counter extends Component {
       render() {
-        const [count, setCount, resetCount] = this.props.store;
+        const [count, setCount] = this.props.store;
         return (
           <div>
             <h1>{count}</h1>
             <button onClick={() => setCount((v) => v + 1)}>+</button>
             <button onClick={() => setCount((v) => v - 1)}>-</button>
-            <button onClick={resetCount}>reset</button>
+            <button onClick={() => setCount(initialStore.count)}>reset</button>
           </div>
         );
       }
@@ -127,11 +129,12 @@ describe('Example: Counter', () => {
   });
 
   it('should work with a counter in a class component: with all store', async () => {
-    const {useStore, withStore} = createStore({count: 0});
+    const initialStore = {count: 0};
+    const {useStore, withStore} = createStore(initialStore);
 
     class Counter extends Component {
       render() {
-        const [store, setStore, resetStore] = this.props.store;
+        const [store, setStore] = this.props.store;
         return (
           <div>
             <h1>{store.count}</h1>
@@ -145,7 +148,7 @@ describe('Example: Counter', () => {
             >
               -
             </button>
-            <button onClick={resetStore}>reset</button>
+            <button onClick={() => setStore(initialStore)}>reset</button>
           </div>
         );
       }
@@ -203,13 +206,28 @@ describe('Example: Counter', () => {
         const {useStore} = createStore({anotherValue: ''});
 
         function Counter() {
-          const [count, setCount, resetCount] = useStore.count();
+          const initialCountValue = useRef();
+          const [count, setCount] = useStore.count();
+
+          useEffect(() => {
+            if (
+              initialCountValue.current === undefined &&
+              count !== undefined
+            ) {
+              initialCountValue.current = count;
+            }
+          }, [count]);
+
           return (
             <div>
               <h1>{count}</h1>
               <button onClick={() => setCount((v) => v + 1)}>+</button>
               <button onClick={() => setCount((v) => v - 1)}>-</button>
-              <button onClick={resetCount}>reset</button>
+              <button
+                onClick={() => setCount(initialCountValue.current)}
+              >
+                reset
+              </button>
             </div>
           );
         }
@@ -272,6 +290,7 @@ describe('Example: Counter', () => {
   it('should work with a counter in a class component: as a new value (not defined on the store)',
       async () => {
         const {useStore, withStore} = createStore();
+        const initialCount = 0;
 
         class Counter extends Component {
           // Forcing update to verify that the initial value is not overwritten
@@ -279,19 +298,19 @@ describe('Example: Counter', () => {
             this.forceUpdate();
           }
           render() {
-            const [count, setCount, resetCount] = this.props.store;
+            const [count, setCount] = this.props.store;
             return (
               <div>
                 <h1>{count}</h1>
                 <button onClick={() => setCount((v) => v + 1)}>+</button>
                 <button onClick={() => setCount((v) => v - 1)}>-</button>
-                <button onClick={resetCount}>reset</button>
+                <button onClick={() => setCount(initialCount)}>reset</button>
               </div>
             );
           }
         }
 
-        const CounterWithStore = withStore.counter.count(Counter, 0);
+        const CounterWithStore = withStore.counter.count(Counter, initialCount);
 
         function DisplayCounter() {
           const [count] = useStore.counter.count();
@@ -339,7 +358,8 @@ describe('Example: Counter', () => {
       });
 
   it('Should increase the value using a form with getStore', async () => {
-    const {useStore, getStore} = createStore({count: 0});
+    const initialStore = {count: 0};
+    const {useStore, getStore} = createStore(initialStore);
 
     function CountForm() {
       const [newCount, setNewCount] = useState(0);

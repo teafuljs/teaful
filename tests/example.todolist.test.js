@@ -27,12 +27,12 @@ describe('Example: Todo list', () => {
     }
 
     function TodoList() {
-      const [todo, setTodo, resetTodo] = useStore.todo();
+      const [todo, setTodo] = useStore.todo();
       const [done, setDone] = useStore.done();
 
       function reset() {
-        resetTodo(); // Reset with initial value
-        setDone([]); // Reset with an empty array
+        setTodo([]);
+        setDone([]);
       }
 
       renderTodoList();

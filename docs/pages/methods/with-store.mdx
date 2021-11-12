@@ -1,0 +1,61 @@
+---
+title: withStore Higher Order Component
+---
+
+import FeedbackRating from '../../components/feedback-rating';
+
+# withStore HOC
+
+It's a wrapper of the `useStore` for class components.
+
+You receive the same values that the useStore hook returns inside `this.props.property`.
+
+Example with a store portion:
+
+```jsx
+const { withStore } = createStore();
+
+class Counter extends Component {
+  render() {
+    const [count, setCount, resetCount] = this.props.store;
+    return (
+      <div>
+        <h1>{count}</h1>
+        <button onClick={() => setCount((v) => v + 1)}>+</button>
+        <button onClick={() => setCount((v) => v - 1)}>-</button>
+        <button onClick={resetCount}>reset</button>
+      </div>
+    );
+  }
+}
+
+// Similar to useStore.counter.count(0)
+const CounterWithStore = withStore.counter.count(Counter, 0);
+```
+
+Example with all store:
+
+```jsx
+const { withStore } = createStore({ count: 0 });
+
+class Counter extends Component {
+  render() {
+    const [store, setStore, resetStore] = this.props.store;
+    return (
+      <div>
+        <h1>{store.count}</h1>
+        <button onClick={() => setStore({ count: store.count + 1 })}>+</button>
+        <button onClick={() => setStore({ count: store.count - 1 })}>-</button>
+        <button onClick={resetStore}>reset</button>
+      </div>
+    );
+  }
+}
+
+// Similar to useStore()
+const CounterWithStore = withStore(Counter);
+```
+
+The only difference with the useStore is that instead of having 2 parameters (initialValue, onAfterUpdate), it has 3 where the first one is mandatory and the other 2 are not (Component, initialValue, onAfterUpdate).
+
+<FeedbackRating />

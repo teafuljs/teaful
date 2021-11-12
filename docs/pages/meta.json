@@ -1,4 +1,9 @@
 {
   "index": "Introduction",
-  "getting-started": "Getting Started"
+  "getting-started": "Getting Started",
+  "methods": "Core Methods",
+  "404": {
+    "type": "nav",
+    "hidden": true
+  }
 }

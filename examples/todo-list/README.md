@@ -1,9 +1,9 @@
-
 # Teaful TodoList Example
 
 ## How to start :gear:
 
 ### Available Scripts
+
 In the project directory, you can run:
 
     npm start
@@ -72,14 +72,17 @@ Here, we are **not mutating** the original todo but creating a new one and passi
 
 This component list the todo and the done list, so we need both of them from store (and of course, import useStore from our `store.js`)
 
-    const  [todo, setTodo, resetTodo] =  useStore.todo();
-    const  [done, setDone, resetDone] =  useStore.done();
+    const  [todo, setTodo] =  useStore.todo();
+    const  [done, setDone] =  useStore.done();
 
 ### Reset lists
 
-This is the easiest point. To reset one element from store, Teaful provide us a reset function at third element on destructure. Having this in mind, the button to reset lists is clear
+This is the easiest point. To reset one element from store, we could use setter again (in this case an empty object for each). Having this in mind, the button to reset lists is clear
 
-    <button onClick={() =>  {resetDone();resetTodo();}}>
+    <button onClick={() =>  {
+        setDone({});
+        setTodo({});
+    }}>
         Reset tasks
     </button>
 

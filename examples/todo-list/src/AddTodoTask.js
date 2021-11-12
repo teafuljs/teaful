@@ -1,12 +1,11 @@
-import {useState} from 'react';
-import {useStore} from './store';
+import { useState } from 'react';
+import { useStore } from './store';
 
 export default function AddTodoTask() {
   const [counter, setCounter] = useState(0);
   const [error, setError] = useStore.error();
   const [todo, setTodo] = useStore.todo();
   const addTask = (e) => {
-    console.log(JSON.stringify(e.target.children[0].value));
     e.preventDefault();
     if (e.target.children[0].value.trim() === '') {
       setError('Can\'t add empty tasks');
@@ -15,7 +14,7 @@ export default function AddTodoTask() {
 
     setTodo({
       ...todo,
-      [counter]: {text: e.target.children[0].value, id: counter},
+      [counter]: { text: e.target.children[0].value, id: counter },
     });
     e.target.children[0].value = '';
     setCounter(counter + 1);

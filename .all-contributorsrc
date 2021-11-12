@@ -21,7 +21,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/4655428?v=4",
       "profile": "https://twitter.com/danielofair",
       "contributions": [
-        "infra"
+        "infra",
+        "code"
       ]
     },
     {
@@ -51,11 +52,20 @@
         "doc",
         "infra"
       ]
+    },
+    {
+      "login": "nekonako",
+      "name": "nekonako",
+      "avatar_url": "https://avatars.githubusercontent.com/u/46141275?v=4",
+      "profile": "https://nekonako.github.io",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
   "projectName": "teaful",
-  "projectOwner": "aralroca",
+  "projectOwner": "teafuljs",
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true

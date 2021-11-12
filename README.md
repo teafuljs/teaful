@@ -10,10 +10,10 @@ _Tiny, easy and powerful **React state management** library_
 [![gzip size](https://img.badgesize.io/https://unpkg.com/teaful?compression=gzip&label=gzip)](https://unpkg.com/teaful)
 [![CI Status](https://github.com/teafuljs/teaful/actions/workflows/test.yml/badge.svg)](https://github.com/teafuljs/teaful/actions/workflows/test.yml)
 [![Maintenance Status](https://badgen.net/badge/maintenance/active/green)](https://github.com/teafuljs/teaful#maintenance-status)
-[![Weekly downloads](https://badgen.net/npm/dw/fragstore?color=blue)](https://www.npmjs.com/package/teaful)
+[![Weekly downloads](https://badgen.net/npm/dw/teaful?color=blue)](https://www.npmjs.com/package/teaful)
 [![GitHub Discussions: Chat With Us](https://badgen.net/badge/discussions/chat%20with%20us/purple)](https://github.com/teafuljs/teaful/discussions)
 [![PRs Welcome][badge-prwelcome]][prwelcome]<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [badge-prwelcome]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
@@ -87,7 +87,7 @@ const initialStore = {
   cart: { price: 0, items: [] },
 };
 
-function onAfterUpdate({ store, prevStore })
+function onAfterUpdate({ store, prevStore }) {
   console.log("This callback is executed after an update");
 }
 
@@ -366,7 +366,7 @@ There are 2 ways to register:
       return;
     }
     // Remove error msg
-    if (store.count >= 99 && store.errorMsg) {
+    if (store.count <= 99 && store.errorMsg) {
       const [, setErrorMsg] = getStore.errorMsg();
       setErrorMsg();
     }
@@ -605,10 +605,11 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="https://aralroca.com"><img src="https://avatars3.githubusercontent.com/u/13313058?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Aral Roca Gomez</b></sub></a><br /><a href="#maintenance-aralroca" title="Maintenance">🚧</a> <a href="https://github.com/teafuljs/teaful/commits?author=aralroca" title="Code">💻</a></td>
-    <td align="center"><a href="https://twitter.com/danielofair"><img src="https://avatars.githubusercontent.com/u/4655428?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Danielo Artola</b></sub></a><br /><a href="#infra-danielart" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+    <td align="center"><a href="https://twitter.com/danielofair"><img src="https://avatars.githubusercontent.com/u/4655428?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Danielo Artola</b></sub></a><br /><a href="#infra-danielart" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/teafuljs/teaful/commits?author=danielart" title="Code">💻</a></td>
     <td align="center"><a href="https://shinshin86.com"><img src="https://avatars.githubusercontent.com/u/8216064?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Yuki Shindo</b></sub></a><br /><a href="#infra-shinshin86" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     <td align="center"><a href="https://github.com/dididy"><img src="https://avatars.githubusercontent.com/u/16266103?v=4?s=100" width="100px;" alt=""/><br /><sub><b>YONGJAE LEE(이용재)</b></sub></a><br /><a href="https://github.com/teafuljs/teaful/issues?q=author%3Adididy" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://juejin.cn/user/4318537404123688/posts"><img src="https://avatars.githubusercontent.com/u/16329407?v=4?s=100" width="100px;" alt=""/><br /><sub><b>niexq</b></sub></a><br /><a href="https://github.com/teafuljs/teaful/commits?author=niexq" title="Documentation">📖</a> <a href="#infra-niexq" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+    <td align="center"><a href="https://nekonako.github.io"><img src="https://avatars.githubusercontent.com/u/46141275?v=4?s=100" width="100px;" alt=""/><br /><sub><b>nekonako</b></sub></a><br /><a href="https://github.com/teafuljs/teaful/commits?author=nekonako" title="Documentation">📖</a></td>
   </tr>
 </table>
 

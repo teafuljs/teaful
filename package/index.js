@@ -86,7 +86,9 @@ export default function createStore(defaultStore = {}, callback) {
 
       // subscribe to the fragmented store
       if (mode === MODE_USE) {
-        useEffect(() => initializeValue && update(value), []);
+        useEffect(() => {
+          if (initializeValue) update(value);
+        }, []);
         useSubscription(DOT+prop, callback);
       }
 
@@ -115,7 +117,7 @@ export default function createStore(defaultStore = {}, callback) {
         subscription._unsubscribe(path, forceRender);
         subscription._unsubscribe(DOT, callback);
       };
-    }, []);
+    }, [path]);
   }
 
   /**

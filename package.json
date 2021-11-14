@@ -56,6 +56,7 @@
     "lint": "eslint ./package ./tests",
     "format": "eslint --fix ./package ./tests ./examples",
     "test": "jest ./package ./tests",
+    "test:example:todo-list": "jest ./examples/todo-list",
     "test:examples": "jest ./examples",
     "test:watch": "jest ./package ./tests --watch",
     "build": "microbundle --jsx React.createElement",

@@ -55,8 +55,8 @@ export default function createStore(defaultStore = {}, callback) {
 
       // ALL STORE (unfragmented):
       //
-      // MODE_GET: let [store, update, reset] = useStore()
-      // MODE_USE: let [store, update, reset] = getStore()
+      // MODE_GET: let [store, update] = useStore()
+      // MODE_USE: let [store, update] = getStore()
       if (!path.length) {
         let updateAll = updateField();
         if (mode === MODE_USE) useSubscription(DOT, callback);

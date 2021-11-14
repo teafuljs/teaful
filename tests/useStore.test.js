@@ -81,33 +81,6 @@ describe('useStore', () => {
     expect(screen.getByTestId('test').textContent).toBe('01');
   });
 
-  it('should allow to reset the value to the initial value', () => {
-    const {useStore, getStore} = createStore();
-
-    function Test() {
-      const [items, setItems] = useStore.items([]);
-      return (
-        <div onClick={() => setItems((v) => [...v, v.length])} data-testid="test">
-          {items.map((item) => <div key={item}>{item}</div>)}
-        </div>
-      );
-    }
-
-    render(<Test />);
-
-    expect(screen.getByTestId('test').textContent).toBe('');
-
-    userEvent.click(screen.getByTestId('test'));
-    expect(screen.getByTestId('test').textContent).toBe('0');
-
-    userEvent.click(screen.getByTestId('test'));
-    expect(screen.getByTestId('test').textContent).toBe('01');
-
-    const reset = getStore.items()[2];
-    act(reset);
-    expect(screen.getByTestId('test').textContent).toBe('');
-  });
-
   it('should be possible to create more than one store', () => {
     const {useStore: useCart, getStore: getCart} = createStore({items: []});
     const {useStore: useCounter} = createStore({count: 0});
@@ -149,7 +122,7 @@ describe('useStore', () => {
 
     function Test() {
       const [state, setState] = useState(0);
-      const [item, setItem, resetItem] = useStore.cart.items[state]();
+      const [item, setItem] = useStore.cart.items[state]();
 
       return (
         <>
@@ -166,7 +139,7 @@ describe('useStore', () => {
             Update item
           </button>
           <button data-testid="update-index" onClick={() => setState(2)}>change Index</button>
-          <button onClick={resetItem}>Reset item</button>
+          <button onClick={() => setItem()}>Reset item</button>
         </>
       );
     }

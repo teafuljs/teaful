@@ -1,0 +1,60 @@
+# Counter with ESM
+
+Yes, you can use Teaful without compilers like Webpack, only a plain `html` file.
+
+To test it:
+
+```bh
+touch example.html
+```
+
+Edit `example.html` file to:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <script type="module">
+      import createStore from 'https://cdn.skypack.dev/teaful'
+      import React from 'https://cdn.skypack.dev/react'
+      import ReactDOM from 'https://cdn.skypack.dev/react-dom'
+      import htm from 'https://cdn.skypack.dev/htm'
+
+      const html = htm.bind(React.createElement)
+      const initialStore = { count: 0 }
+      const { useStore } = createStore(initialStore)
+
+      function Counter() {
+        const [count, setCount] = useStore.count()
+        return html`
+          <div>
+            <h1>${count}</h1>
+            <button onClick=${() => setCount(count + 1)}>+</button>
+            <button onClick=${() => setCount(count - 1)}>-</button>
+            <button onClick=${() => setCount(initialStore.count)}>Reset</button>
+          </div>
+        `
+      }
+
+      function App() {
+        return html`
+          <h1>Teaful Counter</h1>
+          <${Counter} />
+        `
+      }
+
+      ReactDOM.render(html`<${App} />`, document.getElementById('root'))
+    </script>
+    <title>Teaful Counter</title>
+  </head>
+  <body id="root" />
+</html>
+```
+
+And finally:
+
+```bh
+open example.html
+```

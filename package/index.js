@@ -24,7 +24,7 @@ export default function createStore(defaultStore = {}, callback) {
   let validator = {
     _path: [],
     _getHoC(Comp, path, initValue, callback) {
-      let componentName = Comp.displayName || Comp.name || 'Component';
+      let componentName = Comp.displayName || Comp.name || '';
       let WithStore = (props) => {
         let last = path.length - 1;
         let store = path.length ? path.reduce(

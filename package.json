@@ -94,8 +94,5 @@
     "react-dom": "17.0.2",
     "react-test-renderer": "17.0.2"
   },
-  "mangle": {
-    "regex": "^_"
-  },
   "bugs": "https://github.com/teafuljs/teaful/issues"
 }

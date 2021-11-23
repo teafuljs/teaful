@@ -1,0 +1,21 @@
+{
+  "minify": {
+    "mangle": {
+      "properties": {
+        "regex": "^_"
+      }
+    },
+    "compress": {
+      "hoist_vars": true,
+      "reduce_funcs": true
+    }
+  },
+  "props": {
+    "cname": 6,
+    "props": {
+      "$_subscribe": "s",
+      "$_notify": "n",
+      "$_unsubscribe": "u"
+    }
+  }
+}

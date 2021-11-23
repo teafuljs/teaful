@@ -163,7 +163,7 @@ export default function createStore(defaultStore = {}, callback) {
   }
 
   let result = extras.reduce((res, fn) => {
-    let newRes = fn(res, subscription._subscribe);
+    let newRes = fn(res, subscription);
     return typeof newRes === 'object' ? {...res, ...newRes} : res;
   }, {useStore, getStore, withStore});
 
@@ -184,11 +184,13 @@ function createSubscription() {
   let listeners = {};
 
   return {
+    // Renamed to "s" after build to minify code
     _subscribe(path, listener) {
       if (typeof listener !== 'function') return;
       if (!listeners[path]) listeners[path] = new Set();
       listeners[path].add(listener);
     },
+    // Renamed to "n" after build to minify code
     _notify(path, params) {
       Object.keys(listeners).forEach((listenerKey) => {
         if (path.startsWith(listenerKey) || listenerKey.startsWith(path)) {
@@ -196,6 +198,7 @@ function createSubscription() {
         }
       });
     },
+    // Renamed to "u" after build to minify code
     _unsubscribe(path, listener) {
       if (typeof listener !== 'function') return;
       listeners[path].delete(listener);

@@ -5,9 +5,10 @@ import createStore from '../package/index';
 describe('Extras', () => {
   it('should be possible to register a library extra',
       async () => {
-        createStore.ext(({getStore}, subscribe) => {
+        createStore.ext(({getStore}, subscription) => {
           const [, setTest2] = getStore.test2();
-          subscribe('.', ({store}) => {
+          // Renamed to "subscription.s()" after build to minify code
+          subscription._subscribe('.', ({store}) => {
             if (store.test === 3 && !store.test2) {
               setTest2(4);
             }

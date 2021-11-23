@@ -4,6 +4,7 @@ let MODE_GET = 1;
 let MODE_USE = 2;
 let MODE_WITH = 3;
 let DOT = '.';
+let extras = [];
 
 export default function createStore(defaultStore = {}, callback) {
   let subscription = createSubscription();
@@ -161,15 +162,23 @@ export default function createStore(defaultStore = {}, callback) {
     });
   }
 
+  let result = extras.reduce((res, fn) => {
+    let newRes = fn(res, subscription._subscribe);
+    return typeof newRes === 'object' ? {...res, ...newRes} : res;
+  }, {useStore, getStore, withStore});
+
   /**
    * createStore function returns:
    * - useStore hook
    * - getStore helper
    * - withStore HoC
+   * - extras that 3rd party can add
    * @returns {object}
    */
-  return {useStore, getStore, withStore};
+  return result;
 }
+
+createStore.ext = (extra) => typeof extra === 'function' && extras.push(extra);
 
 function createSubscription() {
   let listeners = {};

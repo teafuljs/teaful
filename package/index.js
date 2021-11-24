@@ -4,6 +4,7 @@ let MODE_GET = 1;
 let MODE_USE = 2;
 let MODE_WITH = 3;
 let DOT = '.';
+let extras = [];
 
 export default function createStore(defaultStore = {}, callback) {
   let subscription = createSubscription();
@@ -23,7 +24,7 @@ export default function createStore(defaultStore = {}, callback) {
   let validator = {
     _path: [],
     _getHoC(Comp, path, initValue, callback) {
-      let componentName = Comp.displayName || Comp.name || 'Component';
+      let componentName = Comp.displayName || Comp.name || '';
       let WithStore = (props) => {
         let last = path.length - 1;
         let store = path.length ? path.reduce(
@@ -100,7 +101,7 @@ export default function createStore(defaultStore = {}, callback) {
    * @param {function} callback
    */
   function useSubscription(path, callback) {
-    let forceRender = useReducer(() => ({}), 0)[1];
+    let forceRender = useReducer(() => [], 0)[1];
 
     useEffect(() => {
       subscription._subscribe(path, forceRender);
@@ -161,25 +162,35 @@ export default function createStore(defaultStore = {}, callback) {
     });
   }
 
+  let result = extras.reduce((res, fn) => {
+    let newRes = fn(res, subscription);
+    return typeof newRes === 'object' ? {...res, ...newRes} : res;
+  }, {useStore, getStore, withStore});
+
   /**
    * createStore function returns:
    * - useStore hook
    * - getStore helper
    * - withStore HoC
+   * - extras that 3rd party can add
    * @returns {object}
    */
-  return {useStore, getStore, withStore};
+  return result;
 }
+
+createStore.ext = (extra) => typeof extra === 'function' && extras.push(extra);
 
 function createSubscription() {
   let listeners = {};
 
   return {
+    // Renamed to "s" after build to minify code
     _subscribe(path, listener) {
       if (typeof listener !== 'function') return;
       if (!listeners[path]) listeners[path] = new Set();
       listeners[path].add(listener);
     },
+    // Renamed to "n" after build to minify code
     _notify(path, params) {
       Object.keys(listeners).forEach((listenerKey) => {
         if (path.startsWith(listenerKey) || listenerKey.startsWith(path)) {
@@ -187,6 +198,7 @@ function createSubscription() {
         }
       });
     },
+    // Renamed to "u" after build to minify code
     _unsubscribe(path, listener) {
       if (typeof listener !== 'function') return;
       listeners[path].delete(listener);

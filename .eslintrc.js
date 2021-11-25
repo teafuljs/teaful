@@ -14,6 +14,7 @@ module.exports = {
     'plugin:react/jsx-runtime',
     'google',
   ],
+  'root': true,
   'parserOptions': {
     'ecmaFeatures': {
       'jsx': true,
@@ -34,7 +35,7 @@ module.exports = {
     'linebreak-style': ['error', process.platform === 'win32' ? 'windows' : 'unix'],
     'max-len': [
       'error',
-      {'code': 80, 'ignoreStrings': true},
+      { 'code': 80, 'ignoreStrings': true },
     ],
     'no-restricted-imports': [
       'error',

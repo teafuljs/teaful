@@ -54,7 +54,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint ./package ./tests",
-    "format": "eslint --fix ./package ./tests ./examples",
+    "format": "eslint --fix ./package ./tests",
+    "format:examples": "eslint --fix ./examples",
     "test": "jest ./package ./tests",
     "test:example:todo-list": "jest ./examples/todo-list",
     "test:examples": "jest ./examples",

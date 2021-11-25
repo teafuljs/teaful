@@ -53,7 +53,7 @@
   },
   "types": "dist/index.d.ts",
   "scripts": {
-    "lint": "eslint ./package ./tests",
+    "lint": "eslint ./package ./tests ./examples",
     "format": "eslint --fix ./package ./tests",
     "format:examples": "eslint --fix ./examples",
     "test": "jest ./package ./tests",

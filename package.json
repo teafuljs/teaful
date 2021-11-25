@@ -51,7 +51,7 @@
       }
     ]
   },
-  "types": "dist/index.d.ts",
+  "types": "package/index.d.ts",
   "scripts": {
     "lint": "eslint ./package ./tests",
     "format": "eslint --fix ./package ./tests ./examples",

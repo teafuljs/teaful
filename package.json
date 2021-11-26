@@ -1,6 +1,6 @@
 {
   "name": "teaful",
-  "version": "0.9.0-canary.1",
+  "version": "0.9.0-canary.2",
   "description": "Tiny, easy and powerful React state management (less than 1kb)",
   "license": "MIT",
   "keywords": [
@@ -59,7 +59,7 @@
     "test:example:todo-list": "jest ./examples/todo-list",
     "test:examples": "jest ./examples",
     "test:watch": "jest ./package ./tests --watch",
-    "build": "microbundle --jsx React.createElement",
+    "build": "microbundle --jsx React.createElement --no-generateTypes",
     "dev": "microbundle watch",
     "prepublish": "yarn build"
   },
@@ -68,7 +68,7 @@
   },
   "jest": {
     "testEnvironment": "jsdom",
-     "moduleNameMapper": {
+    "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
       "\\.(css|less)$": "identity-obj-proxy"
     }

@@ -560,6 +560,9 @@ function onAfterUpdate({ store }) {
 }
 ```
 
+It's an anti-pattern? Not in Teaful 😊. As only the fragments of the store are updated and not the whole store, it is the same as updating both properties (`cart.items` and `cart.price`) instead of just `cart.items`.  The anti-pattern comes when it causes unnecessary rerenders, but this is not the case. Only the components that use `cart.items` and `cart.price` are rerendered and not the others.
+
+
 ## Teaful Devtools 🛠
 
 To debug your stores, you can use [Teaful DevTools](https://github.com/teafuljs/teaful-devtools).

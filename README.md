@@ -567,7 +567,7 @@ To debug your stores, you can use [Teaful DevTools](https://github.com/teafuljs/
 <img alt="Teaful DevTools" src="https://github.com/teafuljs/teaful-devtools/blob/master/demo.png?raw=true" />
 
 
-## Addons and extras 🌀
+## Addons and extras 🌀
 
 To facilitate the creation of libraries that extend Teaful (such as [`teaful-devtools`](https://github.com/teafuljs/teaful-devtools)), we allow the possibility to add an extra that:
 

@@ -217,13 +217,13 @@ _Input:_
 
 _Output:_
 
-Is an `Array` with **3** items:
+Is an `Array` with **2** items:
 
 | name         | type       | description                                                                             | example                                                                                                                                                                                                                                                                                                                                                                 |
 | ------------ | ---------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | value        | `any`      | The value of the store portion indicated with the proxy.                                | A store portion <div>`const [price] = useStore.cart.price()`</div>All store: <div> `const [store] = useStore()`</div>                                                                                                                                                                                                                                                   |
 | update value | `function` | Function to update the store property indicated with the proxy.                         | Updating a store portion:<div>`const [count, setCount] = useStore.count(0)`</div>Way 1:<div>`setCount(count + 1)`</div>Way 1:<div>`setCount(c => c + 1)`</div><div>-------</div>Updating all store:<div>`const [store, updateStore] = useStore()`</div>Way 1:<div>`updateStore({ ...store, count: 2 }))`</div>Way 1:<div>`updateStore(s => ({ ...s, count: 2 }))`</div> |
-| 
+
 
 ### getStore helper
 

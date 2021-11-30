@@ -101,7 +101,7 @@ export default function createStore(defaultStore = {}, callback) {
    * @param {function} callback
    */
   function useSubscription(path, callback) {
-    let forceRender = useReducer(() => [], 0)[1];
+    let forceRender = useReducer(() => [])[1];
 
     useEffect(() => {
       subscription._subscribe(path, forceRender);

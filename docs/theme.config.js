@@ -30,4 +30,5 @@ export default {
   unstable_faviconGlyph: '🍵',
   unstable_staticImage: true,
   font: false,
+  floatTOC: true,
 }

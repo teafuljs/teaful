@@ -1,0 +1,28 @@
+# Define Calculated Properties
+
+It's possible to use the `getStore` together with the function that is executed after each update to have store properties calculated from others.
+
+In this example the cart price value will always be a value calculated according to the array of items:
+
+```js
+export const { useStore, getStore } = createStore(
+  {
+    cart: {
+      price: 0,
+      items: [],
+    },
+  },
+  onAfterUpdate
+);
+
+function onAfterUpdate({ store }) {
+  const { items, price } = store.cart;
+  const calculatedPrice = items.length * 3;
+
+  // Price always will be items.length * 3
+  if (price !== calculatedPrice) {
+    const [, setPrice] = getStore.cart.price();
+    setPrice(calculatedPrice);
+  }
+}
+```

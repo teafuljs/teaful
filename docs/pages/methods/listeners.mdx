@@ -1,0 +1,62 @@
+# onAfterUpdate Listeners
+
+Using onAfterUpdate listeners, you can listen to changes in the store. This can be useful for validating properties, storing error messages, optimistic updates, etc...
+
+# Two Types of Listeners
+
+## Permanent events listeners
+
+Inside `createStore`. This event will always be executed for each change made within the store.
+
+```js
+export const { useStore, getStore } = createStore(
+  initialStore,
+  onAfterUpdate
+);
+
+function onAfterUpdate({ store, prevStore }) {
+  // Add an error msg
+  if (store.count > 99 && !store.errorMsg) {
+    const [, setErrorMsg] = getStore.errorMsg();
+    setErrorMsg("The count value should be lower than 100");
+    return;
+  }
+  // Remove error msg
+  if (store.count <= 99 && store.errorMsg) {
+    const [, setErrorMsg] = getStore.errorMsg();
+    setErrorMsg();
+  }
+}
+```
+
+## Temporal events listeners
+
+Inside `useStore` / `withStore`. These events will be executed for each change in the store (or indicated portion) **only during the life of the component**, when the component is unmounted the event is removed.
+
+```js
+function Count() {
+  const [count, setCount] = useStore.count(0, onAfterUpdate);
+  const [errorMsg, setErrorMsg] = useStore.errorMsg();
+
+  // The event lasts as long as this component lives
+  function onAfterUpdate({ store, prevStore }) {
+    // Add an error msg
+    if (store.count > 99 && !store.errorMsg) {
+      setErrorMsg("The count value should be lower than 100");
+      return;
+    }
+    // Remove error msg
+    if (store.count >= 99 && store.errorMsg) {
+      setErrorMsg();
+    }
+  }
+
+  return (
+    <>
+      {errorMsg && <div className="erorMsg">{errorMsg}</div>}
+      <div className="count">{count}</div>
+      <button onClick={() => setCount((v) => v + 1)}>Increment</button>
+    </>
+  );
+}
+```

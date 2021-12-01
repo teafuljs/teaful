@@ -1,0 +1,40 @@
+# Avoid Unnecessary Rerendering
+
+If you do this it causes a rerender to all the properties of the store:
+
+```js
+// 😡
+const [store, setStore] = useStore();
+setStore({ ...store, count: 10, username: "" });
+```
+
+And if you do the next, you convert the whole store into only 2 properties (`{ count: 10, username: '' }`), and you will remove the rest:
+
+```js
+// 🥵
+const [store, setStore] = useStore();
+setStore({ count: 10, username: "" });
+```
+
+If you have to update several properties and you don't want to disturb the rest of the components that are using other store properties you can create a helper with `getStore`.
+
+```js
+export const { useStore, getStore } = createStore(initialStore);
+
+export function setStore(fields) {
+  Object.keys(fields).forEach((key) => {
+    const setStoreField = getStore[key]()[1];
+    setStoreField(fields[key]);
+  });
+}
+```
+
+And use it wherever you want:
+
+```js
+// 🤩
+import { setStore } from "./store";
+
+// ...
+setStore({ count: 10, username: "" });
+```

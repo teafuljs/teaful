@@ -1,5 +1,6 @@
 {
   "use-store": "useStore Hook",
   "get-store": "getStore Helper",
-  "with-store": "withStore HOC"
+  "with-store": "withStore HOC",
+  "listener": "onAfterUpdate Listeners"
 }

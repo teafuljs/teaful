@@ -1,0 +1,42 @@
+# Add a new store property
+
+You can use `useStore` / `getStore` / `withStore` even if the property does not exist inside the store, and create it on the fly.
+
+```js
+const { useStore } = createStore({ username: "Aral" });
+
+function CreateProperty() {
+  const [price, setPrice] = useStore.cart.price(0); // 0 as initial value
+
+  return <div>Price: {price}</div>;
+}
+
+function OtherComponent() {
+  // store now is { username: 'Aral', cart: { price: 0 } }
+  const [store] = useStore();
+  console.log(store.cart.price); // 0
+  // ...
+}
+```
+
+It's **not mandatory to indicate the initial value**, you can create the property in a following step with the updater.
+
+```js
+const { useStore } = createStore({ username: "Aral" });
+
+function CreateProperty() {
+  const [cart, setCart] = useStore.cart();
+
+  useEffect(() => {
+    initCart();
+  }, []);
+  async function initCart() {
+    const newCart = await fetch("/api/cart");
+    setCart(newCart);
+  }
+
+  if (!cart) return null;
+
+  return <div>Price: {cart.price}</div>;
+}
+```

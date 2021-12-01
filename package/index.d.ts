@@ -2,7 +2,7 @@ declare module "teaful" {
 
   import React from "react";
   
-  type HookReturn<T> = [T, (value: T | ((value: T) => T | undefined | null) ) => void, () => void];
+  type HookReturn<T> = [T, (value: T | ((value: T) => T | undefined | null) ) => void];
   type initialStoreType = Record<string, any>;
 
   type Hook<S> = (

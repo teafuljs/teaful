@@ -41,7 +41,7 @@ declare module "teaful" {
   };
 
   function createStore<S extends initialStoreType>(
-    initial: S,
+    initial?: S,
     afterCallback?: afterCallbackType<S>
   ): {
     getStore: HookDry<S> & getStoreType<S>;

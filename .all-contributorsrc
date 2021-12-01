@@ -61,6 +61,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "shubhamV123",
+      "name": "Shubham",
+      "avatar_url": "https://avatars.githubusercontent.com/u/29898106?v=4",
+      "profile": "https://shubhamverma.dev/",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,

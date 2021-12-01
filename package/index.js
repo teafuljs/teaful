@@ -4,13 +4,13 @@ let MODE_GET = 1;
 let MODE_USE = 2;
 let MODE_WITH = 3;
 let DOT = '.';
+let extras = [];
 
 export default function createStore(defaultStore = {}, callback) {
   let subscription = createSubscription();
 
   // Initialize the store and callbacks
   let allStore = defaultStore;
-  let initialStore = defaultStore;
 
   // Add callback subscription
   subscription._subscribe(DOT, callback);
@@ -24,7 +24,7 @@ export default function createStore(defaultStore = {}, callback) {
   let validator = {
     _path: [],
     _getHoC(Comp, path, initValue, callback) {
-      let componentName = Comp.displayName || Comp.name || 'Component';
+      let componentName = Comp.displayName || Comp.name || '';
       let WithStore = (props) => {
         let last = path.length - 1;
         let store = path.length ? path.reduce(
@@ -56,12 +56,12 @@ export default function createStore(defaultStore = {}, callback) {
 
       // ALL STORE (unfragmented):
       //
-      // MODE_GET: let [store, update, reset] = useStore()
-      // MODE_USE: let [store, update, reset] = getStore()
+      // MODE_GET: let [store, update] = useStore()
+      // MODE_USE: let [store, update] = getStore()
       if (!path.length) {
         let updateAll = updateField();
         if (mode === MODE_USE) useSubscription(DOT, callback);
-        return [allStore, updateAll, resetField()];
+        return [allStore, updateAll];
       }
 
       // .................
@@ -69,18 +69,11 @@ export default function createStore(defaultStore = {}, callback) {
       // .................
       let prop = path.join(DOT);
       let update = updateField(prop);
-      let reset = resetField(prop);
-      let value = getField(allStore, prop);
+      let value = getField(prop);
+      let initializeValue = param !== undefined && !existProperty(path);
 
-      let initializeValue =
-        param !== undefined &&
-        value === undefined &&
-        getField(initialStore, prop) === undefined;
-
-      // Initialize the value if is not defined
       if (initializeValue) {
         value = param;
-        initialStore = setField(initialStore, path, value);
         allStore = setField(allStore, path, value);
       }
 
@@ -94,7 +87,7 @@ export default function createStore(defaultStore = {}, callback) {
 
       // MODE_GET: let [price, setPrice] = useStore.cart.price()
       // MODE_USE: let [price, setPrice] = getStore.cart.price()
-      return [value, update, reset];
+      return [value, update];
     },
   };
   let useStore = new Proxy(() => MODE_USE, validator);
@@ -108,7 +101,7 @@ export default function createStore(defaultStore = {}, callback) {
    * @param {function} callback
    */
   function useSubscription(path, callback) {
-    let forceRender = useReducer(() => ({}), 0)[1];
+    let forceRender = useReducer(() => [])[1];
 
     useEffect(() => {
       subscription._subscribe(path, forceRender);
@@ -134,7 +127,7 @@ export default function createStore(defaultStore = {}, callback) {
       let value = newValue;
 
       if (typeof newValue === 'function') {
-        value = newValue(getField(allStore, path));
+        value = newValue(getField(path));
       }
 
       allStore = path ?
@@ -151,55 +144,53 @@ export default function createStore(defaultStore = {}, callback) {
     };
   }
 
-  /**
-   * Reset a field of the store
-   *
-   * When resetField(path) is called, the field of the store is
-   * reset to the initial value.
-   * @param {string} path
-   * @return {function}
-   */
-  function resetField(path) {
-    return () => updateField(path)(getField(initialStore, path));
+  function getField(path, fn = (a, c) => a?.[c]) {
+    if (!path) return allStore;
+    return (Array.isArray(path) ? path : path.split(DOT)).reduce(fn, allStore);
   }
+
+  function setField(store, [prop, ...rest], value) {
+    let newObj = Array.isArray(store) ? [...store] : {...store};
+    newObj[prop] = rest.length ? setField(store[prop], rest, value) : value;
+    return newObj;
+  }
+
+  function existProperty(path) {
+    return getField(path, (a, c, index, arr) => {
+      if (index === arr.length - 1) return c in (a || {});
+      return a?.[c];
+    });
+  }
+
+  let result = extras.reduce((res, fn) => {
+    let newRes = fn(res, subscription);
+    return typeof newRes === 'object' ? {...res, ...newRes} : res;
+  }, {useStore, getStore, withStore});
 
   /**
    * createStore function returns:
    * - useStore hook
    * - getStore helper
    * - withStore HoC
+   * - extras that 3rd party can add
    * @returns {object}
    */
-  return {useStore, getStore, withStore};
+  return result;
 }
 
-// ##########################################################
-// ######################  Helpers  #########################
-// ##########################################################
-
-function getField(store, path) {
-  if (!path) return store;
-  return (Array.isArray(path) ? path : path.split(DOT)).reduce(
-      (a, c) => a?.[c],
-      store,
-  );
-}
-
-function setField(store = {}, [prop, ...rest], value) {
-  let newObj = Array.isArray(store) ? [...store] : {...store};
-  newObj[prop] = rest.length ? setField(store[prop], rest, value) : value;
-  return newObj;
-}
+createStore.ext = (extra) => typeof extra === 'function' && extras.push(extra);
 
 function createSubscription() {
   let listeners = {};
 
   return {
+    // Renamed to "s" after build to minify code
     _subscribe(path, listener) {
       if (typeof listener !== 'function') return;
       if (!listeners[path]) listeners[path] = new Set();
       listeners[path].add(listener);
     },
+    // Renamed to "n" after build to minify code
     _notify(path, params) {
       Object.keys(listeners).forEach((listenerKey) => {
         if (path.startsWith(listenerKey) || listenerKey.startsWith(path)) {
@@ -207,6 +198,7 @@ function createSubscription() {
         }
       });
     },
+    // Renamed to "u" after build to minify code
     _unsubscribe(path, listener) {
       if (typeof listener !== 'function') return;
       listeners[path].delete(listener);

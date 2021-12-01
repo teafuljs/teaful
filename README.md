@@ -13,7 +13,7 @@ _Tiny, easy and powerful **React state management** library_
 [![Weekly downloads](https://badgen.net/npm/dw/teaful?color=blue)](https://www.npmjs.com/package/teaful)
 [![GitHub Discussions: Chat With Us](https://badgen.net/badge/discussions/chat%20with%20us/purple)](https://github.com/teafuljs/teaful/discussions)
 [![PRs Welcome][badge-prwelcome]][prwelcome]<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [badge-prwelcome]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
@@ -42,8 +42,6 @@ _Tiny, easy and powerful **React state management** library_
 - [4. Register events after an update 🚦](#register-events-after-an-update-)
 - [5. How to... 🧑‍🎓](#how-to-)
   - [Add a new store property](#add-a-new-store-property)
-  - [Reset a store property](#reset-a-store-property)
-  - [Reset all the store](#reset-all-the-store)
   - [Use more than one store](#use-more-than-one-store)
   - [Update several portions avoiding rerenders in the rest](#update-several-portions-avoiding-rerenders-in-the-rest)
   - [Define calculated properties](#define-calculated-properties)
@@ -219,13 +217,13 @@ _Input:_
 
 _Output:_
 
-Is an `Array` with **3** items:
+Is an `Array` with **2** items:
 
 | name         | type       | description                                                                             | example                                                                                                                                                                                                                                                                                                                                                                 |
 | ------------ | ---------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | value        | `any`      | The value of the store portion indicated with the proxy.                                | A store portion <div>`const [price] = useStore.cart.price()`</div>All store: <div> `const [store] = useStore()`</div>                                                                                                                                                                                                                                                   |
 | update value | `function` | Function to update the store property indicated with the proxy.                         | Updating a store portion:<div>`const [count, setCount] = useStore.count(0)`</div>Way 1:<div>`setCount(count + 1)`</div>Way 1:<div>`setCount(c => c + 1)`</div><div>-------</div>Updating all store:<div>`const [store, updateStore] = useStore()`</div>Way 1:<div>`updateStore({ ...store, count: 2 }))`</div>Way 1:<div>`updateStore(s => ({ ...s, count: 2 }))`</div> |
-| reset value  | `function` | Function that reset the store property indicated with the proxy to their initial value. | Reset store portion:<div>`const [,,resetCount] = useStore.count()`</div><div>`resetCount()`</div><small>_Put counter to 0 again (initial value defined inside the `createStore`)._</small><div>-------</div>Reset all store:<div>`const [,,resetStore] = useStore()`</div><div>`resetStore()`</div><small>_All store portions to their initial values._</small>         |
+
 
 ### getStore helper
 
@@ -255,18 +253,25 @@ It works exactly like `useStore` but with **some differences**:
 Very useful to use it:
 
 - **Outside components**: helpers, services, etc.
-- **Inside components**: Avoiding rerenders if you want to consume it inside events, when you only use the updaters `const [, setCount, resetCount] = getStore.count()`, etc.
+- **Inside components**: Avoiding rerenders if you want to consume it inside events, when you only use the updater `const [, setCount] = getStore.count()`, etc.
 
 Example:
 
 ```js
 import { useState } from "react";
 
-const { getStore } = createStore({ count: 0 });
+const initialStore = { count: 0 }
+const { getStore } = createStore(initialStore);
 
 function Example1() {
-  const resetStore = getStore()[2];
-  return <button onClick={resetStore}>Reset store</button>;
+  return (
+    <button onClick={() => {
+      const [, setStore] = getStore();
+      setStore(initialStore)
+    }}>
+      Reset store
+    </button>
+  );
 }
 
 function Example2() {
@@ -303,13 +308,13 @@ const { withStore } = createStore();
 
 class Counter extends Component {
   render() {
-    const [count, setCount, resetCount] = this.props.store;
+    const [count, setCount] = this.props.store;
     return (
       <div>
         <h1>{count}</h1>
         <button onClick={() => setCount((v) => v + 1)}>+</button>
         <button onClick={() => setCount((v) => v - 1)}>-</button>
-        <button onClick={resetCount}>reset</button>
+        <button onClick={() => setCount(0)}>reset</button>
       </div>
     );
   }
@@ -326,13 +331,13 @@ const { withStore } = createStore({ count: 0 });
 
 class Counter extends Component {
   render() {
-    const [store, setStore, resetStore] = this.props.store;
+    const [store, setStore] = this.props.store;
     return (
       <div>
         <h1>{store.count}</h1>
         <button onClick={() => setStore({ count: store.count + 1 })}>+</button>
         <button onClick={() => setStore({ count: store.count - 1 })}>-</button>
-        <button onClick={resetStore}>reset</button>
+        <button onClick={() => setStore({ count: 0 })}>reset</button>
       </div>
     );
   }
@@ -446,34 +451,6 @@ function CreateProperty() {
 
   return <div>Price: {cart.price}</div>;
 }
-```
-
-### Reset a store property
-
-You can use the 3th array item from `useStore` / `getStore` / `withStore`. It's a function to return the value to its initial value.
-
-```js
-const [item, setItem, resetItem] = useStore.item();
-// ...
-resetItem();
-```
-
-If you only want the reset function and not the value, we recommend using the `getStore` to avoid creating a subscription and avoid unnecessary rerenders.
-
-```js
-const [, , resetItem] = getStore.item();
-// or...
-const resetItem = getStore.item()[2];
-```
-
-### Reset all the store
-
-The [same thing](#reset-a-store-property) works to reset the entire store to its initial value.
-
-```js
-const [store, setStore, resetStore] = useStore();
-// ...
-resetStore();
 ```
 
 ### Use more than one store
@@ -610,6 +587,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/dididy"><img src="https://avatars.githubusercontent.com/u/16266103?v=4?s=100" width="100px;" alt=""/><br /><sub><b>YONGJAE LEE(이용재)</b></sub></a><br /><a href="https://github.com/teafuljs/teaful/issues?q=author%3Adididy" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://juejin.cn/user/4318537404123688/posts"><img src="https://avatars.githubusercontent.com/u/16329407?v=4?s=100" width="100px;" alt=""/><br /><sub><b>niexq</b></sub></a><br /><a href="https://github.com/teafuljs/teaful/commits?author=niexq" title="Documentation">📖</a> <a href="#infra-niexq" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     <td align="center"><a href="https://nekonako.github.io"><img src="https://avatars.githubusercontent.com/u/46141275?v=4?s=100" width="100px;" alt=""/><br /><sub><b>nekonako</b></sub></a><br /><a href="https://github.com/teafuljs/teaful/commits?author=nekonako" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://shubhamverma.dev/"><img src="https://avatars.githubusercontent.com/u/29898106?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Shubham</b></sub></a><br /><a href="https://github.com/teafuljs/teaful/commits?author=shubhamV123" title="Documentation">📖</a></td>
   </tr>
 </table>
 

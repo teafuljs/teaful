@@ -1,4 +1,10 @@
-# Define Calculated Properties
+---
+title: How To Define Calculated Properties
+---
+
+import FeedbackRating from '../../components/feedback-rating.jsx';
+
+# Define calculated properties
 
 It's possible to use the `getStore` together with the function that is executed after each update to have store properties calculated from others.
 
@@ -26,3 +32,5 @@ function onAfterUpdate({ store }) {
   }
 }
 ```
+
+<FeedbackRating />

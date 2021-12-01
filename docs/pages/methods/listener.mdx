@@ -1,10 +1,16 @@
-# onAfterUpdate Listeners
+---
+title: onAfterUpdate Listener
+---
 
-Using onAfterUpdate listeners, you can listen to changes in the store. This can be useful for validating properties, storing error messages, optimistic updates, etc...
+import FeedbackRating from '../../components/feedback-rating.jsx';
 
-# Two Types of Listeners
+# onAfterUpdate Listener
 
-## Permanent events listeners
+Using onAfterUpdate listener, you can listen to changes in the store. This can be useful for validating properties, storing error messages, optimistic updates, etc...
+
+There are two types of listeners as shown below -
+
+## Permanent events listener
 
 Inside `createStore`. This event will always be executed for each change made within the store.
 
@@ -29,7 +35,7 @@ function onAfterUpdate({ store, prevStore }) {
 }
 ```
 
-## Temporal events listeners
+## Temporal events listener
 
 Inside `useStore` / `withStore`. These events will be executed for each change in the store (or indicated portion) **only during the life of the component**, when the component is unmounted the event is removed.
 
@@ -60,3 +66,5 @@ function Count() {
   );
 }
 ```
+
+<FeedbackRating />

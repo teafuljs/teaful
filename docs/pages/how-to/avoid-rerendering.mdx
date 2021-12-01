@@ -1,4 +1,10 @@
-# Avoid Unnecessary Rerendering
+---
+title: How To Avoid Unnecessary Rerendering
+---
+
+import FeedbackRating from '../../components/feedback-rating.jsx';
+
+# Avoid unnecessary re-rendering
 
 If you do this it causes a rerender to all the properties of the store:
 
@@ -38,3 +44,5 @@ import { setStore } from "./store";
 // ...
 setStore({ count: 10, username: "" });
 ```
+
+<FeedbackRating />

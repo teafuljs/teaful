@@ -18,13 +18,13 @@ const { getStore } = createStore({ count: 0 });
 function ResetButton() {
   // the component won't re-render when the count property changes
   // because there is no subscription created
-  const [,,resetCount] = getStore.count();
+  const [,setCount] = getStore.count();
 
-  const onClick = () => {
-    getStore().count = 0;
+  const handleReset = () => {
+    setCount(0);
   };
 
-  return <button onClick={onClick}>Reset</button>;
+  return <button onClick={handleReset}>Reset</button>;
 }
 ```
 

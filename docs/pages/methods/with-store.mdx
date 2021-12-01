@@ -17,13 +17,12 @@ const { withStore } = createStore();
 
 class Counter extends Component {
   render() {
-    const [count, setCount, resetCount] = this.props.store;
+    const [count, setCount] = this.props.store;
     return (
       <div>
         <h1>{count}</h1>
         <button onClick={() => setCount((v) => v + 1)}>+</button>
         <button onClick={() => setCount((v) => v - 1)}>-</button>
-        <button onClick={resetCount}>reset</button>
       </div>
     );
   }
@@ -40,13 +39,12 @@ const { withStore } = createStore({ count: 0 });
 
 class Counter extends Component {
   render() {
-    const [store, setStore, resetStore] = this.props.store;
+    const [store, setStore] = this.props.store;
     return (
       <div>
         <h1>{store.count}</h1>
         <button onClick={() => setStore({ count: store.count + 1 })}>+</button>
         <button onClick={() => setStore({ count: store.count - 1 })}>-</button>
-        <button onClick={resetStore}>reset</button>
       </div>
     );
   }

@@ -59,7 +59,8 @@
     "test:example:todo-list": "jest ./examples/todo-list",
     "test:examples": "jest ./examples",
     "test:watch": "jest ./package ./tests --watch",
-    "build": "microbundle --jsx React.createElement --no-generateTypes",
+    "build-types": "cp ./package/index.d.ts ./dist/index.d.ts",
+    "build": "microbundle --jsx React.createElement --no-generateTypes && yarn build-types",
     "dev": "microbundle watch",
     "prepublish": "yarn build"
   },

@@ -1,6 +1,6 @@
 {
   "name": "teaful",
-  "version": "0.8.1",
+  "version": "0.9.0-canary.7",
   "description": "Tiny, easy and powerful React state management (less than 1kb)",
   "license": "MIT",
   "keywords": [
@@ -51,7 +51,7 @@
       }
     ]
   },
-  "types": "dist/index.d.ts",
+  "types": "package/index.d.ts",
   "scripts": {
     "lint": "eslint ./package ./tests",
     "format": "eslint --fix ./package ./tests ./examples",
@@ -59,7 +59,8 @@
     "test:example:todo-list": "jest ./examples/todo-list",
     "test:examples": "jest ./examples",
     "test:watch": "jest ./package ./tests --watch",
-    "build": "microbundle --jsx React.createElement",
+    "build-types": "cp ./package/index.d.ts ./dist/index.d.ts",
+    "build": "microbundle --jsx React.createElement --no-generateTypes && yarn build-types",
     "dev": "microbundle watch",
     "prepublish": "yarn build"
   },
@@ -68,7 +69,7 @@
   },
   "jest": {
     "testEnvironment": "jsdom",
-     "moduleNameMapper": {
+    "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
       "\\.(css|less)$": "identity-obj-proxy"
     }

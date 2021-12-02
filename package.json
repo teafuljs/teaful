@@ -65,7 +65,13 @@
     "prepublish": "yarn build"
   },
   "peerDependencies": {
-    "react": ">= 16.8.0"
+    "react": ">= 16.8.0",
+    "teaful-devtools": ">= 0.4.0"
+  },
+  "peerDependenciesMeta": {
+    "teaful-devtools": {
+      "optional": true
+    }
   },
   "jest": {
     "testEnvironment": "jsdom",

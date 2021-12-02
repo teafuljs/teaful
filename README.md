@@ -45,9 +45,11 @@ _Tiny, easy and powerful **React state management** library_
   - [Use more than one store](#use-more-than-one-store)
   - [Update several portions avoiding rerenders in the rest](#update-several-portions-avoiding-rerenders-in-the-rest)
   - [Define calculated properties](#define-calculated-properties)
-- [6. Examples 🖥](#examples-)
-- [7. Roadmap 🛣](#roadmap-)
-- [8. Contributors ✨](#contributors-)
+- [6. Teaful Devtools 🛠](#teaful-devtools-)
+- [7. Addons and extras 🌀](#addons-and-extras-)
+- [8. Examples 🖥](#examples-)
+- [9. Roadmap 🛣](#roadmap-)
+- [10. Contributors ✨](#contributors-)
 
 ## Installation 🧑🏻‍💻
 
@@ -558,6 +560,57 @@ function onAfterUpdate({ store }) {
 }
 ```
 
+It's an anti-pattern? Not in Teaful 😊. As only the fragments of the store are updated and not the whole store, it is the same as updating both properties (`cart.items` and `cart.price`) instead of just `cart.items`.  The anti-pattern comes when it causes unnecessary rerenders, but this is not the case. Only the components that use `cart.items` and `cart.price` are rerendered and not the others.
+
+
+## Teaful Devtools 🛠
+
+To debug your stores, you can use [Teaful DevTools](https://github.com/teafuljs/teaful-devtools).
+
+<img alt="Teaful DevTools" src="https://github.com/teafuljs/teaful-devtools/blob/master/demo.png?raw=true" />
+
+
+## Addons and extras 🌀
+
+To facilitate the creation of libraries that extend Teaful (such as [`teaful-devtools`](https://github.com/teafuljs/teaful-devtools)), we allow the possibility to add an extra that:
+
+- Have access to everything returned by each `createStore` consumed: `getStore`, `useStore`, `withStore`.
+- Return an object with new elements to be returned by each `createStore`. It's optional, if nothing is returned it will continue to return the usual. If, for example, you return `{ getCustomThing }` will do an assign with what is currently returned by the `createStore`.
+- Ability to **subscribe**, **unsubscribe** and **notify** in each `createStore`.
+
+For that, use the `createStore.ext` function.
+
+<small>teaful-yourlib:</small>
+
+```js
+import createStore from 'teaful'
+
+createStore.ext(({ getStore,  }, subscription) => {
+    // s = subscribe (minified by Teaful)
+    //     "." -> all store
+    //     ".cart" -> only inside cart
+    //     ".cart.price" -> only inside cart.price
+    // n = notify (minified by Teaful)
+    // u = unsubscribe (minified by Teaful)
+    subscription.s(".", ({ store, prevStore }) => {
+      // This will be executed in any store (".") change.
+    });
+
+    // optional
+    return { getCustomThing: () => console.log('example') }
+})
+```
+
+Then, your library should be imported at the top:
+
+```js
+import 'teaful-yourlib'
+import { render } from 'preact';
+import App from './components/App';
+
+render(<App />, document.getElementById('root'));
+```
+
 ## Examples 🖥
 
 We will expand the examples over time. For now you can use this Codesandbox:
@@ -567,7 +620,10 @@ We will expand the examples over time. For now you can use this Codesandbox:
 ## Roadmap 🛣
 
 - [x] React support
-- [x] TypeScript support
+- [x] Teaful DevTools
+- [ ] TypeScript support
+    - [x] Add TypeScript types
+    - [ ] Migrate full Teaful project to TypeScript
 - [ ] Vanilla JavaScript support
 - [ ] Svelte support
 - [ ] Vue support

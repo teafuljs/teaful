@@ -1,6 +1,6 @@
 {
   "name": "teaful",
-  "version": "0.9.0-canary.6",
+  "version": "0.9.0-canary.7",
   "description": "Tiny, easy and powerful React state management (less than 1kb)",
   "license": "MIT",
   "keywords": [

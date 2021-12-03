@@ -619,14 +619,24 @@ We will expand the examples over time. For now you can use this Codesandbox:
 
 ## Roadmap 🛣
 
+**For 1.0**:
+
 - [x] React support
 - [x] Teaful DevTools
 - [ ] TypeScript support
     - [x] Add TypeScript types
     - [ ] Migrate full Teaful project to TypeScript
+- [ ] React Native support
 - [ ] Vanilla JavaScript support
+
+
+**Optional for 1.0 (else +1.0):**
+
 - [ ] Svelte support
 - [ ] Vue support
+- [ ] Solid support
+
+_If you think that there is something that should be preindicated by version 1.0 please report it as an issue or discussion 🙏_
 
 ## Contributors ✨
 

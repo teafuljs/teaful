@@ -627,6 +627,8 @@ We will expand the examples over time. For now you can use this Codesandbox:
 - [ ] Migrate full Teaful project to TypeScript
 - [ ] React Native support
 - [ ] Vanilla JavaScript support
+- [ ] Create a documentation website
+- [ ] Add more examples: with Next.js, Remix, Preact, React Native...
 
 
 **Optional for 1.0 (else +1.0):**

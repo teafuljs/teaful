@@ -615,7 +615,10 @@ render(<App />, document.getElementById('root'));
 
 We will expand the examples over time. For now you can use this Codesandbox:
 
-- https://codesandbox.io/s/teaful-example-4p5dv?file=/src/store.js
+- [Example of store - CodeSandbox](https://codesandbox.io/s/teaful-example-4p5dv?file=/src/store.js)
+- [Counter with ESM](https://github.com/teafuljs/teaful/tree/master/examples/counter-with-esm)
+- [Todo list](https://github.com/teafuljs/teaful/tree/master/examples/todo-list)
+- [Example with an API list](https://github.com/teafuljs/teaful/blob/master/examples/api-list/README.md)
 
 ## Roadmap 🛣
 

@@ -25,7 +25,7 @@ declare module "teaful" {
   }) => void;
 
   type getStoreType<S extends initialStoreType> = {
-    [key in keyof S | string ]: S[key] extends initialStoreType
+    [key in keyof S]: S[key] extends initialStoreType
       ? useStoreType<S[key]> & HookDry<S[key]> : HookDry<S[key]>;
   };
 

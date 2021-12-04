@@ -16,7 +16,8 @@ declare module "teaful" {
 
   type HocFunc<S, R extends React.ComponentClass = React.ComponentClass> = (
     component: R,
-    initial?: S
+    initial?: S,
+    onAfterUpdate?: afterCallbackType<S>
   ) => R;
 
   type afterCallbackType<S extends initialStoreType> = (param: {

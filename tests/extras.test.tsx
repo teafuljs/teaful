@@ -1,3 +1,4 @@
+// @ts-nocheck
 import '@babel/polyfill';
 
 import createStore from '../package/index';

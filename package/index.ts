@@ -1,11 +1,11 @@
- // @ts-nocheck
+// @ts-nocheck
 import React, {useEffect, useReducer, createElement} from 'react';
 
 let MODE_GET = 1;
 let MODE_USE = 2;
 let MODE_WITH = 3;
 let DOT = '.';
-let extras: Array<Function> = [];
+let extras: Function[] = [];
 
 export default function createStore<S extends initialStoreType>(initial: S = {} as S, callback?: afterCallbackType<S>): {
   getStore: HookDry<S> & getStoreType<S>;
@@ -27,8 +27,8 @@ export default function createStore<S extends initialStoreType>(initial: S = {} 
    * - withStore HoC proxy
    */
   let validator = {
-    _path: [] as Array<string>,
-    _getHoC<S extends initialStoreType>(Comp: React.ComponentClass, path: Array<string>, initValue: S, callback?:  afterCallbackType<S>) {
+    _path: [] as string[],
+    _getHoC<S extends initialStoreType>(Comp: React.ComponentClass, path: string[], initValue: S, callback?:  afterCallbackType<S>) {
       let componentName = Comp.displayName || Comp.name || '';
       let WithStore: React.FunctionComponent = (props) => {
         let last = path.length - 1;

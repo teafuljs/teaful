@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {useState} from 'react';
 import {render, screen} from '@testing-library/react';
 import {act} from 'react-dom/test-utils';

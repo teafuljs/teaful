@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {Component, useEffect, useRef, useState} from 'react';
 import {render, waitFor, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -203,11 +204,16 @@ describe('Example: Counter', () => {
 
   it('should work with a counter: as a new value (not defined on the store)',
       async () => {
-        const {useStore} = createStore({anotherValue: ''});
+        type storeType = {
+          anotherValue: string,
+          count?: number
+        }
+
+        const {useStore} = createStore<storeType>({anotherValue: ''});
 
         function Counter() {
-          const initialCountValue = useRef();
-          const [count, setCount] = useStore.count();
+          const initialCountValue = useRef<number>();
+          const [count, setCount] = useStore.count!();
 
           useEffect(() => {
             if (
@@ -289,7 +295,13 @@ describe('Example: Counter', () => {
       });
   it('should work with a counter in a class component: as a new value (not defined on the store)',
       async () => {
-        const {useStore, withStore} = createStore();
+        type storeType = {
+          counter: {
+            count?: number
+          }
+        }
+
+        const {useStore, withStore} = createStore<storeType>();
         const initialCount = 0;
 
         class Counter extends Component {

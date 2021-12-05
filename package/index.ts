@@ -1,16 +1,21 @@
-import {useEffect, useReducer, createElement} from 'react';
+ // @ts-nocheck
+import React, {useEffect, useReducer, createElement} from 'react';
 
 let MODE_GET = 1;
 let MODE_USE = 2;
 let MODE_WITH = 3;
 let DOT = '.';
-let extras = [];
+let extras: Array<Function> = [];
 
-export default function createStore(defaultStore = {}, callback) {
+export default function createStore<S extends initialStoreType>(initial: S = {} as S, callback?: afterCallbackType<S>): {
+  getStore: HookDry<S> & getStoreType<S>;
+  useStore: Hook<S> & useStoreType<S>;
+  withStore: HocFunc<S> & withStoreType<S>;
+} {
   let subscription = createSubscription();
 
   // Initialize the store and callbacks
-  let allStore = defaultStore;
+  let allStore = initial;
 
   // Add callback subscription
   subscription._subscribe(DOT, callback);
@@ -22,10 +27,10 @@ export default function createStore(defaultStore = {}, callback) {
    * - withStore HoC proxy
    */
   let validator = {
-    _path: [],
-    _getHoC(Comp, path, initValue, callback) {
+    _path: [] as Array<string>,
+    _getHoC<S extends initialStoreType>(Comp: React.ComponentClass, path: Array<string>, initValue: S, callback?:  afterCallbackType<S>) {
       let componentName = Comp.displayName || Comp.name || '';
-      let WithStore = (props) => {
+      let WithStore: React.FunctionComponent = (props) => {
         let last = path.length - 1;
         let store = path.length ? path.reduce(
             (a, c, index) => index === last ? a[c](initValue, callback) : a[c],
@@ -36,12 +41,12 @@ export default function createStore(defaultStore = {}, callback) {
       WithStore.displayName = `withStore(${componentName})`;
       return WithStore;
     },
-    get(target, path) {
+    get(target, path: string) {
       if (path === 'prototype') return {};
       this._path.push(path);
       return new Proxy(target, validator);
     },
-    apply(getMode, _, args) {
+    apply(getMode: Function, _, args) {
       let mode = getMode();
       let param = args[0];
       let callback = args[1];
@@ -178,7 +183,7 @@ export default function createStore(defaultStore = {}, callback) {
   return result;
 }
 
-createStore.ext = (extra) => typeof extra === 'function' && extras.push(extra);
+createStore.ext = (extra: Function) => extras.push(extra);
 
 function createSubscription() {
   let listeners = {};
@@ -206,3 +211,46 @@ function createSubscription() {
     },
   };
 }
+
+/**
+ * TypeScript types
+ */
+
+type HookReturn<T> = [T, (value: T | ((value: T) => T | undefined | null) ) => void];
+type initialStoreType = Record<string, any>;
+
+type Hook<S> = (
+  initial?: S,
+  onAfterUpdate?: afterCallbackType<S>
+) => HookReturn<S>;
+
+type HookDry<S> = (initial?: S) => HookReturn<S>;
+
+export type Hoc<S> = { store: HookReturn<S> };
+
+type HocFunc<S, R extends React.ComponentClass = React.ComponentClass> = (
+  component: R,
+  initial?: S,
+  onAfterUpdate?: afterCallbackType<S>
+) => R;
+
+type afterCallbackType<S extends initialStoreType> = (param: {
+  store: S;
+  prevStore: S;
+}) => void;
+
+type getStoreType<S extends initialStoreType> = {
+  [key in keyof S]: S[key] extends initialStoreType
+    ? useStoreType<S[key]> & HookDry<S[key]> : HookDry<S[key]>;
+};
+
+type useStoreType<S extends initialStoreType> = {
+  [key in keyof S]: S[key] extends initialStoreType
+    ? useStoreType<S[key]> & Hook<S[key]> : Hook<S[key]>;
+};
+
+type withStoreType<S extends initialStoreType> = {
+  [key in keyof S]: S[key] extends initialStoreType
+    ? withStoreType<S[key]> & HocFunc<S>
+    : HocFunc<S>;
+};

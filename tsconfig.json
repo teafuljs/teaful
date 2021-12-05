@@ -1,0 +1,11 @@
+{
+	"compileOnSave": false,
+	"compilerOptions": {
+		"strict": true,
+		"noEmit": true,
+		"declaration": true,
+		"moduleResolution": "node",
+		"esModuleInterop": true
+	},
+	"include": ["package/*.ts", "test/*.ts"]
+}

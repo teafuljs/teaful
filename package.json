@@ -23,7 +23,7 @@
     "type": "git",
     "url": "https://github.com/teafuljs/teaful.git"
   },
-  "source": "package/index.js",
+  "source": "package/index.ts",
   "main": "dist/index.js",
   "umd:main": "dist/index.umd.js",
   "module": "dist/index.m.js",
@@ -51,7 +51,7 @@
       }
     ]
   },
-  "types": "package/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint ./package ./tests",
     "format": "eslint --fix ./package ./tests ./examples",
@@ -59,8 +59,7 @@
     "test:example:todo-list": "jest ./examples/todo-list",
     "test:examples": "jest ./examples",
     "test:watch": "jest ./package ./tests --watch",
-    "copy-types": "node ./config/copy-type-definition.js",
-    "build": "microbundle --jsx React.createElement --no-generateTypes && yarn copy-types",
+    "build": "microbundle --jsx React.createElement",
     "dev": "microbundle watch",
     "prepublish": "yarn build"
   },
@@ -87,6 +86,7 @@
     "@testing-library/dom": "8.11.1",
     "@testing-library/react": "12.1.2",
     "@testing-library/user-event": "13.5.0",
+    "@types/react": "^17.0.37",
     "babel-jest": "27.4.2",
     "bundlewatch": "0.3.2",
     "eslint": "8.4.0",
@@ -99,8 +99,7 @@
     "microbundle": "0.14.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-test-renderer": "17.0.2",
-    "shelljs": "0.8.4"
+    "react-test-renderer": "17.0.2"
   },
   "bugs": "https://github.com/teafuljs/teaful/issues"
 }

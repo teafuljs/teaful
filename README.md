@@ -20,8 +20,6 @@ _Tiny, easy and powerful **React state management** library_
 [prwelcome]: http://makeapullrequest.com
 
 
- <img src="/assets/teaful.png" />
-
 ## What advantages does it have? ✨
 
 <ul>
@@ -30,7 +28,7 @@ _Tiny, easy and powerful **React state management** library_
     <li>🚀  ・<b>Powerful</b>: When a store property is updated, only its components are re-rendered. It's not re-rendering components that use other store properties.</li>
 </ul>
 
-<hr />
+<img src="/assets/teaful.png" />
 
 ## Guide 🗺
 

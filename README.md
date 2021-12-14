@@ -28,7 +28,10 @@ _Tiny, easy and powerful **React state management** library_
     <li>🚀  ・<b>Powerful</b>: When a store property is updated, only its components are re-rendered. It's not re-rendering components that use other store properties.</li>
 </ul>
 
-<img src="/assets/teaful.png" />
+<div align="center" >
+<img width="800" src="/assets/teaful.png" />
+</div>
+
 
 ## Guide 🗺
 

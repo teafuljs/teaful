@@ -1,13 +1,10 @@
 import React from 'react';
 
-function ga(event) {
-  console.table(event);
-}
-
 const FeedbackRating = () => {
   
   const sendYes = () => {
-    ga({
+    window.ga('send', {
+      hitType: 'event',
       origin: window.location.origin,
       pathname: window.location.pathname,
       category: 'Feedback',
@@ -17,7 +14,8 @@ const FeedbackRating = () => {
   };
 
   const sendMaybe = () => {
-    ga({
+    window.ga('send', {
+      hitType: 'event',
       origin: window.location.origin,
       pathname: window.location.pathname,
       category: 'Feedback',
@@ -27,7 +25,8 @@ const FeedbackRating = () => {
   };
 
   const sendNo = () => {
-    ga({
+    window.ga('send', {
+      hitType: 'event',
       origin: window.location.origin,
       pathname: window.location.pathname,
       category: 'Feedback',

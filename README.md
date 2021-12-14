@@ -1,4 +1,4 @@
- <img src="logo.svg" width="200" alt="Teaful" align="right" />
+ <img src="/assets/logo.svg" width="200" alt="Teaful" align="right" />
 
 <h1>
 <div><b>Teaful</b></div>
@@ -18,6 +18,9 @@ _Tiny, easy and powerful **React state management** library_
 
 [badge-prwelcome]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
 [prwelcome]: http://makeapullrequest.com
+
+
+ <img src="/assets/teaful.png" />
 
 ## What advantages does it have? ✨
 

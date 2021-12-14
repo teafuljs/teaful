@@ -1,6 +1,6 @@
 {
   "name": "teaful",
-  "version": "0.9.0-canary.1",
+  "version": "0.9.2",
   "description": "Tiny, easy and powerful React state management (less than 1kb)",
   "license": "MIT",
   "keywords": [
@@ -51,7 +51,7 @@
       }
     ]
   },
-  "types": "dist/index.d.ts",
+  "types": "package/index.d.ts",
   "scripts": {
     "lint": "eslint ./package ./tests",
     "format": "eslint --fix ./package ./tests ./examples",
@@ -59,16 +59,23 @@
     "test:example:todo-list": "jest ./examples/todo-list",
     "test:examples": "jest ./examples",
     "test:watch": "jest ./package ./tests --watch",
-    "build": "microbundle --jsx React.createElement",
+    "copy-types": "node ./config/copy-type-definition.js",
+    "build": "microbundle --jsx React.createElement --no-generateTypes && yarn copy-types",
     "dev": "microbundle watch",
     "prepublish": "yarn build"
   },
   "peerDependencies": {
-    "react": ">= 16.8.0"
+    "react": ">= 16.8.0",
+    "teaful-devtools": ">= 0.4.0"
+  },
+  "peerDependenciesMeta": {
+    "teaful-devtools": {
+      "optional": true
+    }
   },
   "jest": {
     "testEnvironment": "jsdom",
-     "moduleNameMapper": {
+    "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
       "\\.(css|less)$": "identity-obj-proxy"
     }
@@ -80,19 +87,20 @@
     "@testing-library/dom": "8.11.1",
     "@testing-library/react": "12.1.2",
     "@testing-library/user-event": "13.5.0",
-    "babel-jest": "27.3.1",
+    "babel-jest": "27.4.2",
     "bundlewatch": "0.3.2",
-    "eslint": "8.3.0",
+    "eslint": "8.4.0",
     "eslint-config-google": "0.14.0",
     "eslint-plugin-jest": "25.3.0",
     "eslint-plugin-react": "7.27.1",
     "eslint-plugin-react-hooks": "4.3.0",
-    "eslint-plugin-testing-library": "5.0.0",
-    "jest": "27.3.1",
+    "eslint-plugin-testing-library": "5.0.1",
+    "jest": "27.4.3",
     "microbundle": "0.14.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-test-renderer": "17.0.2"
+    "react-test-renderer": "17.0.2",
+    "shelljs": "0.8.4"
   },
   "bugs": "https://github.com/teafuljs/teaful/issues"
 }

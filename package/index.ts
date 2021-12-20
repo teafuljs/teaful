@@ -251,6 +251,6 @@ type useStoreType<S extends initialStoreType> = {
 
 type withStoreType<S extends initialStoreType> = {
   [key in keyof S]: S[key] extends initialStoreType
-    ? withStoreType<S[key]> & HocFunc<S>
-    : HocFunc<S>;
+    ? withStoreType<S[key]> & HocFunc<S[key]>
+    : HocFunc<S[key]>;
 };

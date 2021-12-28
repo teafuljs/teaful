@@ -36,6 +36,7 @@ function CreateProperty() {
   useEffect(() => {
     initCart();
   }, []);
+  
   async function initCart() {
     const newCart = await fetch("/api/cart");
     setCart(newCart);

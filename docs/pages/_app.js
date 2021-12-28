@@ -2,10 +2,11 @@ import { useEffect } from 'react';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-jsx';
 
+import '../styles/tailwind.css';
 import 'nextra-theme-docs/style.css';
+import '../styles/globals.css';
 import '../styles/theme-light.css';
 import '../styles/theme-dark.css';
-import '../styles/globals.css';
 
 (typeof global !== 'undefined' ? global : window).Prism = Prism;
 

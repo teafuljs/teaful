@@ -1,4 +1,4 @@
- <img src="logo.svg" width="200" alt="Teaful" align="right" />
+ <img src="/assets/logo.svg" width="200" alt="Teaful" align="right" />
 
 <h1>
 <div><b>Teaful</b></div>
@@ -19,6 +19,7 @@ _Tiny, easy and powerful **React state management** library_
 [badge-prwelcome]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
 [prwelcome]: http://makeapullrequest.com
 
+
 ## What advantages does it have? ✨
 
 <ul>
@@ -27,7 +28,10 @@ _Tiny, easy and powerful **React state management** library_
     <li>🚀  ・<b>Powerful</b>: When a store property is updated, only its components are re-rendered. It's not re-rendering components that use other store properties.</li>
 </ul>
 
-<hr />
+<div align="center" >
+<img width="800" src="/assets/teaful.png" />
+</div>
+
 
 ## Guide 🗺
 

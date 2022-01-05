@@ -232,7 +232,7 @@ type HocFunc<S, R extends React.ComponentClass = React.ComponentClass> = (
   component: R,
   initial?: S,
   onAfterUpdate?: afterCallbackType<S>
-) => R;
+) => R & { store: useStoreType<S> };
 
 type afterCallbackType<S extends initialStoreType> = (param: {
   store: S;

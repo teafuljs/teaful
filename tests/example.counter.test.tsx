@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {Component, useEffect, useRef, useState} from 'react';
 import {render, waitFor, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -66,9 +65,18 @@ describe('Example: Counter', () => {
 
   it('should work with a counter in a class component', async () => {
     const initialStore = {count: 0};
-    const {useStore, withStore} = createStore(initialStore);
 
-    class Counter extends Component {
+    type storeType = {
+      count: number;
+    }
+
+    const {useStore, withStore} = createStore<storeType>(initialStore);
+
+    type Props = {
+      store?: ReturnType<typeof useStore.count>;
+    }
+
+    class Counter extends Component<Props> {
       render() {
         const [count, setCount] = this.props.store;
         return (
@@ -133,7 +141,11 @@ describe('Example: Counter', () => {
     const initialStore = {count: 0};
     const {useStore, withStore} = createStore(initialStore);
 
-    class Counter extends Component {
+    type Props = {
+      store?: ReturnType<typeof useStore>;
+    }
+
+    class Counter extends Component<Props> {
       render() {
         const [store, setStore] = this.props.store;
         return (
@@ -304,7 +316,11 @@ describe('Example: Counter', () => {
         const {useStore, withStore} = createStore<storeType>();
         const initialCount = 0;
 
-        class Counter extends Component {
+        type Props = {
+          store?: ReturnType<typeof useStore.counter.count>;
+        }
+
+        class Counter extends Component<Props> {
           // Forcing update to verify that the initial value is not overwritten
           componentDidMount() {
             this.forceUpdate();

@@ -1,0 +1,38 @@
+---
+title: How To Use Multiple Stores
+---
+
+# Use multiple stores
+
+You can have as many stores as you want. The only thing you have to do is to use as many `createStore` as stores you want.
+
+store.js
+
+```js
+import createStore from "teaful";
+
+export const { useStore: useCart } = createStore({ price: 0, items: [] });
+export const { useStore: useCounter } = createStore({ count: 0 });
+```
+
+Cart.js
+
+```js
+import { useCart } from "./store";
+
+export default function Cart() {
+  const [price, setPrice] = useCart.price();
+  // ... rest
+}
+```
+
+Counter.js
+
+```js
+import { useCounter } from "./store";
+
+export default function Counter() {
+  const [count, setCount] = useCounter.count();
+  // ... rest
+}
+```

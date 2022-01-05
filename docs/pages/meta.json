@@ -1,0 +1,12 @@
+{
+  "index": "Introduction",
+  "getting-started": "Getting Started",
+  "methods": "Core Methods",
+  "how-to": "How To",
+  "examples": "Examples",
+  "404": {
+    "type": "nav",
+    "title": "Not Found",
+    "hidden": true
+  }
+}

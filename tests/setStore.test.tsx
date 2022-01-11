@@ -5,22 +5,20 @@ import '@babel/polyfill';
 
 import createStore from '../package/index';
 
-describe('getStore', () => {
-  it('should avoid rerenders on component that use the getStore', () => {
+describe('setStore', () => {
+  it('should avoid rerenders on component that use the setStore', () => {
     const renderCart = jest.fn();
     const renderOther = jest.fn();
     const renderUpdateProps = jest.fn();
 
-    const {useStore, getStore} = createStore({cart: {price: 0}, name: 'Aral', count: 0});
+    const {useStore, setStore} = createStore({cart: {price: 0}, name: 'Aral', count: 0});
 
     function UpdateProps() {
-      const [, setName] = getStore.name();
-      const [, setCount] = getStore.count();
       renderUpdateProps();
       return (
         <button data-testid="click" onClick={() => {
-          setName('ARAL');
-          setCount(10);
+          setStore.name('ARAL');
+          setStore.count(10);
         }}
         />
       );
@@ -64,17 +62,16 @@ describe('getStore', () => {
   it('Update serveral portions should avoid rerenders in the rest', () => {
     const renderCart = jest.fn();
     const renderOther = jest.fn();
-    const {useStore, getStore} = createStore({cart: {price: 0}, name: 'Aral', count: 0});
+    const {useStore, setStore} = createStore({cart: {price: 0}, name: 'Aral', count: 0});
 
-    function setStore(fields) {
+    function setFragmentedStore(fields) {
       Object.keys(fields).forEach((key) => {
-        const setStoreField = getStore[key]()[1];
-        setStoreField(fields[key]);
+        setStore[key](fields[key]);
       });
     }
 
     function UpdateProps() {
-      return <button data-testid="click" onClick={() => setStore({name: 'ARAL', count: 10})} />;
+      return <button data-testid="click" onClick={() => setFragmentedStore({name: 'ARAL', count: 10})} />;
     }
 
     function Cart() {

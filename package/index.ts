@@ -4,6 +4,7 @@ import React, {useEffect, useReducer, createElement} from 'react';
 let MODE_GET = 1;
 let MODE_USE = 2;
 let MODE_WITH = 3;
+let MODE_SET = 4;
 let DOT = '.';
 let extras: Function[] = [];
 
@@ -11,6 +12,7 @@ export default function createStore<S extends initialStoreType>(initial: S = {} 
   getStore: HookDry<S> & getStoreType<S>;
   useStore: Hook<S> & useStoreType<S>;
   withStore: HocFunc<S> & withStoreType<S>;
+  setStore: setter<S> & setStoreType<S>;
 } {
   let subscription = createSubscription();
 
@@ -63,9 +65,11 @@ export default function createStore<S extends initialStoreType>(initial: S = {} 
       //
       // MODE_GET: let [store, update] = useStore()
       // MODE_USE: let [store, update] = getStore()
+      // MODE_SET: setStore({ newStore: true })
       if (!path.length) {
         let updateAll = updateField();
         if (mode === MODE_USE) useSubscription(DOT, callback);
+        if (mode === MODE_SET) return updateAll(param);
         return [allStore, updateAll];
       }
 
@@ -76,6 +80,9 @@ export default function createStore<S extends initialStoreType>(initial: S = {} 
       let update = updateField(prop);
       let value = getField(prop);
       let initializeValue = param !== undefined && !existProperty(path);
+
+      // MODE_SET: setStore.cart.price(10)
+      if (mode === MODE_SET) return update(param);
 
       if (initializeValue) {
         value = param;
@@ -95,9 +102,11 @@ export default function createStore<S extends initialStoreType>(initial: S = {} 
       return [value, update];
     },
   };
-  let useStore = new Proxy(() => MODE_USE, validator);
-  let getStore = new Proxy(() => MODE_GET, validator);
-  let withStore = new Proxy(() => MODE_WITH, validator);
+  let createProxy = (mode) => new Proxy(() => mode, validator);
+  let useStore = createProxy(MODE_USE);
+  let getStore = createProxy(MODE_GET);
+  let withStore = createProxy(MODE_WITH);
+  let setStore = createProxy(MODE_SET);
 
   /**
    * Hook to register a listener to force a render when the
@@ -170,7 +179,7 @@ export default function createStore<S extends initialStoreType>(initial: S = {} 
   let result = extras.reduce((res, fn) => {
     let newRes = fn(res, subscription);
     return typeof newRes === 'object' ? {...res, ...newRes} : res;
-  }, {useStore, getStore, withStore});
+  }, {useStore, getStore, withStore, setStore});
 
   /**
    * createStore function returns:
@@ -215,8 +224,8 @@ function createSubscription() {
 /**
  * TypeScript types
  */
-
-type HookReturn<T> = [T, (value: T | ((value: T) => T | undefined | null) ) => void];
+type setter<T> = (value?: T | ((value: T) => T | undefined | null) ) => void;
+type HookReturn<T> = [T, setter<T>];
 type initialStoreType = Record<string, any>;
 
 type Hook<S> = (
@@ -242,6 +251,11 @@ type afterCallbackType<S extends initialStoreType> = (param: {
 type getStoreType<S extends initialStoreType> = {
   [key in keyof S]: S[key] extends initialStoreType
     ? useStoreType<S[key]> & HookDry<S[key]> : HookDry<S[key]>;
+};
+
+type setStoreType<S extends initialStoreType> = {
+  [key in keyof S]: S[key] extends initialStoreType
+    ? setStoreType<S[key]> & setter<S[key]> : setter<S[key]>;
 };
 
 type useStoreType<S extends initialStoreType> = {

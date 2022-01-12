@@ -290,6 +290,18 @@ function ExampleOfForm() {
 }
 ```
 
+This second example only causes re-rendering in the components that consume the property that has been modified. 
+
+In this way:
+
+```js
+const [formFields, setFormFields] = useStore()
+// ...
+setFormFields(s => ({ ...s, [key]: value })) // ❌
+```
+
+This causes a re-render on all components that are consuming any of the form properties, instead of just the one that has been updated. So using the `setStore` proxy helper is more recommended.
+
 ### getStore helper
 
 It works exactly like `useStore` but with **some differences**:

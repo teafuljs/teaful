@@ -588,10 +588,9 @@ If you have to update several properties and you don't want to disturb the rest 
 ```js
 export const { useStore, setStore } = createStore(initialStore);
 
-export function setStore(fields) {
-  Object.keys(fields).forEach((key) => {
-    const setStoreField = setStore[key];
-    setStoreField(fields[key]);
+export function setFragmentedStore(fields) {
+  Object.entries(fields).forEach(([key, value]) => {
+    setStore[key](value);
   });
 }
 ```

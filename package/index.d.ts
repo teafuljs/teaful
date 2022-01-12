@@ -2,7 +2,8 @@ declare module "teaful" {
 
   import React from "react";
   
-  type HookReturn<T> = [T, (value: T | ((value: T) => T | undefined | null) ) => void];
+  type setter<T> = (value?: T | ((value: T) => T | undefined | null) ) => void;
+  type HookReturn<T> = [T, setter<T>];
   type initialStoreType = Record<string, any>;
 
   type Hook<S> = (
@@ -35,6 +36,11 @@ declare module "teaful" {
       ? useStoreType<S[key]> & Hook<S[key]> : Hook<S[key]>;
   };
 
+  type setStoreType<S extends initialStoreType> = {
+    [key in keyof S]: S[key] extends initialStoreType
+      ? setStoreType<S[key]> & setter<S[key]> : setter<S[key]>;
+  };
+
   type withStoreType<S extends initialStoreType> = {
     [key in keyof S]: S[key] extends initialStoreType
       ? withStoreType<S[key]> & HocFunc<S>
@@ -47,6 +53,7 @@ declare module "teaful" {
   ): {
     getStore: HookDry<S> & getStoreType<S>;
     useStore: Hook<S> & useStoreType<S>;
+    setStore: setter<S> & setStoreType<S>;
     withStore: HocFunc<S> & withStoreType<S>;
   };
 

@@ -278,22 +278,15 @@ function ExampleOfForm() {
      setStore[e.target.name](e.target.value)
   }
 
-  return (
-    <>
+  return Object.entries(formFields).map(([key, value]) => (
       <input 
-        defaultValue={formFields.firstName} 
-        type="text" 
-        name="firstName" 
+        defaultValue={value} 
+        type="text"
+        key={key}
+        name={key} 
         onChange={onChange} 
       />
-      <input 
-        defaultValue={formFields.lastName} 
-        type="text" 
-        name="lastName" 
-        onChange={onChange} 
-      />
-    </>
-  )
+  ))
 }
 ```
 

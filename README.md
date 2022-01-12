@@ -290,7 +290,7 @@ function ExampleOfForm() {
 }
 ```
 
-This second example only causes re-rendering in the components that consume the property that has been modified. 
+This second example only causes re-renders in the components that consume the property that has been modified. 
 
 In this way:
 

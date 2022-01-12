@@ -297,7 +297,7 @@ In this way:
 ```js
 const [formFields, setFormFields] = useStore()
 // ...
-setFormFields(s => ({ ...s, [key]: value })) // ❌
+setFormFields(s => ({ ...s, [key]: e.target.value })) // ❌
 ```
 
 This causes a re-render on all components that are consuming any of the form properties, instead of just the one that has been updated. So using the `setStore` proxy helper is more recommended.

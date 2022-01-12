@@ -265,6 +265,38 @@ function Resets() {
 }
 ```
 
+Another example:
+
+```js
+const { useStore, setStore } = createStore({});
+
+function ExampleOfForm() {
+  const [formFields] = useStore()
+
+  // Update depending the "name" attribute
+  function onChange(e) {
+     setStore[e.target.name](e.target.value)
+  }
+
+  return (
+    <>
+      <input 
+        defaultValue={formFields.firstName} 
+        type="text" 
+        name="firstName" 
+        onChange={onChange} 
+      />
+      <input 
+        defaultValue={formFields.lastName} 
+        type="text" 
+        name="lastName" 
+        onChange={onChange} 
+      />
+    </>
+  )
+}
+```
+
 ### getStore helper
 
 It works exactly like `useStore` but with **some differences**:

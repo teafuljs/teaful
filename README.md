@@ -268,24 +268,24 @@ function Resets() {
 Another example:
 
 ```js
-const { useStore, setStore } = createStore({});
+const { useStore, setStore } = createStore({
+  firstName: '',
+  lastName: '' 
+});
 
 function ExampleOfForm() {
   const [formFields] = useStore()
 
-  // Update depending the "name" attribute
-  function onChange(e) {
-     setStore[e.target.name](e.target.value)
-  }
-
   return Object.entries(formFields).map(([key, value]) => (
-      <input 
-        defaultValue={value} 
-        type="text"
-        key={key}
-        name={key} 
-        onChange={onChange} 
-      />
+    <input 
+      defaultValue={value} 
+      type="text"
+      key={key}
+      onChange={e => {
+        // Update depending the key attribute
+        setStore[key](e.target.value)
+      }} 
+    />
   ))
 }
 ```

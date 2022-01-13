@@ -41,6 +41,7 @@ _Tiny, easy and powerful **React state management** library_
   - [How to export](#how-to-export)
 - [3. Manage the store 🕹](#manage-the-store-)
   - [useStore hook](#usestore-hook)
+  - [setStore helper](#setstore-helper)
   - [getStore helper](#getstore-helper)
   - [withStore HoC](#withstore-hoc)
 - [4. Register events after an update 🚦](#register-events-after-an-update-)
@@ -111,6 +112,7 @@ _Output:_
 | ----------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | `useStore`  | `Proxy` | Proxy hook to consume and update store properties inside your components. Each time the value changes, the component is rendered again with the new value. More [info](#usestore-hook).                 | `const [price, setPrice] = useStore.cart.price()` |
 | `getStore`  | `Proxy` | Similar to `useStore` but without subscription. You can use it as a helper outside (or inside) components. Note that if the value changes, it does not cause a rerender. More [info](#getstore-helper). | `const [price, setPrice] = getStore.cart.price()` |
+| `setStore`  | `Proxy` | It's a proxy helper to modify a store property outside (or inside) components. More [info](#setstore-helper). | `setStore.user.name('Aral')` or `setStore.cart.price(price => price + 10)`  |
 | `withStore` | `Proxy` | HoC with `useStore` inside. Useful for components that are not functional. More [info](#withstore-hoc).                                                                                                 | `withStore.cart.price(MyComponent)`               |
 
 ### How to export
@@ -230,6 +232,75 @@ Is an `Array` with **2** items:
 | value        | `any`      | The value of the store portion indicated with the proxy.                                | A store portion <div>`const [price] = useStore.cart.price()`</div>All store: <div> `const [store] = useStore()`</div>                                                                                                                                                                                                                                                   |
 | update value | `function` | Function to update the store property indicated with the proxy.                         | Updating a store portion:<div>`const [count, setCount] = useStore.count(0)`</div>Way 1:<div>`setCount(count + 1)`</div>Way 1:<div>`setCount(c => c + 1)`</div><div>-------</div>Updating all store:<div>`const [store, updateStore] = useStore()`</div>Way 1:<div>`updateStore({ ...store, count: 2 }))`</div>Way 1:<div>`updateStore(s => ({ ...s, count: 2 }))`</div> |
 
+
+### setStore helper
+
+Useful helper to modify the store from anywhere (outside/inside components).
+
+Example:
+
+```js
+const initialStore = { count: 0, name: 'Aral' }
+const { setStore } = createStore(initialStore);
+
+const resetStore = () => setStore(initialStore);
+const resetCount = () => setStore.count(initialStore.count);
+const resetName = () => setStore.name(initialStore.name);
+
+// Component without any re-render (without useStore hook)
+function Resets() {
+  return (
+    <>
+      <button onClick={resetStore}>
+        Reset store
+      </button>
+      <button onClick={resetCount}>
+        Reset count
+      </button>
+      <button onClick={resetName}>
+        Reset name
+      </button>
+    </>
+  );
+}
+```
+
+Another example:
+
+```js
+const { useStore, setStore } = createStore({
+  firstName: '',
+  lastName: '' 
+});
+
+function ExampleOfForm() {
+  const [formFields] = useStore()
+
+  return Object.entries(formFields).map(([key, value]) => (
+    <input 
+      defaultValue={value} 
+      type="text"
+      key={key}
+      onChange={e => {
+        // Update depending the key attribute
+        setStore[key](e.target.value)
+      }} 
+    />
+  ))
+}
+```
+
+This second example only causes re-renders in the components that consume the property that has been modified. 
+
+In this way:
+
+```js
+const [formFields, setFormFields] = useStore()
+// ...
+setFormFields(s => ({ ...s, [key]: e.target.value })) // ❌
+```
+
+This causes a re-render on all components that are consuming any of the form properties, instead of just the one that has been updated. So using the `setStore` proxy helper is more recommended.
 
 ### getStore helper
 
@@ -515,12 +586,11 @@ setStore({ count: 10, username: "" });
 If you have to update several properties and you don't want to disturb the rest of the components that are using other store properties you can create a helper with `getStore`.
 
 ```js
-export const { useStore, getStore } = createStore(initialStore);
+export const { useStore, setStore } = createStore(initialStore);
 
-export function setStore(fields) {
-  Object.keys(fields).forEach((key) => {
-    const setStoreField = getStore[key]()[1];
-    setStoreField(fields[key]);
+export function setFragmentedStore(fields) {
+  Object.entries(fields).forEach(([key, value]) => {
+    setStore[key](value);
   });
 }
 ```
@@ -537,12 +607,12 @@ setStore({ count: 10, username: "" });
 
 ### Define calculated properties
 
-It's possible to use the `getStore` together with the function that is executed after each update to have store properties calculated from others.
+It's possible to use the `setStore` together with the function that is executed after each update to have store properties calculated from others.
 
 In this example the cart price value will always be a value calculated according to the array of items:
 
 ```js
-export const { useStore, getStore } = createStore(
+export const { useStore, setStore } = createStore(
   {
     cart: {
       price: 0,
@@ -558,8 +628,7 @@ function onAfterUpdate({ store }) {
 
   // Price always will be items.length * 3
   if (price !== calculatedPrice) {
-    const [, setPrice] = getStore.cart.price();
-    setPrice(calculatedPrice);
+    setStore.cart.price(calculatedPrice);
   }
 }
 ```

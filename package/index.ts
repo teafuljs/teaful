@@ -8,11 +8,11 @@ let MODE_SET = 4;
 let DOT = '.';
 let extras: Function[] = [];
 
-export default function createStore<S extends initialStoreType>(initial: S = {} as S, callback?: afterCallbackType<S>): {
+export default function createStore<S extends Store>(initial: S = {} as S, callback?: afterCallbackType<S>): {
   getStore: HookDry<S> & getStoreType<S>;
   useStore: Hook<S> & useStoreType<S>;
   withStore: HocFunc<S> & withStoreType<S>;
-  setStore: setter<S> & setStoreType<S>;
+  setStore: Setter<S> & setStoreType<S>;
 } {
   let subscription = createSubscription();
 
@@ -30,7 +30,7 @@ export default function createStore<S extends initialStoreType>(initial: S = {} 
    */
   let validator = {
     _path: [] as string[],
-    _getHoC<S extends initialStoreType>(Comp: React.ComponentClass, path: string[], initValue: S, callback?:  afterCallbackType<S>) {
+    _getHoC<S extends Store>(Comp: React.ComponentClass, path: string[], initValue: S, callback?:  afterCallbackType<S>) {
       let componentName = Comp.displayName || Comp.name || '';
       let WithStore: React.FunctionComponent = (props) => {
         let last = path.length - 1;
@@ -224,9 +224,9 @@ function createSubscription() {
 /**
  * TypeScript types
  */
-type setter<T> = (value?: T | ((value: T) => T | undefined | null) ) => void;
-type HookReturn<T> = [T, setter<T>];
-type initialStoreType = Record<string, any>;
+type Setter<T> = (value?: T | ((value: T) => T | undefined | null) ) => void;
+type HookReturn<T> = [T, Setter<T>];
+type Store = Record<string, any>;
 
 type Hook<S> = (
   initial?: S,
@@ -243,28 +243,28 @@ type HocFunc<S, R extends React.ComponentClass = React.ComponentClass> = (
   onAfterUpdate?: afterCallbackType<S>
 ) => R & { store: useStoreType<S> };
 
-type afterCallbackType<S extends initialStoreType> = (param: {
+type afterCallbackType<S extends Store> = (param: {
   store: S;
   prevStore: S;
 }) => void;
 
-type getStoreType<S extends initialStoreType> = {
-  [key in keyof S]: S[key] extends initialStoreType
+type getStoreType<S extends Store> = {
+  [key in keyof S]: S[key] extends Store
     ? useStoreType<S[key]> & HookDry<S[key]> : HookDry<S[key]>;
 };
 
-type setStoreType<S extends initialStoreType> = {
-  [key in keyof S]: S[key] extends initialStoreType
-    ? setStoreType<S[key]> & setter<S[key]> : setter<S[key]>;
+type setStoreType<S extends Store> = {
+  [key in keyof S]: S[key] extends Store
+    ? setStoreType<S[key]> & Setter<S[key]> : Setter<S[key]>;
 };
 
-type useStoreType<S extends initialStoreType> = {
-  [key in keyof S]: S[key] extends initialStoreType
+type useStoreType<S extends Store> = {
+  [key in keyof S]: S[key] extends Store
     ? useStoreType<S[key]> & Hook<S[key]> : Hook<S[key]>;
 };
 
-type withStoreType<S extends initialStoreType> = {
-  [key in keyof S]: S[key] extends initialStoreType
+type withStoreType<S extends Store> = {
+  [key in keyof S]: S[key] extends Store
     ? withStoreType<S[key]> & HocFunc<S[key]>
     : HocFunc<S[key]>;
 };

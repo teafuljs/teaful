@@ -8,7 +8,6 @@ let MODE_SET = 4;
 let DOT = '.';
 let extras: Function[] = [];
 
-
 export default function createStore<S extends Store>(initial: S = {} as S, callback?: afterCallbackType<S>): {
   getStore: HookDry<S> & getStoreType<S>;
   useStore: Hook<S> & useStoreType<S>;

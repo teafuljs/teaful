@@ -1,5 +1,7 @@
 {
 	"compileOnSave": false,
+	"module": "ESNext",
+	"target": "ESNext",
 	"compilerOptions": {
 		"strict": true,
 		"noEmit": true,

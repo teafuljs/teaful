@@ -8,14 +8,14 @@ let MODE_SET = 4;
 let DOT = '.';
 let extras: Function[] = [];
 
+
 export default function createStore<S extends Store>(initial: S = {} as S, callback?: afterCallbackType<S>): {
   getStore: HookDry<S> & getStoreType<S>;
   useStore: Hook<S> & useStoreType<S>;
   withStore: HocFunc<S> & withStoreType<S>;
   setStore: Setter<S> & setStoreType<S>;
-  [extra: string]: any;
-} {
-  let subscription = createSubscription();
+} & Extra {
+  let subscription = createSubscription<S>();
 
   // Initialize the store and callbacks
   let allStore = initial;
@@ -29,7 +29,7 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
    * - getStore helper proxy
    * - withStore HoC proxy
    */
-  let validator = {
+  let validator: Validator = {
     _path: [] as string[],
     _getHoC<S extends Store>(Comp: React.ComponentClass, path: string[], initValue: S, callback?:  afterCallbackType<S>) {
       let componentName = Comp.displayName || Comp.name || '';
@@ -44,12 +44,12 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
       WithStore.displayName = `withStore(${componentName})`;
       return WithStore;
     },
-    get(target, path: string) {
+    get(target: Function, path: string) {
       if (path === 'prototype') return {};
       this._path.push(path);
       return new Proxy(target, validator);
     },
-    apply(getMode: Function, _, args) {
+    apply(getMode: Function, _: any, args: any[]) {
       let mode = getMode();
       let param = args[0];
       let callback = args[1];
@@ -103,7 +103,7 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
       return [value, update];
     },
   };
-  let createProxy = (mode) => new Proxy(() => mode, validator);
+  let createProxy = (mode: Number) => new Proxy(() => mode, validator);
   let useStore = createProxy(MODE_USE);
   let getStore = createProxy(MODE_GET);
   let withStore = createProxy(MODE_WITH);
@@ -115,8 +115,8 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
    * @param {string} path
    * @param {function} callback
    */
-  function useSubscription(path, callback) {
-    let forceRender = useReducer(() => [])[1];
+  function useSubscription(path: string, callback?: Function) {
+    let forceRender = (useReducer as Function)(() => [])[1];
 
     useEffect(() => {
       subscription._subscribe(path, forceRender);
@@ -137,7 +137,7 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
   function updateField(path = '') {
     let fieldPath = Array.isArray(path) ? path : path.split(DOT);
 
-    return (newValue) => {
+    return (newValue: any) => {
       let prevStore = allStore;
       let value = newValue;
 
@@ -159,20 +159,20 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
     };
   }
 
-  function getField(path, fn = (a, c) => a?.[c]) {
+  function getField(path?: string[] | string, fn: ReducerFn = (a, c) => a?.[c]) {
     if (!path) return allStore;
     return (Array.isArray(path) ? path : path.split(DOT)).reduce(fn, allStore);
   }
 
-  function setField(store, [prop, ...rest], value) {
-    let newObj = Array.isArray(store) ? [...store] : {...store};
+  function setField(store: Store, [prop, ...rest]: string[], value: any) {
+    let newObj: any = Array.isArray(store) ? [...store] : {...store};
     newObj[prop] = rest.length ? setField(store[prop], rest, value) : value;
     return newObj;
   }
 
-  function existProperty(path) {
+  function existProperty(path: string[] | string) {
     return getField(path, (a, c, index, arr) => {
-      if (index === arr.length - 1) return c in (a || {});
+      if (index === arr!.length - 1) return c in (a || {});
       return a?.[c];
     });
   }
@@ -196,18 +196,18 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
 
 createStore.ext = (extra: Function) => extras.push(extra);
 
-function createSubscription() {
-  let listeners = {};
+function createSubscription<S extends Store>() {
+  let listeners: { [key: string]: Set<Function> } = {};
 
   return {
     // Renamed to "s" after build to minify code
-    _subscribe(path, listener) {
+    _subscribe(path: string, listener?: Function) {
       if (typeof listener !== 'function') return;
       if (!listeners[path]) listeners[path] = new Set();
       listeners[path].add(listener);
     },
     // Renamed to "n" after build to minify code
-    _notify(path, params) {
+    _notify(path: string, params: Params<S>) {
       Object.keys(listeners).forEach((listenerKey) => {
         if (path.startsWith(listenerKey) || listenerKey.startsWith(path)) {
           listeners[listenerKey].forEach((listener) => listener(params));
@@ -215,7 +215,7 @@ function createSubscription() {
       });
     },
     // Renamed to "u" after build to minify code
-    _unsubscribe(path, listener) {
+    _unsubscribe(path: string, listener?: Function) {
       if (typeof listener !== 'function') return;
       listeners[path].delete(listener);
       if (listeners[path].size === 0) delete listeners[path];
@@ -229,6 +229,13 @@ function createSubscription() {
 type Setter<T> = (value?: T | ((value: T) => T | undefined | null) ) => void;
 type HookReturn<T> = [T, Setter<T>];
 type Store = Record<string, any>;
+type ReducerFn = (a: Store, c: string, index?: Number, arr?: string[]) => any
+
+type Extra = {
+  [key: string]: any;
+}
+
+type Validator =  ProxyHandler<Function> & Extra
 
 type Hook<S> = (
   initial?: S,
@@ -243,12 +250,11 @@ type HocFunc<S, R extends React.ComponentClass = React.ComponentClass> = (
   component: R,
   initial?: S,
   onAfterUpdate?: afterCallbackType<S>
-) => R & { store: useStoreType<S> };
+) => R & { store: useStoreType<S> };
 
-type afterCallbackType<S extends Store> = (param: {
-  store: S;
-  prevStore: S;
-}) => void;
+type Params<S extends Store> = {store: S, prevStore: S };
+
+type afterCallbackType<S extends Store> = (param: Params<S>) => void;
 
 type getStoreType<S extends Store> = {
   [key in keyof S]: S[key] extends Store

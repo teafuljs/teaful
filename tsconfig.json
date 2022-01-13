@@ -9,5 +9,5 @@
 		"moduleResolution": "node",
 		"esModuleInterop": true
 	},
-	"include": ["package/*.ts", "test/*.ts"]
+	"include": ["package/*.ts", "test/*.tsx"]
 }

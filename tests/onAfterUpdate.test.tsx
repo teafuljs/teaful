@@ -12,7 +12,7 @@ describe('onAfterUpdate callback', () => {
     const callback = jest.fn();
 
     type Store = {
-      test?: {},
+      test?: Record<string, unknown>;
       mount?: boolean,
     }
 
@@ -55,7 +55,7 @@ describe('onAfterUpdate callback', () => {
     const callback = jest.fn();
 
     type Store = {
-      test?: {},
+      test?: Record<string, unknown>;
       mount?: boolean,
     }
 
@@ -96,7 +96,7 @@ describe('onAfterUpdate callback', () => {
     const callback = jest.fn();
 
     type Store = {
-      test?: {},
+      test?:  Record<string, unknown>;
       mount?: boolean,
     }
     

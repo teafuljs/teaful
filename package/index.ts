@@ -1,13 +1,16 @@
-import React, {useEffect, useReducer, createElement} from 'react';
+import {useEffect, useReducer, createElement, ComponentClass, FunctionComponent} from 'react';
 
 let MODE_GET = 1;
 let MODE_USE = 2;
 let MODE_WITH = 3;
 let MODE_SET = 4;
 let DOT = '.';
-let extras: Function[] = [];
+let extras: ExtraFn[] = [];
 
-export default function createStore<S extends Store>(initial: S = {} as S, callback?: afterCallbackType<S>) {
+export default function createStore<S extends Store>(
+  initial: S = {} as S, 
+  callback?: Listener<S>
+) {
   let subscription = createSubscription<S>();
 
   // Initialize the store and callbacks
@@ -23,27 +26,36 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
    * - setStore helper proxy
    * - withStore HoC proxy
    */
-  let validator: Validator = {
+  let validator: Validator<S> = {
     _path: [] as string[],
-    _getHoC<S extends Store>(Comp: React.ComponentClass, path: string[], initValue: S, callback?:  afterCallbackType<S>) {
+    _getHoC<S extends Store>(
+      Comp: ComponentClass, 
+      path: string[], 
+      initValue: S, 
+      callback?:  Listener<S>
+    ) {
       let componentName = Comp.displayName || Comp.name || '';
-      let WithStore: React.FunctionComponent = (props) => {
+      let WithStore: FunctionComponent = (props) => {
         let last = path.length - 1;
         let store = path.length ? path.reduce(
-            (a: Store, c: string, index) => index === last ? a[c](initValue, callback) : a[c],
+            (a: Store, c: string, index) => index === last 
+              ? a[c](initValue, callback) 
+              : a[c],
             useStore,
         ) : useStore(initValue, callback);
-        return createElement<{ store?: HookReturn<S> }>(Comp, {...props, store});
+        return createElement<{ store?: HookReturn<S> }>(
+          Comp, {...props, store}
+        );
       };
       WithStore.displayName = `withStore(${componentName})`;
       return WithStore;
     },
-    get(target: Function, path: string) {
+    get(target: () => number, path: string) {
       if (path === 'prototype') return {};
       this._path.push(path);
       return new Proxy(target, validator);
     },
-    apply(getMode: Function, _: any, args: any[]) {
+    apply(getMode: () => number, _: any, args: any[]) {
       let mode = getMode();
       let param = args[0];
       let callback = args[1];
@@ -97,7 +109,7 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
       return [value, update];
     },
   };
-  let createProxy = (mode: Number) => new Proxy(() => mode, validator);
+  let createProxy = (mode: number) => new Proxy(() => mode, validator);
   let useStore = createProxy(MODE_USE);
   let getStore = createProxy(MODE_GET);
   let withStore = createProxy(MODE_WITH);
@@ -109,8 +121,8 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
    * @param {string} path
    * @param {function} callback
    */
-  function useSubscription(path: string, callback?: Function) {
-    let forceRender = (useReducer as Function)(() => [])[1];
+  function useSubscription(path: string, callback?: Listener<S>) {
+    let forceRender = (useReducer as any)(() => [])[1];
 
     useEffect(() => {
       subscription._subscribe(path, forceRender);
@@ -153,9 +165,13 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
     };
   }
 
-  function getField(path?: string[] | string, fn: ReducerFn = (a, c) => a?.[c]) {
+  function getField(
+    path?: string[] | string, 
+    fn: ReducerFn = (a, c) => a?.[c]
+  ) {
     if (!path) return allStore;
-    return (Array.isArray(path) ? path : path.split(DOT)).reduce(fn, allStore);
+    return (Array.isArray(path) ? path : path.split(DOT))
+      .reduce(fn, allStore);
   }
 
   function setField(store: Store, [prop, ...rest]: string[], value: any) {
@@ -174,7 +190,7 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
   let result = extras.reduce((res, fn) => {
     let newRes = fn(res, subscription);
     return typeof newRes === 'object' ? {...res, ...newRes} : res;
-  }, {useStore, getStore, withStore, setStore});
+  }, {useStore, getStore, withStore, setStore} as Result<S>);
 
   /**
    * createStore function returns:
@@ -185,28 +201,23 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
    * - extras that 3rd party can add
    * @returns {object}
    */
-  return result as {
-    getStore: HookDry<S> & getStoreType<S>;
-    useStore: Hook<S> & useStoreType<S>;
-    withStore: HocFunc<S> & withStoreType<S>;
-    setStore: Setter<S> & setStoreType<S>;
-  } & Extra;
+  return result as Result<S>;
 }
 
-createStore.ext = (extra: Function) => extras.push(extra);
+createStore.ext = (extra: ExtraFn) => extras.push(extra);
 
-function createSubscription<S extends Store>() {
-  let listeners: { [key: string]: Set<Function> } = {};
+function createSubscription<S extends Store>(): Subscription<S> {
+  let listeners: ListenersObj<S> = {};
 
   return {
     // Renamed to "s" after build to minify code
-    _subscribe(path: string, listener?: Function) {
+    _subscribe(path, listener) {
       if (typeof listener !== 'function') return;
       if (!listeners[path]) listeners[path] = new Set();
       listeners[path].add(listener);
     },
     // Renamed to "n" after build to minify code
-    _notify(path: string, params: Params<S>) {
+    _notify(path, params) {
       Object.keys(listeners).forEach((listenerKey) => {
         if (path.startsWith(listenerKey) || listenerKey.startsWith(path)) {
           listeners[listenerKey].forEach((listener) => listener(params));
@@ -214,7 +225,7 @@ function createSubscription<S extends Store>() {
       });
     },
     // Renamed to "u" after build to minify code
-    _unsubscribe(path: string, listener?: Function) {
+    _unsubscribe(path, listener) {
       if (typeof listener !== 'function') return;
       listeners[path].delete(listener);
       if (listeners[path].size === 0) delete listeners[path];
@@ -228,32 +239,41 @@ function createSubscription<S extends Store>() {
 type Setter<T> = (value?: T | ((value: T) => T | undefined | null) ) => void;
 type HookReturn<T> = [T, Setter<T>];
 type Store = Record<string, any>;
-type ReducerFn = (a: Store, c: string, index?: Number, arr?: string[]) => any
+type ReducerFn = (a: Store, c: string, index?: number, arr?: string[]) => any
+type Params<S extends Store> = {store: S, prevStore: S };
+type ListenersObj<S extends Store> = { [key: string]: Set<Listener<S>> }
+
+type Subscription<S extends Store> = {
+  _subscribe(path: string, listener?: Listener<S>): void;
+  _unsubscribe(path: string, listener?: Listener<S>): void;
+  _notify(path: string, params: Params<S>): void;
+}
+
+type ExtraFn = (res: Result<any>, subscription: Subscription<any>) => Extra;
 
 type Extra = {
   [key: string]: any;
 }
+type ValueOf<T> = T[keyof T];
 
-type Validator =  ProxyHandler<Function> & Extra
+type Validator<S> =  ProxyHandler<ValueOf<Result<S>>> & Extra
 
 type Hook<S> = (
   initial?: S,
-  onAfterUpdate?: afterCallbackType<S>
+  onAfterUpdate?: Listener<S>
 ) => HookReturn<S>;
 
 type HookDry<S> = (initial?: S) => HookReturn<S>;
 
 export type Hoc<S> = { store: HookReturn<S> };
 
-type HocFunc<S, R extends React.ComponentClass = React.ComponentClass> = (
+type HocFunc<S, R extends ComponentClass = ComponentClass> = (
   component: R,
   initial?: S,
-  onAfterUpdate?: afterCallbackType<S>
+  onAfterUpdate?: Listener<S>
 ) => R & { store: useStoreType<S> };
 
-type Params<S extends Store> = {store: S, prevStore: S };
-
-type afterCallbackType<S extends Store> = (param: Params<S>) => void;
+type Listener<S extends Store> = (param: Params<S>) => void;
 
 type getStoreType<S extends Store> = {
   [key in keyof S]: S[key] extends Store
@@ -275,3 +295,10 @@ type withStoreType<S extends Store> = {
     ? withStoreType<S[key]> & HocFunc<S[key]>
     : HocFunc<S[key]>;
 };
+
+type Result<S extends Store> = {
+  getStore: HookDry<S> & getStoreType<S>;
+  useStore: Hook<S> & useStoreType<S>;
+  withStore: HocFunc<S> & withStoreType<S>;
+  setStore: Setter<S> & setStoreType<S>;
+} & Extra

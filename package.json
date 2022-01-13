@@ -54,7 +54,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint ./package ./tests",
-    "format": "eslint --fix ./package ./tests ./examples",
+    "format": "eslint --fix ./package ./tests",
+    "format:examples": "eslint --fix ./examples",
     "test": "jest ./package ./tests",
     "test:example:todo-list": "jest ./examples/todo-list",
     "test:examples": "jest ./examples",
@@ -85,6 +86,8 @@
     "@testing-library/user-event": "13.5.0",
     "@types/jest": "27.0.3",
     "@types/react": "17.0.37",
+    "@typescript-eslint/eslint-plugin": "^5.9.1",
+    "@typescript-eslint/parser": "^5.9.1",
     "babel-jest": "27.4.2",
     "bundlewatch": "0.3.2",
     "eslint": "8.4.0",

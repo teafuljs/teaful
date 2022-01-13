@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, {useEffect, useReducer, createElement} from 'react';
 
 let MODE_GET = 1;
@@ -21,6 +20,7 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
    * Proxy validator that implements:
    * - useStore hook proxy
    * - getStore helper proxy
+   * - setStore helper proxy
    * - withStore HoC proxy
    */
   let validator: Validator = {
@@ -33,7 +33,7 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
             (a: Store, c: string, index) => index === last ? a[c](initValue, callback) : a[c],
             useStore,
         ) : useStore(initValue, callback);
-        return createElement(Comp, {...props, store});
+        return createElement<{ store?: HookReturn<S> }>(Comp, {...props, store});
       };
       WithStore.displayName = `withStore(${componentName})`;
       return WithStore;

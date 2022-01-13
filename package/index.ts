@@ -8,12 +8,7 @@ let MODE_SET = 4;
 let DOT = '.';
 let extras: Function[] = [];
 
-export default function createStore<S extends Store>(initial: S = {} as S, callback?: afterCallbackType<S>): {
-  getStore: HookDry<S> & getStoreType<S>;
-  useStore: Hook<S> & useStoreType<S>;
-  withStore: HocFunc<S> & withStoreType<S>;
-  setStore: Setter<S> & setStoreType<S>;
-} & Extra {
+export default function createStore<S extends Store>(initial: S = {} as S, callback?: afterCallbackType<S>) {
   let subscription = createSubscription<S>();
 
   // Initialize the store and callbacks
@@ -35,7 +30,7 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
       let WithStore: React.FunctionComponent = (props) => {
         let last = path.length - 1;
         let store = path.length ? path.reduce(
-            (a, c, index) => index === last ? a[c](initValue, callback) : a[c],
+            (a: Store, c: string, index) => index === last ? a[c](initValue, callback) : a[c],
             useStore,
         ) : useStore(initValue, callback);
         return createElement(Comp, {...props, store});
@@ -190,7 +185,12 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
    * - extras that 3rd party can add
    * @returns {object}
    */
-  return result;
+  return result as {
+    getStore: HookDry<S> & getStoreType<S>;
+    useStore: Hook<S> & useStoreType<S>;
+    withStore: HocFunc<S> & withStoreType<S>;
+    setStore: Setter<S> & setStoreType<S>;
+  } & Extra;
 }
 
 createStore.ext = (extra: Function) => extras.push(extra);

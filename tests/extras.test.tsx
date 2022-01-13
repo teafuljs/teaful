@@ -1,4 +1,3 @@
-// @ts-nocheck
 import '@babel/polyfill';
 
 import createStore from '../package/index';
@@ -18,7 +17,6 @@ describe('Extras', () => {
         });
 
         const {getStoreFromPath} = createStore({test: 0, test2: 0});
-
         const [, setTest] = getStoreFromPath('test');
         setTest(1);
         expect(getStoreFromPath('test')[0]).toBe(1);

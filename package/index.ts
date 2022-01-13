@@ -13,6 +13,7 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
   useStore: Hook<S> & useStoreType<S>;
   withStore: HocFunc<S> & withStoreType<S>;
   setStore: Setter<S> & setStoreType<S>;
+  [extra: string]: any;
 } {
   let subscription = createSubscription();
 
@@ -185,6 +186,7 @@ export default function createStore<S extends Store>(initial: S = {} as S, callb
    * createStore function returns:
    * - useStore hook
    * - getStore helper
+   * - setStore helper
    * - withStore HoC
    * - extras that 3rd party can add
    * @returns {object}

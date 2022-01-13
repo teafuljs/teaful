@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {act} from 'react-dom/test-utils';
@@ -11,7 +10,13 @@ import createStore from '../package/index';
 describe('onAfterUpdate callback', () => {
   it('should be possible to remove an onAfterUpdate event when a component with useStore.test is unmounted', () => {
     const callback = jest.fn();
-    const {useStore, getStore} = createStore({mount: true});
+
+    type Store = {
+      test?: {},
+      mount?: boolean,
+    }
+
+    const {useStore, getStore} = createStore<Store>({mount: true});
 
     function RegisterCallback() {
       useStore.test(undefined, callback);
@@ -48,7 +53,13 @@ describe('onAfterUpdate callback', () => {
 
   it('should be possible to remove an onAfterUpdate event when a component with useStore is unmounted', () => {
     const callback = jest.fn();
-    const {useStore, getStore} = createStore({mount: true});
+
+    type Store = {
+      test?: {},
+      mount?: boolean,
+    }
+
+    const {useStore, getStore} = createStore<Store>({mount: true});
 
     function RegisterCallback() {
       useStore(undefined, callback);
@@ -83,7 +94,13 @@ describe('onAfterUpdate callback', () => {
 
   it('should be possible to remove an onAfterUpdate event when a component with withStore is unmounted', () => {
     const callback = jest.fn();
-    const {useStore, withStore, getStore} = createStore({mount: true});
+
+    type Store = {
+      test?: {},
+      mount?: boolean,
+    }
+    
+    const {useStore, withStore, getStore} = createStore<Store>({mount: true});
     class RegisterCallbackComponent extends Component {
       render() {
         return null;
@@ -246,7 +263,7 @@ describe('onAfterUpdate callback', () => {
     expect(params2.prevStore).toMatchObject({cart: {price: 1}});
   });
 
-  it('Updating the prevValue should work as limit | via createStore', () => {
+  it('Updating the prevValue should work as limit | via createStore', () => {
     const initialStore = {cart: {price: 0}};
     const {useStore, getStore} = createStore(initialStore, callback);
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {Component} from 'react';
 import {render, screen} from '@testing-library/react';
 import {act} from 'react-dom/test-utils';
@@ -10,9 +9,17 @@ import createStore from '../package/index';
 
 describe('withStore', () => {
   it('should rerender the last value', () => {
-    const {withStore, getStore} = createStore({items: []});
+    type Store = {
+      items?: string[],
+    }
+  
+    const {withStore, getStore, useStore} = createStore<Store>({items: []});
 
-    class TestComponent extends Component {
+    type Props = {
+      store?: ReturnType<typeof useStore.items>;
+    }
+
+    class TestComponent extends Component<Props> {
       render() {
         const [items] = this.props.store;
         return (
@@ -39,9 +46,13 @@ describe('withStore', () => {
   });
 
   it('should work with a non existing store value', () => {
-    const {withStore, getStore} = createStore();
+    const {withStore, setStore, useStore} = createStore();
 
-    class TestComponent extends Component {
+    type Props = {
+      store?: ReturnType<typeof useStore.items>;
+    }
+
+    class TestComponent extends Component<Props> {
       render() {
         const [items] = this.props.store;
         return (
@@ -56,7 +67,7 @@ describe('withStore', () => {
 
     render(<Test />);
 
-    const update = getStore.items()[1];
+    const update = v => setStore.items(v);
 
     expect(screen.getByTestId('test').textContent).toBe('');
 
@@ -68,9 +79,13 @@ describe('withStore', () => {
   });
 
   it('should allow to update the value', () => {
-    const {withStore} = createStore();
+    const {withStore, useStore} = createStore();
 
-    class TestComponent extends Component {
+    type Props = {
+      store?: ReturnType<typeof useStore.items>;
+    }
+
+    class TestComponent extends Component<Props> {
       render() {
         const [items, setItems] = this.props.store;
         return (

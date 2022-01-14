@@ -24,6 +24,4 @@ jobs:
           yarn install
           yarn build
           yarn run bundlewatch
-          yarn lint
           yarn test
-          yarn test:ts

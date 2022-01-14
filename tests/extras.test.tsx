@@ -13,7 +13,7 @@ describe('Extras', () => {
               setTest2(4);
             }
           });
-          return {getStoreFromPath: (path) => getStore[path]()};
+          return {getStoreFromPath: (path: string) => getStore[path]()};
         });
 
         const {getStoreFromPath} = createStore({test: 0, test2: 0});

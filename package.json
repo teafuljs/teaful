@@ -56,8 +56,7 @@
     "lint": "eslint ./package ./tests",
     "format": "eslint --fix ./package ./tests",
     "format:examples": "eslint --fix ./examples",
-    "test": "jest ./tests",
-    "test:ts": "jest -c jest.tsc.config.js",
+    "test": "jest",
     "test:example:todo-list": "jest ./examples/todo-list",
     "test:examples": "jest ./examples",
     "test:watch": "jest ./tests --watch",
@@ -75,7 +74,11 @@
     }
   },
   "jest": {
-    "testEnvironment": "jsdom"
+    "projects": [
+      "./tests/config/jest.config.js",
+      "./tests/config/jest.lint.config.js",
+      "./tests/config/jest.tsc.config.js"
+    ]
   },
   "jest-runner-tsc": {
     "tsconfigPath": "./tsconfig.json"
@@ -102,6 +105,7 @@
     "eslint-plugin-react-hooks": "4.3.0",
     "eslint-plugin-testing-library": "5.0.3",
     "jest": "27.4.7",
+    "jest-runner-eslint": "1.0.0",
     "jest-runner-tsc": "1.6.0",
     "microbundle": "0.14.2",
     "react": "17.0.2",

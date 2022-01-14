@@ -7,7 +7,8 @@
 		"noEmit": true,
 		"declaration": true,
 		"moduleResolution": "node",
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"jsx": "react-jsx"
 	},
 	"include": ["package/*.ts", "test/*.tsx"]
 }

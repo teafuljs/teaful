@@ -24,7 +24,7 @@ describe('withStore', () => {
         const [items] = this.props.store;
         return (
           <div data-testid="test">
-            {items.map((item) => <div key={item}>{item}</div>)}
+            {items.map((item: string) => <div key={item}>{item}</div>)}
           </div>
         );
       }

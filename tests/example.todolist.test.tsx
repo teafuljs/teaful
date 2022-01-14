@@ -1,3 +1,4 @@
+import { FormEvent } from 'react';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -13,9 +14,11 @@ describe('Example: Todo list', () => {
 
     function AddTodoTask() {
       const [todo, setTodo] = useStore.todo();
-      const addTask = (e) => {
+      const addTask = (e: FormEvent) => {
         e.preventDefault();
-        setTodo([...todo, e.target.children[0].value]);
+        const form = e.target as HTMLFormElement;
+        const input = form.children[0] as HTMLInputElement;
+        setTodo([...todo, input.value]);
       };
       renderAddTodoTask();
       return (

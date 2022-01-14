@@ -64,8 +64,8 @@ describe('setStore', () => {
     const renderOther = jest.fn();
     const {useStore, setStore} = createStore({cart: {price: 0}, name: 'Aral', count: 0});
 
-    function setFragmentedStore(fields) {
-      Object.keys(fields).forEach((key) => {
+    function setFragmentedStore(fields: Record<string, any>) {
+      Object.keys(fields).forEach((key: string) => {
         setStore[key](fields[key]);
       });
     }

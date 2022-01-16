@@ -1,5 +1,6 @@
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {act} from 'react-dom/test-utils';
 
 import '@babel/polyfill';
 
@@ -109,4 +110,29 @@ describe('getStore', () => {
     expect(screen.getByTestId('price').textContent).toContain('0');
     expect(screen.getByTestId('other').textContent).toContain('ARAL 10');
   });
+
+  it('should be possible to create methods to use the setter from getStore', () => {
+    const {useStore, getStore} = createStore({cart: {items: []}});
+
+    function push(proxy, value) {
+      const [val, set] = proxy(getStore);
+      set([...val, value]);
+    }
+
+    function Cart() {
+      const [cart] = useStore.cart();
+      return <div data-testid="items">{cart.items.join(',')}</div>;
+    }
+
+    const items = (proxy) => proxy.cart.items();
+
+    render(<Cart />);
+
+    expect(screen.getByTestId('items').textContent).toContain('');
+
+    act(() => push(items, 'firstElement'));
+    expect(screen.getByTestId('items').textContent).toContain('firstElement');
+    act(() => push(items, 'secondElement'));
+    expect(screen.getByTestId('items').textContent).toContain('firstElement,secondElement');
+  })
 });

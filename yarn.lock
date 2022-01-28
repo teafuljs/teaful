@@ -3779,7 +3779,7 @@ jest-resolve@^27.4.6:
     resolve.exports "^1.1.0"
     slash "^3.0.0"
 
-jest-runner-eslint@^1.0.0:
+jest-runner-eslint@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/jest-runner-eslint/-/jest-runner-eslint-1.0.0.tgz#5cede321ed5ed57233462c5204a0fa8d90f993bd"
   integrity sha512-LMlAaIQqIIySEThv651bfvzwX6J4nOu91RaEUYmXJgn4XXbM40rSMlBaC8ZrrFcFemu88MFlnrCLuYf7ZHE2sQ==

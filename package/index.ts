@@ -183,7 +183,7 @@ export default function createStore<S extends Store>(
 
   function existProperty(path: string[] | string) {
     return getField(path, (a, c, index, arr) => {
-      if (index === arr!.length - 1) return c in (a || {});
+      if (index === (arr as string[]).length - 1) return c in (a || {});
       return a?.[c];
     });
   }

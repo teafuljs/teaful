@@ -13,7 +13,7 @@ _Tiny, easy and powerful **React state management** library_
 [![Weekly downloads](https://badgen.net/npm/dw/teaful?color=blue)](https://www.npmjs.com/package/teaful)
 [![GitHub Discussions: Chat With Us](https://badgen.net/badge/discussions/chat%20with%20us/purple)](https://github.com/teafuljs/teaful/discussions)
 [![PRs Welcome][badge-prwelcome]][prwelcome]<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [badge-prwelcome]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
@@ -734,6 +734,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="http://siddharthborderwala.com"><img src="https://avatars.githubusercontent.com/u/54456279?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Siddharth Borderwala</b></sub></a><br /><a href="https://github.com/teafuljs/teaful/commits?author=siddharthborderwala" title="Documentation">📖</a> <a href="#infra-siddharthborderwala" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/teafuljs/teaful/commits?author=siddharthborderwala" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/wh5938316"><img src="https://avatars.githubusercontent.com/u/16160933?v=4?s=100" width="100px;" alt=""/><br /><sub><b>watcher</b></sub></a><br /><a href="https://github.com/teafuljs/teaful/commits?author=wh5938316" title="Code">💻</a></td>
   </tr>
 </table>
 

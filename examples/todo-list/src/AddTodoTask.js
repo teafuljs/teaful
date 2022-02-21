@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useStore } from './store';
+import {useState} from 'react';
+import {useStore} from './store';
 
 export default function AddTodoTask() {
   const [counter, setCounter] = useState(0);
@@ -14,7 +14,7 @@ export default function AddTodoTask() {
 
     setTodo({
       ...todo,
-      [counter]: { text: e.target.children[0].value, id: counter },
+      [counter]: {text: e.target.children[0].value, id: counter},
     });
     e.target.children[0].value = '';
     setCounter(counter + 1);

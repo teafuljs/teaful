@@ -12,7 +12,7 @@ describe('onAfterUpdate callback', () => {
     const callback = jest.fn();
 
     type Store = {
-      test?: Record<string, unknown>;
+      test?: Record<string, unknown> | undefined;
       mount?: boolean,
     }
 
@@ -314,7 +314,18 @@ describe('onAfterUpdate callback', () => {
   it('Should be possible to create calculated variables', () => {
     const renderTest = jest.fn();
     const initialStore = {cart: {price: 0, items: []}};
-    const {useStore, getStore} = createStore(initialStore, onAfterUpdate);
+
+    type Store = {
+      cart: { 
+        price: number;
+        items: { name: string }[];
+      }
+    }
+
+    const {useStore, getStore} = createStore<Store>(
+      initialStore, 
+      onAfterUpdate
+    );
 
     function onAfterUpdate({store}) {
       const {items, price} = store.cart;

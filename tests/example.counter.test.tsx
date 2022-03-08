@@ -225,7 +225,7 @@ describe('Example: Counter', () => {
 
         function Counter() {
           const initialCountValue = useRef<number>();
-          const [count, setCount] = useStore.count!();
+          const [count, setCount] = useStore.count();
 
           useEffect(() => {
             if (

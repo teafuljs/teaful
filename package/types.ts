@@ -80,9 +80,14 @@ export type withStoreType<S extends Store> = {
     : HocFunc<S[key]>;
 };
 
+type Complete<T> = {
+  [P in keyof Required<T>]: 
+  Pick<T, P> extends Required<Pick<T, P>> ? T[P] : (T[P] | undefined);
+}
+
 export type Result<S extends Store> = {
-  getStore: HookDry<S> & getStoreType<S>;
-  useStore: Hook<S> & useStoreType<S>;
-  withStore: HocFunc<S> & withStoreType<S>;
-  setStore: Setter<S> & setStoreType<S>;
+  getStore: HookDry<Complete<S>> & getStoreType<Complete<S>>;
+  useStore: Hook<Complete<S>> & useStoreType<Complete<S>>;
+  withStore: HocFunc<Complete<S>> & withStoreType<Complete<S>>;
+  setStore: Setter<Complete<S>> & setStoreType<Complete<S>>;
 } & Extra

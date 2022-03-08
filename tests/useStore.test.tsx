@@ -9,7 +9,10 @@ import createStore from '../package/index';
 
 describe('useStore', () => {
   it('should rerender the last value', () => {
-    const {useStore, getStore} = createStore({items: []});
+    type Store = {
+      items: string[];
+    }
+    const {useStore, getStore} = createStore<Store>({items: []});
 
     function Test() {
       const [items] = useStore.items();
@@ -34,7 +37,10 @@ describe('useStore', () => {
   });
 
   it('should work with a non existing store value', () => {
-    const {useStore, getStore} = createStore();
+    type Store = {
+      items: string[];
+    }
+    const {useStore, getStore} = createStore<Store>();
 
     function Test() {
       const [items] = useStore.items([]);

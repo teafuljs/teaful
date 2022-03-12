@@ -265,9 +265,18 @@ describe('onAfterUpdate callback', () => {
 
   it('Updating the prevValue should work as limit | via createStore', () => {
     const initialStore = {cart: {price: 0}};
-    const {useStore, getStore} = createStore(initialStore, callback);
 
-    function callback({prevStore, store}) {
+    type Store = {
+      cart: {
+        price: number;
+      }
+    }
+
+    type Callback = {prevStore: Store, store: Store}
+
+    const {useStore, getStore} = createStore<Store>(initialStore, callback);
+
+    function callback({prevStore, store}: Callback) {
       const {price} = store.cart;
       if (price > 4) {
         const [, setPrice] = getStore.cart.price();
@@ -322,12 +331,14 @@ describe('onAfterUpdate callback', () => {
       }
     }
 
+    type Callback = {prevStore: Store, store: Store}
+
     const {useStore, getStore} = createStore<Store>(
       initialStore, 
       onAfterUpdate
     );
 
-    function onAfterUpdate({store}) {
+    function onAfterUpdate({store}: Callback) {
       const {items, price} = store.cart;
       const calculatedPrice = items.length * 3;
       if (price !== calculatedPrice) {
@@ -381,12 +392,23 @@ describe('onAfterUpdate callback', () => {
   });
 
   it('Updating another value using the getStore should work', () => {
+    type Store = {
+      cart: {
+        price: number;
+      },
+      limit: boolean;
+    }
+    type Callback = {prevStore: Store, store: Store}
+
     const initialStore = {cart: {price: 0}, limit: false};
-    const {useStore, getStore} = createStore(initialStore, onAfterUpdate);
+    const {useStore, getStore} = createStore<Store>(
+      initialStore, 
+      onAfterUpdate
+    );
     const renderTestApp = jest.fn();
     const renderTest = jest.fn();
 
-    function onAfterUpdate({prevStore, store}) {
+    function onAfterUpdate({prevStore, store}: Callback) {
       const price = store.cart.price;
       const prevPrice = prevStore.cart.price;
       const [, setLimit] = getStore.limit();

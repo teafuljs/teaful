@@ -57,7 +57,7 @@ export type HocFunc<S, R extends ComponentClass = ComponentClass> = (
   onAfterUpdate?: Listener<S>
 ) => R & { store: useStoreType<S> };
 
-export type Listener<S extends Store> = (param: Params<S>) => void;
+export type Listener<S extends Store> = (params: Params<S>) => void;
 
 export type getStoreType<S extends Store> = {
   [key in keyof S]: S[key] extends Store

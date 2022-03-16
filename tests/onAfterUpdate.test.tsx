@@ -10,7 +10,13 @@ import createStore from '../package/index';
 describe('onAfterUpdate callback', () => {
   it('should be possible to remove an onAfterUpdate event when a component with useStore.test is unmounted', () => {
     const callback = jest.fn();
-    const {useStore, getStore} = createStore({mount: true});
+
+    type Store = {
+      test?: Record<string, unknown> | undefined;
+      mount?: boolean,
+    }
+
+    const {useStore, getStore} = createStore<Store>({mount: true});
 
     function RegisterCallback() {
       useStore.test(undefined, callback);
@@ -47,7 +53,13 @@ describe('onAfterUpdate callback', () => {
 
   it('should be possible to remove an onAfterUpdate event when a component with useStore is unmounted', () => {
     const callback = jest.fn();
-    const {useStore, getStore} = createStore({mount: true});
+
+    type Store = {
+      test?: Record<string, unknown>;
+      mount?: boolean,
+    }
+
+    const {useStore, getStore} = createStore<Store>({mount: true});
 
     function RegisterCallback() {
       useStore(undefined, callback);
@@ -82,7 +94,13 @@ describe('onAfterUpdate callback', () => {
 
   it('should be possible to remove an onAfterUpdate event when a component with withStore is unmounted', () => {
     const callback = jest.fn();
-    const {useStore, withStore, getStore} = createStore({mount: true});
+
+    type Store = {
+      test?:  Record<string, unknown>;
+      mount?: boolean,
+    }
+    
+    const {useStore, withStore, getStore} = createStore<Store>({mount: true});
     class RegisterCallbackComponent extends Component {
       render() {
         return null;
@@ -245,11 +263,20 @@ describe('onAfterUpdate callback', () => {
     expect(params2.prevStore).toMatchObject({cart: {price: 1}});
   });
 
-  it('Updating the prevValue should work as limit | via createStore', () => {
+  it('Updating the prevValue should work as limit | via createStore', () => {
     const initialStore = {cart: {price: 0}};
-    const {useStore, getStore} = createStore(initialStore, callback);
 
-    function callback({prevStore, store}) {
+    type Store = {
+      cart: {
+        price: number;
+      }
+    }
+
+    type Callback = {prevStore: Store, store: Store}
+
+    const {useStore, getStore} = createStore<Store>(initialStore, callback);
+
+    function callback({prevStore, store}: Callback) {
       const {price} = store.cart;
       if (price > 4) {
         const [, setPrice] = getStore.cart.price();
@@ -296,9 +323,22 @@ describe('onAfterUpdate callback', () => {
   it('Should be possible to create calculated variables', () => {
     const renderTest = jest.fn();
     const initialStore = {cart: {price: 0, items: []}};
-    const {useStore, getStore} = createStore(initialStore, onAfterUpdate);
 
-    function onAfterUpdate({store}) {
+    type Store = {
+      cart: { 
+        price: number;
+        items: { name: string }[];
+      }
+    }
+
+    type Callback = {prevStore: Store, store: Store}
+
+    const {useStore, getStore} = createStore<Store>(
+      initialStore, 
+      onAfterUpdate
+    );
+
+    function onAfterUpdate({store}: Callback) {
       const {items, price} = store.cart;
       const calculatedPrice = items.length * 3;
       if (price !== calculatedPrice) {
@@ -352,12 +392,23 @@ describe('onAfterUpdate callback', () => {
   });
 
   it('Updating another value using the getStore should work', () => {
+    type Store = {
+      cart: {
+        price: number;
+      },
+      limit: boolean;
+    }
+    type Callback = {prevStore: Store, store: Store}
+
     const initialStore = {cart: {price: 0}, limit: false};
-    const {useStore, getStore} = createStore(initialStore, onAfterUpdate);
+    const {useStore, getStore} = createStore<Store>(
+      initialStore, 
+      onAfterUpdate
+    );
     const renderTestApp = jest.fn();
     const renderTest = jest.fn();
 
-    function onAfterUpdate({prevStore, store}) {
+    function onAfterUpdate({prevStore, store}: Callback) {
       const price = store.cart.price;
       const prevPrice = prevStore.cart.price;
       const [, setLimit] = getStore.limit();

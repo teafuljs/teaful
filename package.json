@@ -5,6 +5,7 @@
   "license": "MIT",
   "keywords": [
     "react",
+    "typescript",
     "preact",
     "state",
     "state management",

@@ -55,6 +55,8 @@
   "scripts": {
     "lint": "eslint ./package ./tests",
     "format": "eslint --fix ./package ./tests ./examples",
+    "prettier": "prettier --check **/*.js",
+    "prettier:fix": "prettier --write **/*.js",
     "test": "jest ./package ./tests",
     "test:example:todo-list": "jest ./examples/todo-list",
     "test:examples": "jest ./examples",
@@ -97,6 +99,7 @@
     "eslint-plugin-testing-library": "5.0.1",
     "jest": "27.4.3",
     "microbundle": "0.14.2",
+    "prettier": "^2.6.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-test-renderer": "17.0.2",

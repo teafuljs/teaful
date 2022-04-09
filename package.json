@@ -63,7 +63,8 @@
     "test:watch": "jest ./tests --watch",
     "build": "microbundle --jsx React.createElement",
     "dev": "microbundle watch",
-    "prepublish": "yarn build"
+    "prepublish": "yarn build",
+    "bundlewatch": "bundlewatch"
   },
   "peerDependencies": {
     "react": ">= 16.8.0",

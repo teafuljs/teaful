@@ -1,28 +1,24 @@
-name: CI
-on: [pull_request]
+name: Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
 jobs:
   build:
-    name: Test
+
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [14.x]
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: preactjs/compressed-size-action@v2
+      - uses: actions/checkout@v3
+      - name: Use Node.js 17
+        uses: actions/setup-node@v3
         with:
-          compression: 'brotli'
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '17'
       - name: Install dependencies
-        run: |
-          npm install -g yarn
-      - name: yarn install, build, and test
-        run: |
-          yarn install
-          yarn build
-          yarn run bundlewatch
-          yarn lint
-          yarn test
+        run: npm install
+      - run: npm run build
+      - run: npm run bundlewatch
+      - run: npm test

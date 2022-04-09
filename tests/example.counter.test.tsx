@@ -8,8 +8,9 @@ import createStore from '../package/index';
 
 describe('Example: Counter', () => {
   it('should work with a simple counter', () => {
+    type Count = { count: number };
     const initialStore = {count: 0};
-    const {useStore} = createStore(initialStore);
+    const {useStore} = createStore<Count>(initialStore);
 
     function Counter() {
       const [count, setCount] = useStore.count();
@@ -65,9 +66,18 @@ describe('Example: Counter', () => {
 
   it('should work with a counter in a class component', async () => {
     const initialStore = {count: 0};
-    const {useStore, withStore} = createStore(initialStore);
 
-    class Counter extends Component {
+    type storeType = {
+      count: number;
+    }
+
+    const {useStore, withStore} = createStore<storeType>(initialStore);
+
+    type Props = {
+      store: ReturnType<typeof useStore.count>;
+    }
+
+    class Counter extends Component<Props> {
       render() {
         const [count, setCount] = this.props.store;
         return (
@@ -129,10 +139,15 @@ describe('Example: Counter', () => {
   });
 
   it('should work with a counter in a class component: with all store', async () => {
+    type Count = { count: number };
     const initialStore = {count: 0};
-    const {useStore, withStore} = createStore(initialStore);
+    const {useStore, withStore} = createStore<Count>(initialStore);
 
-    class Counter extends Component {
+    type Props = {
+      store: ReturnType<typeof useStore>;
+    }
+
+    class Counter extends Component<Props> {
       render() {
         const [store, setStore] = this.props.store;
         return (
@@ -203,10 +218,15 @@ describe('Example: Counter', () => {
 
   it('should work with a counter: as a new value (not defined on the store)',
       async () => {
-        const {useStore} = createStore({anotherValue: ''});
+        type storeType = {
+          anotherValue: string,
+          count?: number
+        }
+
+        const {useStore} = createStore<storeType>({anotherValue: ''});
 
         function Counter() {
-          const initialCountValue = useRef();
+          const initialCountValue = useRef<number>();
           const [count, setCount] = useStore.count();
 
           useEffect(() => {
@@ -221,8 +241,8 @@ describe('Example: Counter', () => {
           return (
             <div>
               <h1>{count}</h1>
-              <button onClick={() => setCount((v) => v + 1)}>+</button>
-              <button onClick={() => setCount((v) => v - 1)}>-</button>
+              <button onClick={() => setCount((v = 0) => v + 1)}>+</button>
+              <button onClick={() => setCount((v = 0) => v - 1)}>-</button>
               <button
                 onClick={() => setCount(initialCountValue.current)}
               >
@@ -289,10 +309,20 @@ describe('Example: Counter', () => {
       });
   it('should work with a counter in a class component: as a new value (not defined on the store)',
       async () => {
-        const {useStore, withStore} = createStore();
+        type storeType = {
+          counter: {
+            count: number
+          }
+        }
+
+        const {useStore, withStore} = createStore<storeType>();
         const initialCount = 0;
 
-        class Counter extends Component {
+        type Props = {
+          store: ReturnType<typeof useStore.counter.count>;
+        }
+
+        class Counter extends Component<Props> {
           // Forcing update to verify that the initial value is not overwritten
           componentDidMount() {
             this.forceUpdate();
@@ -358,13 +388,14 @@ describe('Example: Counter', () => {
       });
 
   it('Should increase the value using a form with getStore', async () => {
+    type Count = { count: number };
     const initialStore = {count: 0};
-    const {useStore, getStore} = createStore(initialStore);
+    const {useStore, getStore} = createStore<Count>(initialStore);
 
     function CountForm() {
       const [newCount, setNewCount] = useState(0);
 
-      function saveIncreasedCount(e) {
+      function saveIncreasedCount(e: React.FormEvent) {
         e.preventDefault();
         const [count, setCount] = getStore.count();
         if (newCount > count) setCount(newCount);

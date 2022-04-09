@@ -5,6 +5,8 @@ import {act} from 'react-dom/test-utils';
 import '@babel/polyfill';
 
 import createStore from '../package/index';
+import { HookReturn } from '../package/types';
+
 
 describe('getStore', () => {
   it('should avoid rerenders on component that use the getStore', () => {
@@ -12,7 +14,15 @@ describe('getStore', () => {
     const renderOther = jest.fn();
     const renderUpdateProps = jest.fn();
 
-    const {useStore, getStore} = createStore({cart: {price: 0}, name: 'Aral', count: 0});
+    type Store = {
+      cart: {
+        price: number;
+      }
+      name: string;
+      count: number;
+    }
+
+    const {useStore, getStore} = createStore<Store>({cart: {price: 0}, name: 'Aral', count: 0});
 
     function UpdateProps() {
       const [, setName] = getStore.name();
@@ -65,11 +75,23 @@ describe('getStore', () => {
   it('Update serveral portions should avoid rerenders in the rest', () => {
     const renderCart = jest.fn();
     const renderOther = jest.fn();
-    const {useStore, getStore} = createStore({cart: {price: 0}, name: 'Aral', count: 0});
 
-    function setStore(fields) {
-      Object.keys(fields).forEach((key) => {
-        const setStoreField = getStore[key]()[1];
+    type Store = {
+      cart: {
+        price: number;
+      }
+      name: string;
+      count: number;
+    }
+
+    type Fields = Partial<Store>
+    type Set = (value: number | string | { price: number } | undefined ) => void
+
+    const {useStore, getStore} = createStore<Store>({cart: {price: 0}, name: 'Aral', count: 0});
+
+    function setStore(fields: Fields) {
+      (Object.keys(fields) as Array<keyof Fields>).forEach((key) => {
+        const setStoreField = getStore[key]()[1] as Set;
         setStoreField(fields[key]);
       });
     }
@@ -112,9 +134,17 @@ describe('getStore', () => {
   });
 
   it('should be possible to create methods to use the setter from getStore', () => {
-    const {useStore, getStore} = createStore({cart: {items: []}});
+    type Store = {
+      cart: {
+        items: string[]
+      }
+    }
+    const {useStore, getStore} = createStore<Store>({cart: {items: []}});
 
-    function push(proxy, value) {
+    function push<T>(
+      proxy: (proxy: typeof getStore) => HookReturn<T[]>, 
+      value: T
+    ) {
       const [val, set] = proxy(getStore);
       set([...val, value]);
     }
@@ -124,15 +154,19 @@ describe('getStore', () => {
       return <div data-testid="items">{cart.items.join(',')}</div>;
     }
 
-    const items = (proxy) => proxy.cart.items();
+    type Items = (
+      proxy: typeof getStore
+    ) => ReturnType<typeof getStore.cart.items>
+
+    const items: Items = (proxy) => proxy.cart.items();
 
     render(<Cart />);
 
     expect(screen.getByTestId('items').textContent).toContain('');
 
-    act(() => push(items, 'firstElement'));
+    act(() => push<string>(items, 'firstElement'));
     expect(screen.getByTestId('items').textContent).toContain('firstElement');
-    act(() => push(items, 'secondElement'));
+    act(() => push<string>(items, 'secondElement'));
     expect(screen.getByTestId('items').textContent).toContain('firstElement,secondElement');
   })
 });

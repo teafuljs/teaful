@@ -1,0 +1,14 @@
+{
+	"compileOnSave": false,
+	"module": "ESNext",
+	"target": "ESNext",
+	"compilerOptions": {
+		"strict": true,
+		"noEmit": true,
+		"declaration": true,
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"jsx": "react-jsx"
+	},
+	"include": ["package/*.ts", "test/*.tsx"]
+}

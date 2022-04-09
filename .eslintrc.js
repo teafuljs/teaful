@@ -14,6 +14,13 @@ module.exports = {
     'plugin:react/jsx-runtime',
     'google',
   ],
+  'root': true,
+  'parser': '@typescript-eslint/parser',
+  'extends': [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
+  ],
   'parserOptions': {
     'ecmaFeatures': {
       'jsx': true,
@@ -26,6 +33,7 @@ module.exports = {
     'react-hooks',
     'testing-library',
     'jest',
+    '@typescript-eslint',
   ],
   'rules': {
     'require-jsdoc': 0,

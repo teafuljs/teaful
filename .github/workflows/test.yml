@@ -17,11 +17,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
-        run: |
-          npm install -g yarn
-      - name: yarn install, build, and test
-        run: |
-          yarn install
-          yarn build
-          yarn run bundlewatch
-          yarn test
+        run: npm install
+      - name: Build 
+        run: npm build
+      - name: Bundlewatch
+        run: npm run bundlewatch
+      - name: Test
+        run: npm test

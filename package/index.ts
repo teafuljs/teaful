@@ -1,17 +1,21 @@
-import {useEffect, useReducer, createElement} from 'react';
+import {useEffect, useReducer, createElement, ComponentClass, FunctionComponent} from 'react';
+import type { Args, ArgsHoc, ExtraFn, Hoc, Listener, ListenersObj, ReducerFn, Result, Store, Subscription, Validator } from './types';
 
 let MODE_GET = 1;
 let MODE_USE = 2;
 let MODE_WITH = 3;
 let MODE_SET = 4;
 let DOT = '.';
-let extras = [];
+let extras: ExtraFn<Store>[] = [];
 
-export default function createStore(defaultStore = {}, callback) {
-  let subscription = createSubscription();
+export default function createStore<S extends Store>(
+  initial: S = {} as S, 
+  callback?: Listener<S>
+) {
+  let subscription = createSubscription<S>();
 
   // Initialize the store and callbacks
-  let allStore = defaultStore;
+  let allStore = initial;
 
   // Add callback subscription
   subscription._subscribe(DOT, callback);
@@ -20,29 +24,38 @@ export default function createStore(defaultStore = {}, callback) {
    * Proxy validator that implements:
    * - useStore hook proxy
    * - getStore helper proxy
+   * - setStore helper proxy
    * - withStore HoC proxy
    */
-  let validator = {
-    _path: [],
-    _getHoC(Comp, path, initValue, callback) {
-      let componentName = Comp.displayName || Comp.name || '';
-      let WithStore = (props) => {
+  let validator: Validator<S> = {
+    _path: [] as string[],
+    _getHoC<S extends Store>(
+      Comp: ComponentClass<Hoc<S>>, 
+      path: string[], 
+      initValue: S, 
+      callback?:  Listener<S>
+    ) {
+      let componentName = Comp.displayName || Comp.name;
+      let WithStore: FunctionComponent = (props) => {
         let last = path.length - 1;
         let store = path.length ? path.reduce(
-            (a, c, index) => index === last ? a[c](initValue, callback) : a[c],
+            (a: Store, c: string, index) => index === last 
+              ? a[c](initValue, callback) 
+              : a[c],
             useStore,
         ) : useStore(initValue, callback);
-        return createElement(Comp, {...props, store});
+        return createElement<Hoc<S>>(
+          Comp, {...props, store}
+        );
       };
       WithStore.displayName = `withStore(${componentName})`;
       return WithStore;
     },
-    get(target, path) {
-      if (path === 'prototype') return {};
+    get(target: () => number, path: string) {
       this._path.push(path);
-      return new Proxy(target, validator);
+      return path === 'prototype' ? {} : new Proxy(target, validator);
     },
-    apply(getMode, _, args) {
+    apply(getMode: () => number, _: unknown, args: Args<S> & ArgsHoc<S>) {
       let mode = getMode();
       let param = args[0];
       let callback = args[1];
@@ -96,7 +109,7 @@ export default function createStore(defaultStore = {}, callback) {
       return [value, update];
     },
   };
-  let createProxy = (mode) => new Proxy(() => mode, validator);
+  let createProxy = (mode: number) => new Proxy(() => mode, validator);
   let useStore = createProxy(MODE_USE);
   let getStore = createProxy(MODE_GET);
   let withStore = createProxy(MODE_WITH);
@@ -108,7 +121,8 @@ export default function createStore(defaultStore = {}, callback) {
    * @param {string} path
    * @param {function} callback
    */
-  function useSubscription(path, callback) {
+  function useSubscription(path: string, callback?: Listener<S>) {
+    // @ts-expect-error - useReducer as forceRender without rest of args
     let forceRender = useReducer(() => [])[1];
 
     useEffect(() => {
@@ -130,7 +144,7 @@ export default function createStore(defaultStore = {}, callback) {
   function updateField(path = '') {
     let fieldPath = Array.isArray(path) ? path : path.split(DOT);
 
-    return (newValue) => {
+    return (newValue: unknown) => {
       let prevStore = allStore;
       let value = newValue;
 
@@ -152,51 +166,57 @@ export default function createStore(defaultStore = {}, callback) {
     };
   }
 
-  function getField(path, fn = (a, c) => a?.[c]) {
+  function getField(
+    path?: string[] | string, 
+    fn: ReducerFn = (a, c) => a?.[c]
+  ) {
     if (!path) return allStore;
-    return (Array.isArray(path) ? path : path.split(DOT)).reduce(fn, allStore);
+    return (Array.isArray(path) ? path : path.split(DOT))
+      .reduce(fn, allStore);
   }
 
-  function setField(store, [prop, ...rest], value) {
-    let newObj = Array.isArray(store) ? [...store] : {...store};
+  function setField(store: Store, [prop, ...rest]: string[], value: any) {
+    let newObj: any = Array.isArray(store) ? [...store] : {...store};
     newObj[prop] = rest.length ? setField(store[prop], rest, value) : value;
     return newObj;
   }
 
-  function existProperty(path) {
-    return getField(path, (a, c, index, arr) => {
-      if (index === arr.length - 1) return c in (a || {});
-      return a?.[c];
+  function existProperty(path: string[] | string) {
+    return getField(path, (a = {}, c, index, arr) => {
+      if (index === (arr as string[]).length - 1) return c in a;
+      return a[c];
     });
   }
 
   let result = extras.reduce((res, fn) => {
     let newRes = fn(res, subscription);
     return typeof newRes === 'object' ? {...res, ...newRes} : res;
-  }, {useStore, getStore, withStore, setStore});
+  }, {useStore, getStore, withStore, setStore} as Result<Store>);
 
   /**
    * createStore function returns:
    * - useStore hook
    * - getStore helper
+   * - setStore helper
    * - withStore HoC
    * - extras that 3rd party can add
    * @returns {object}
    */
-  return result;
+  return result as Result<S>;
 }
 
-createStore.ext = (extra) => typeof extra === 'function' && extras.push(extra);
+createStore.ext = (extra: ExtraFn<Store>) => extras.push(extra);
 
-function createSubscription() {
-  let listeners = {};
+function createSubscription<S extends Store>(): Subscription<S> {
+  let listeners: ListenersObj<S> = {};
 
   return {
     // Renamed to "s" after build to minify code
     _subscribe(path, listener) {
-      if (typeof listener !== 'function') return;
-      if (!listeners[path]) listeners[path] = new Set();
-      listeners[path].add(listener);
+      if (typeof listener === 'function') {
+        if (!listeners[path]) listeners[path] = new Set();
+        listeners[path].add(listener);
+      }
     },
     // Renamed to "n" after build to minify code
     _notify(path, params) {
@@ -208,9 +228,10 @@ function createSubscription() {
     },
     // Renamed to "u" after build to minify code
     _unsubscribe(path, listener) {
-      if (typeof listener !== 'function') return;
-      listeners[path].delete(listener);
-      if (listeners[path].size === 0) delete listeners[path];
+      if (typeof listener === 'function') {
+        listeners[path].delete(listener);
+        if (listeners[path].size === 0) delete listeners[path];
+      }
     },
   };
 }

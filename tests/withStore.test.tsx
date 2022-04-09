@@ -9,14 +9,19 @@ import createStore from '../package/index';
 
 describe('withStore', () => {
   it('should rerender the last value', () => {
-    const {withStore, getStore} = createStore({items: []});
+    type Store = { items: string[] };
+    const {withStore, getStore, useStore} = createStore<Store>({items: []});
 
-    class TestComponent extends Component {
+    type Props = {
+      store: ReturnType<typeof useStore.items>;
+    };
+
+    class TestComponent extends Component<Props> {
       render() {
         const [items] = this.props.store;
         return (
           <div data-testid="test">
-            {items.map((item) => <div key={item}>{item}</div>)}
+            {items.map((item: string) => <div key={item}>{item}</div>)}
           </div>
         );
       }
@@ -38,9 +43,13 @@ describe('withStore', () => {
   });
 
   it('should work with a non existing store value', () => {
-    const {withStore, getStore} = createStore();
-
-    class TestComponent extends Component {
+    type Store = { items: string[] }
+    const {withStore, setStore, useStore} = createStore<Store>();
+    type Items = ReturnType<typeof useStore.items>
+    type Props = { store: Items };
+    type SetItems = string[] | ((value: string[]) => string[]);
+  
+    class TestComponent extends Component<Props> {
       render() {
         const [items] = this.props.store;
         return (
@@ -55,7 +64,7 @@ describe('withStore', () => {
 
     render(<Test />);
 
-    const update = getStore.items()[1];
+    const update = (v: SetItems) => setStore.items(v);
 
     expect(screen.getByTestId('test').textContent).toBe('');
 
@@ -67,9 +76,14 @@ describe('withStore', () => {
   });
 
   it('should allow to update the value', () => {
-    const {withStore} = createStore();
+    type Store = { items: number[] };
+    const {withStore, useStore} = createStore<Store>();
 
-    class TestComponent extends Component {
+    type Props = {
+      store: ReturnType<typeof useStore.items>;
+    }
+
+    class TestComponent extends Component<Props> {
       render() {
         const [items, setItems] = this.props.store;
         return (

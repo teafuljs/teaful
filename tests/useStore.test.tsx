@@ -9,7 +9,10 @@ import createStore from '../package/index';
 
 describe('useStore', () => {
   it('should rerender the last value', () => {
-    const {useStore, getStore} = createStore({items: []});
+    type Store = {
+      items: string[];
+    }
+    const {useStore, getStore} = createStore<Store>({items: []});
 
     function Test() {
       const [items] = useStore.items();
@@ -34,7 +37,10 @@ describe('useStore', () => {
   });
 
   it('should work with a non existing store value', () => {
-    const {useStore, getStore} = createStore();
+    type Store = {
+      items: string[];
+    }
+    const {useStore, getStore} = createStore<Store>();
 
     function Test() {
       const [items] = useStore.items([]);
@@ -59,7 +65,10 @@ describe('useStore', () => {
   });
 
   it('should allow to update the value', () => {
-    const {useStore} = createStore();
+    type Store = {
+      items: number[];
+    }
+    const {useStore} = createStore<Store>();
 
     function Test() {
       const [items, setItems] = useStore.items([]);
@@ -82,8 +91,18 @@ describe('useStore', () => {
   });
 
   it('should be possible to create more than one store', () => {
-    const {useStore: useCart, getStore: getCart} = createStore({items: []});
-    const {useStore: useCounter} = createStore({count: 0});
+    type CartStore = {
+       items: string[];
+    }
+
+    type CounterStore = {
+      count: number;
+    }
+
+    const {useStore: useCart, getStore: getCart} = createStore<CartStore>({
+      items: []
+    });
+    const {useStore: useCounter} = createStore<CounterStore>({count: 0});
 
     function Test() {
       const [count] = useCounter.count();
@@ -114,14 +133,23 @@ describe('useStore', () => {
 
   it('should work changing the index of an array on fly', () => {
     const onAfterUpdate = jest.fn();
-    const {useStore} = createStore({
+    type Items = {
+      price: number;
+      name: string;
+    }
+    type Store = {
+      cart: {
+        items: Items[];
+      }
+    }
+    const {useStore} = createStore<Store>({
       cart: {
         items: [],
       },
     }, onAfterUpdate);
 
     function Test() {
-      const [state, setState] = useState(0);
+      const [state, setState] = useState<number>(0);
       const [item, setItem] = useStore.cart.items[state]();
 
       return (

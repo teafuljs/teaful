@@ -81,6 +81,15 @@
         "infra",
         "code"
       ]
+    },
+    {
+      "login": "wh5938316",
+      "name": "watcher",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16160933?v=4",
+      "profile": "https://github.com/wh5938316",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

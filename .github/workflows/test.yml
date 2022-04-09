@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Build 
-        run: npm build
+        run: npm run build
       - name: Bundlewatch
         run: npm run bundlewatch
       - name: Test

@@ -134,5 +134,5 @@ describe('getStore', () => {
     expect(screen.getByTestId('items').textContent).toContain('firstElement');
     act(() => push(items, 'secondElement'));
     expect(screen.getByTestId('items').textContent).toContain('firstElement,secondElement');
-  })
+  });
 });

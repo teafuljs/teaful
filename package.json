@@ -102,5 +102,8 @@
     "react-test-renderer": "17.0.2",
     "shelljs": "0.8.4"
   },
-  "bugs": "https://github.com/teafuljs/teaful/issues"
+  "bugs": "https://github.com/teafuljs/teaful/issues",
+  "dependencies": {
+    "use-sync-external-store": "^1.2.0"
+  }
 }

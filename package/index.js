@@ -1,4 +1,5 @@
 import {useEffect, useReducer, createElement} from 'react';
+import {useSyncExternalStore} from 'use-sync-external-store/shim';
 
 let MODE_GET = 1;
 let MODE_USE = 2;

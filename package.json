@@ -66,6 +66,7 @@
   },
   "peerDependencies": {
     "react": ">= 16.8.0",
+    "use-sync-external-store": "^1.2.0",
     "teaful-devtools": ">= 0.4.0"
   },
   "peerDependenciesMeta": {

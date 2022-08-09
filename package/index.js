@@ -1,4 +1,5 @@
-import {useEffect, useReducer, createElement} from 'react';
+import {useEffect, createElement} from 'react';
+import {useSyncExternalStore} from 'use-sync-external-store/shim';
 
 let MODE_GET = 1;
 let MODE_USE = 2;
@@ -7,14 +8,18 @@ let MODE_SET = 4;
 let DOT = '.';
 let extras = [];
 
-export default function createStore(defaultStore = {}, callback) {
-  let subscription = createSubscription();
+export default function createStore(defaultStore = {}, storeCallback) {
+  const listeners = new Set();
+  function subscribe(listener) {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  }
+  function notifyListeners() {
+    listeners.forEach((l) => l());
+  }
 
   // Initialize the store and callbacks
   let allStore = defaultStore;
-
-  // Add callback subscription
-  subscription._subscribe(DOT, callback);
 
   /**
    * Proxy validator that implements:
@@ -45,7 +50,7 @@ export default function createStore(defaultStore = {}, callback) {
     apply(getMode, _, args) {
       let mode = getMode();
       let param = args[0];
-      let callback = args[1];
+      let proxyCallback = args[1];
       let path = this._path.slice();
       this._path = [];
 
@@ -61,8 +66,14 @@ export default function createStore(defaultStore = {}, callback) {
       // MODE_USE: let [store, update] = getStore()
       // MODE_SET: setStore({ newStore: true })
       if (!path.length) {
-        let updateAll = updateField();
-        if (mode === MODE_USE) useSubscription(DOT, callback);
+        let updateAll = updateField('', proxyCallback);
+        if (mode === MODE_USE) {
+          const current = useSyncExternalStore(
+            subscribe,
+            () => allStore,
+          );
+          return [current, updateAll];
+        }
         if (mode === MODE_SET) return updateAll(param);
         return [allStore, updateAll];
       }
@@ -71,7 +82,7 @@ export default function createStore(defaultStore = {}, callback) {
       // FRAGMENTED STORE:
       // .................
       let prop = path.join(DOT);
-      let update = updateField(prop);
+      let update = updateField(prop, proxyCallback);
       let value = getField(prop);
       let initializeValue = param !== undefined && !existProperty(path);
 
@@ -80,15 +91,27 @@ export default function createStore(defaultStore = {}, callback) {
 
       if (initializeValue) {
         value = param;
+        const prevStore = allStore;
         allStore = setField(allStore, path, value);
+
+        if (proxyCallback) {
+          proxyCallback({ prevStore, store: allStore });
+        }
+        if (storeCallback) {
+          storeCallback({ prevStore, store: allStore });
+        }
       }
 
       // subscribe to the fragmented store
       if (mode === MODE_USE) {
+        value = useSyncExternalStore(
+          subscribe,
+          () => getField(prop),
+        );
+
         useEffect(() => {
           if (initializeValue) update(value);
         }, []);
-        useSubscription(DOT+prop, callback);
       }
 
       // MODE_GET: let [price, setPrice] = useStore.cart.price()
@@ -103,31 +126,13 @@ export default function createStore(defaultStore = {}, callback) {
   let setStore = createProxy(MODE_SET);
 
   /**
-   * Hook to register a listener to force a render when the
-   * subscribed field changes.
-   * @param {string} path
-   * @param {function} callback
-   */
-  function useSubscription(path, callback) {
-    let forceRender = useReducer(() => [])[1];
-
-    useEffect(() => {
-      subscription._subscribe(path, forceRender);
-      subscription._subscribe(DOT, callback);
-      return () => {
-        subscription._unsubscribe(path, forceRender);
-        subscription._unsubscribe(DOT, callback);
-      };
-    }, [path]);
-  }
-
-  /**
    * 1. Updates any field of the store
    * 2. Notifies to all the involved subscribers
    * @param {string} path
+   * @param {function} after
    * @return {function} update
    */
-  function updateField(path = '') {
+  function updateField(path = '', after) {
     let fieldPath = Array.isArray(path) ? path : path.split(DOT);
 
     return (newValue) => {
@@ -139,16 +144,19 @@ export default function createStore(defaultStore = {}, callback) {
       }
 
       allStore = path ?
-       // Update a field
-       setField(allStore, fieldPath, value) :
-       // Update all the store
-       value;
+        // Update a field
+        setField(allStore, fieldPath, value) :
+        // Update all the store
+        value;
 
-      // Notifying to all subscribers
-      subscription._notify(DOT+path, {
-        prevStore,
-        store: allStore,
-      });
+      if (after) {
+        after({ prevStore, store: allStore });
+      }
+      if (storeCallback) {
+        storeCallback({ prevStore, store: allStore });
+      }
+      
+      notifyListeners();
     };
   }
 
@@ -187,30 +195,3 @@ export default function createStore(defaultStore = {}, callback) {
 }
 
 createStore.ext = (extra) => typeof extra === 'function' && extras.push(extra);
-
-function createSubscription() {
-  let listeners = {};
-
-  return {
-    // Renamed to "s" after build to minify code
-    _subscribe(path, listener) {
-      if (typeof listener !== 'function') return;
-      if (!listeners[path]) listeners[path] = new Set();
-      listeners[path].add(listener);
-    },
-    // Renamed to "n" after build to minify code
-    _notify(path, params) {
-      Object.keys(listeners).forEach((listenerKey) => {
-        if (path.startsWith(listenerKey) || listenerKey.startsWith(path)) {
-          listeners[listenerKey].forEach((listener) => listener(params));
-        }
-      });
-    },
-    // Renamed to "u" after build to minify code
-    _unsubscribe(path, listener) {
-      if (typeof listener !== 'function') return;
-      listeners[path].delete(listener);
-      if (listeners[path].size === 0) delete listeners[path];
-    },
-  };
-}

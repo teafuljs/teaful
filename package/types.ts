@@ -71,7 +71,7 @@ export type Listener<S extends Store> = (params: Params<S>) => void;
 
 export type getStoreType<S extends Store> = {
   [key in keyof S]-?: NonNullable<S[key]> extends Store
-    ? useStoreType<S[key]> & HookDry<S[key]> : HookDry<S[key]>;
+    ? getStoreType<S[key]> & HookDry<S[key]> : HookDry<S[key]>;
 };
 
 export type setStoreType<S extends Store> = {

@@ -1,3 +1,4 @@
+import { FormEvent } from 'react';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -7,15 +8,21 @@ import createStore from '../package/index';
 
 describe('Example: Todo list', () => {
   it('should work with a simple todo list app', () => {
-    const {useStore} = createStore({todo: [], done: []});
+    type Store = {
+      todo: string[];
+      done: string[];
+    }
+    const {useStore} = createStore<Store>({todo: [], done: []});
     const renderAddTodoTask = jest.fn();
     const renderTodoList = jest.fn();
 
     function AddTodoTask() {
       const [todo, setTodo] = useStore.todo();
-      const addTask = (e) => {
+      const addTask = (e: FormEvent) => {
         e.preventDefault();
-        setTodo([...todo, e.target.children[0].value]);
+        const form = e.target as HTMLFormElement;
+        const input = form.children[0] as HTMLInputElement;
+        setTodo([...todo, input.value]);
       };
       renderAddTodoTask();
       return (

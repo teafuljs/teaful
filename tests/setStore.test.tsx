@@ -62,12 +62,22 @@ describe('setStore', () => {
   it('Update serveral portions should avoid rerenders in the rest', () => {
     const renderCart = jest.fn();
     const renderOther = jest.fn();
-    const {useStore, setStore} = createStore({cart: {price: 0}, name: 'Aral', count: 0});
+    const initialStore = {cart: {price: 0}, name: 'Aral', count: 0}
+    type Store = {
+      cart: {
+        price: number
+      },
+      name: string,
+      count: number
+    }
+    type Fields = Partial<Store>
+    type Set = (value: number | string | { price: number } | undefined ) => void
+    const {useStore, setStore} = createStore<Store>(initialStore);
 
-    function setFragmentedStore(fields) {
-      Object.keys(fields).forEach((key) => {
-        setStore[key](fields[key]);
-      });
+    function setFragmentedStore(fields: Fields) {
+      (Object.keys(fields) as Array<keyof Fields>).forEach((key) => {
+        (setStore[key] as Set)(fields[key])
+      })
     }
 
     function UpdateProps() {

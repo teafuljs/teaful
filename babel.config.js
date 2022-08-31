@@ -10,6 +10,7 @@ module.exports = {
       },
     ],
     ['@babel/preset-react', {runtime: 'automatic'}],
+    '@babel/preset-typescript',
   ],
   plugins: [],
 };

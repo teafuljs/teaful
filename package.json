@@ -1,10 +1,11 @@
 {
   "name": "teaful",
-  "version": "0.10.0",
+  "version": "0.11.0-canary.2",
   "description": "Tiny, easy and powerful React state management (less than 1kb)",
   "license": "MIT",
   "keywords": [
     "react",
+    "typescript",
     "preact",
     "state",
     "state management",
@@ -23,7 +24,7 @@
     "type": "git",
     "url": "https://github.com/teafuljs/teaful.git"
   },
-  "source": "package/index.js",
+  "source": "package/index.ts",
   "main": "dist/index.js",
   "umd:main": "dist/index.umd.js",
   "module": "dist/index.m.js",
@@ -39,7 +40,7 @@
       },
       {
         "path": "./dist/index.modern.js",
-        "maxSize": "1 kB"
+        "maxSize": "1.1 kB"
       },
       {
         "path": "./dist/index.m.js",
@@ -51,18 +52,19 @@
       }
     ]
   },
-  "types": "package/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint ./package ./tests",
-    "format": "eslint --fix ./package ./tests ./examples",
-    "test": "jest ./package ./tests",
+    "format": "eslint --fix ./package ./tests",
+    "format:examples": "eslint --fix ./examples",
+    "test": "jest",
     "test:example:todo-list": "jest ./examples/todo-list",
     "test:examples": "jest ./examples",
-    "test:watch": "jest ./package ./tests --watch",
-    "copy-types": "node ./config/copy-type-definition.js",
-    "build": "microbundle --jsx React.createElement --no-generateTypes && yarn copy-types",
+    "test:watch": "jest ./tests --watch",
+    "build": "microbundle --jsx React.createElement",
     "dev": "microbundle watch",
-    "prepublish": "yarn build"
+    "prepublish": "yarn build",
+    "bundlewatch": "bundlewatch"
   },
   "peerDependencies": {
     "react": ">= 16.8.0",
@@ -74,33 +76,43 @@
     }
   },
   "jest": {
-    "testEnvironment": "jsdom",
-    "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
-      "\\.(css|less)$": "identity-obj-proxy"
-    }
+    "projects": [
+      "./tests/config/jest.config.js",
+      "./tests/config/jest.lint.config.js",
+      "./tests/config/jest.tsc.config.js"
+    ]
+  },
+  "jest-runner-tsc": {
+    "tsconfigPath": "./tsconfig.json"
   },
   "devDependencies": {
     "@babel/polyfill": "7.12.1",
-    "@babel/preset-env": "7.16.4",
-    "@babel/preset-react": "7.16.0",
-    "@testing-library/dom": "8.11.1",
-    "@testing-library/react": "12.1.2",
+    "@babel/preset-env": "7.16.11",
+    "@babel/preset-react": "7.16.7",
+    "@babel/preset-typescript": "7.16.7",
+    "@testing-library/dom": "8.11.3",
+    "@testing-library/react": "12.1.4",
     "@testing-library/user-event": "13.5.0",
-    "babel-jest": "27.4.2",
-    "bundlewatch": "0.3.2",
-    "eslint": "8.4.0",
+    "@types/jest": "27.4.1",
+    "@types/react": "17.0.40",
+    "@types/react-dom": "17.0.13",
+    "@typescript-eslint/eslint-plugin": "5.15.0",
+    "@typescript-eslint/parser": "5.15.0",
+    "babel-jest": "27.5.1",
+    "bundlewatch": "0.3.3",
+    "eslint": "8.11.0",
     "eslint-config-google": "0.14.0",
-    "eslint-plugin-jest": "25.3.0",
-    "eslint-plugin-react": "7.27.1",
+    "eslint-plugin-jest": "26.1.1",
+    "eslint-plugin-react": "7.29.4",
     "eslint-plugin-react-hooks": "4.3.0",
-    "eslint-plugin-testing-library": "5.0.1",
-    "jest": "27.4.3",
+    "eslint-plugin-testing-library": "5.1.0",
+    "jest": "27.5.1",
+    "jest-runner-eslint": "1.0.0",
+    "jest-runner-tsc": "1.6.0",
     "microbundle": "0.14.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-test-renderer": "17.0.2",
-    "shelljs": "0.8.4"
+    "react-test-renderer": "17.0.2"
   },
   "bugs": "https://github.com/teafuljs/teaful/issues"
 }

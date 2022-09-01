@@ -90,6 +90,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "filoozom",
+      "name": "Philippe Schommers",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6319092?v=4",
+      "profile": "http://www.schommers.be",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

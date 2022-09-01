@@ -203,4 +203,41 @@ describe('useStore', () => {
         .toMatchObject({cart: {items: [{name: 'new Item', price: 2}, undefined, {name: 'new Item', price: 1}]}});
     expect(screen.getByTestId('item').textContent).toBe('Item: {"name":"new Item","price":1}');
   });
+
+  it("should work with optional properties", () => {
+    type User = {
+      username: string;
+    };
+
+    type Store = {
+      user?: User;
+    };
+
+    const { useStore, getStore } = createStore<Store>();
+
+    function Test() {
+      const [user] = useStore.user();
+      const [username] = useStore.user.username();
+      return (
+        <>
+          <div data-testid="username">{username}</div>
+          <div data-testid="user">{JSON.stringify(user)}</div>
+        </>
+      );
+    }
+
+    render(<Test />);
+
+    const update = getStore.user.username()[1];
+
+    expect(screen.getByTestId("username").textContent).toBe("");
+
+    act(() => update('myUsername'));
+    expect(screen.getByTestId("username").textContent).toBe("myUsername");
+    expect(screen.getByTestId("user").textContent).toBe('{"username":"myUsername"}');
+
+    act(() => update((v) => v + "Update"));
+    expect(screen.getByTestId("username").textContent).toBe("myUsernameUpdate");
+    expect(screen.getByTestId("user").textContent).toBe('{"username":"myUsernameUpdate"}');
+  });
 });

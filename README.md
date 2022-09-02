@@ -700,7 +700,7 @@ We will expand the examples over time. For now you can use this Codesandbox:
 - [x] React support
 - [x] Teaful DevTools
 - [x] TypeScript types support
-- [ ] Migrate full Teaful project to TypeScript
+- [x] Migrate full Teaful project to TypeScript
 - [ ] React Native support
 - [ ] Vanilla JavaScript support
 - [ ] Create a documentation website

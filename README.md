@@ -599,10 +599,10 @@ And use it wherever you want:
 
 ```js
 // 🤩
-import { setStore } from "./store";
+import { setFragmentedStore } from "./store";
 
 // ...
-setStore({ count: 10, username: "" });
+setFragmentedStore({ count: 10, username: "" });
 ```
 
 ### Define calculated properties

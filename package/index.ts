@@ -1,5 +1,6 @@
-import {useEffect, useReducer, createElement, ComponentClass, FunctionComponent} from 'react';
-import type { Args, ArgsHoc, ExtraFn, Hoc, Listener, ListenersObj, ReducerFn, Result, Store, Subscription, Validator } from './types';
+import {useEffect, createElement, ComponentClass, FunctionComponent} from 'react';
+import {useSyncExternalStore} from 'use-sync-external-store/shim';
+import type { Args, ArgsHoc, ExtraFn, Hoc, Listener, ListenersObj, Params, ReducerFn, Result, Store, Subscription, Validator } from './types';
 
 let MODE_GET = 1;
 let MODE_USE = 2;
@@ -10,15 +11,24 @@ let extras: ExtraFn<Store>[] = [];
 
 export default function createStore<S extends Store>(
   initial: S = {} as S, 
-  callback?: Listener<S>
+  storeCallback?: Listener<S>
 ) {
+  // For extra functions
   let subscription = createSubscription<S>();
+
+  // For useSyncExternalStore
+  const listeners = new Set<() => void>();
+
+  function subscribe(listener: () => void): () => void {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  }
+  function notifyListeners() {
+    listeners.forEach((listener) => listener());
+  }
 
   // Initialize the store and callbacks
   let allStore = initial;
-
-  // Add callback subscription
-  subscription._subscribe(DOT, callback);
 
   /**
    * Proxy validator that implements:
@@ -55,10 +65,10 @@ export default function createStore<S extends Store>(
       this._path.push(path);
       return path === 'prototype' ? {} : new Proxy(target, validator);
     },
-    apply(getMode: () => number, _: unknown, args: Args<S> & ArgsHoc<S>) {
+    apply(getMode: () => number, _: unknown, args: Args<S> | ArgsHoc<S>) {
       let mode = getMode();
       let param = args[0];
-      let callback = args[1];
+      let proxyCallback = args[1] as Listener<S> | undefined;
       let path = this._path.slice();
       this._path = [];
 
@@ -74,8 +84,14 @@ export default function createStore<S extends Store>(
       // MODE_USE: let [store, update] = getStore()
       // MODE_SET: setStore({ newStore: true })
       if (!path.length) {
-        let updateAll = updateField();
-        if (mode === MODE_USE) useSubscription(DOT, callback);
+        let updateAll = updateField('', proxyCallback);
+        if (mode === MODE_USE) {
+          const current = useSyncExternalStore(
+            subscribe,
+            () => allStore,
+          );
+          return [current, updateAll];
+        }
         if (mode === MODE_SET) return updateAll(param);
         return [allStore, updateAll];
       }
@@ -84,7 +100,7 @@ export default function createStore<S extends Store>(
       // FRAGMENTED STORE:
       // .................
       let prop = path.join(DOT);
-      let update = updateField(prop);
+      let update = updateField(prop, proxyCallback);
       let value = getField(prop);
       let initializeValue = param !== undefined && !existProperty(path);
 
@@ -93,15 +109,27 @@ export default function createStore<S extends Store>(
 
       if (initializeValue) {
         value = param;
+        const prevStore = allStore;
         allStore = setField(allStore, path, value);
+
+        if (proxyCallback) {
+          proxyCallback({ prevStore, store: allStore });
+        }
+        if (storeCallback) {
+          storeCallback({ prevStore, store: allStore });
+        }
       }
 
       // subscribe to the fragmented store
       if (mode === MODE_USE) {
+        value = useSyncExternalStore(
+          subscribe,
+          () => getField(prop),
+        );
+
         useEffect(() => {
           if (initializeValue) update(value);
         }, []);
-        useSubscription(DOT+prop, callback);
       }
 
       // MODE_GET: let [price, setPrice] = useStore.cart.price()
@@ -116,32 +144,13 @@ export default function createStore<S extends Store>(
   let setStore = createProxy(MODE_SET);
 
   /**
-   * Hook to register a listener to force a render when the
-   * subscribed field changes.
-   * @param {string} path
-   * @param {function} callback
-   */
-  function useSubscription(path: string, callback?: Listener<S>) {
-    // @ts-expect-error - useReducer as forceRender without rest of args
-    let forceRender = useReducer(() => [])[1];
-
-    useEffect(() => {
-      subscription._subscribe(path, forceRender);
-      subscription._subscribe(DOT, callback);
-      return () => {
-        subscription._unsubscribe(path, forceRender);
-        subscription._unsubscribe(DOT, callback);
-      };
-    }, [path]);
-  }
-
-  /**
    * 1. Updates any field of the store
    * 2. Notifies to all the involved subscribers
    * @param {string} path
+   * @param {function} after
    * @return {function} update
    */
-  function updateField(path = '') {
+  function updateField(path = '', after?: (params: Params<S>) => void) {
     let fieldPath = Array.isArray(path) ? path : path.split(DOT);
 
     return (newValue: unknown) => {
@@ -153,16 +162,25 @@ export default function createStore<S extends Store>(
       }
 
       allStore = path ?
-       // Update a field
-       setField(allStore, fieldPath, value) :
-       // Update all the store
-       value;
+        // Update a field
+        setField(allStore, fieldPath, value) :
+        // Update all the store
+        value;
 
-      // Notifying to all subscribers
-      subscription._notify(DOT+path, {
+      // Notify extra functions
+      subscription._notify(DOT + path, {
         prevStore,
         store: allStore,
       });
+
+      if (after) {
+        after({ prevStore, store: allStore });
+      }
+      if (storeCallback) {
+        storeCallback({ prevStore, store: allStore });
+      }
+
+      notifyListeners();
     };
   }
 
@@ -207,6 +225,7 @@ export default function createStore<S extends Store>(
 
 createStore.ext = (extra: ExtraFn<Store>) => extras.push(extra);
 
+// Exists just for extra functions
 function createSubscription<S extends Store>(): Subscription<S> {
   let listeners: ListenersObj<S> = {};
 

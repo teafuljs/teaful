@@ -10,6 +10,7 @@ import createStore from '../package/index';
 describe('onAfterUpdate callback', () => {
   it('should be possible to remove an onAfterUpdate event when a component with useStore.test is unmounted', () => {
     const callback = jest.fn();
+    let numMockCalls;
 
     type Store = {
       test?: Record<string, unknown> | undefined;
@@ -34,25 +35,30 @@ describe('onAfterUpdate callback', () => {
     const update = getStore.test()[1];
 
     expect(callback).toHaveBeenCalledTimes(0);
+    numMockCalls = callback.mock.calls.length;
 
     act(() => update({}));
-    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledTimes(numMockCalls + 1);
+    numMockCalls = callback.mock.calls.length;
 
     act(() => update({}));
-    expect(callback).toHaveBeenCalledTimes(2);
+    expect(callback).toHaveBeenCalledTimes(numMockCalls + 1);
+    numMockCalls = callback.mock.calls.length;
 
     act(() => getStore.mount()[1](false));
-    expect(callback).toHaveBeenCalledTimes(3);
+    expect(callback).toHaveBeenCalledTimes(numMockCalls + 1);
+    numMockCalls = callback.mock.calls.length;
 
     // Updating twice to confirm that updates don't call the callback when the
     // component with the useStore is unmounted
     act(() => update({}));
     act(() => update({}));
-    expect(callback).toHaveBeenCalledTimes(3);
+    expect(callback).toHaveBeenCalledTimes(numMockCalls + 1);
   });
 
   it('should be possible to remove an onAfterUpdate event when a component with useStore is unmounted', () => {
     const callback = jest.fn();
+    let numMockCalls;
 
     type Store = {
       test?: Record<string, unknown>;
@@ -77,23 +83,28 @@ describe('onAfterUpdate callback', () => {
     const update = getStore.test()[1];
 
     expect(callback).toHaveBeenCalledTimes(0);
+    numMockCalls = callback.mock.calls.length;
 
     act(() => update({}));
-    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledTimes(numMockCalls + 1);
+    numMockCalls = callback.mock.calls.length;
 
     act(() => update({}));
-    expect(callback).toHaveBeenCalledTimes(2);
+    expect(callback).toHaveBeenCalledTimes(numMockCalls + 1);
+    numMockCalls = callback.mock.calls.length;
 
     act(() => getStore.mount()[1](false));
-    expect(callback).toHaveBeenCalledTimes(3);
+    expect(callback).toHaveBeenCalledTimes(numMockCalls + 1);
+    numMockCalls = callback.mock.calls.length;
 
     act(() => update({}));
     act(() => update({}));
-    expect(callback).toHaveBeenCalledTimes(3);
+    expect(callback).toHaveBeenCalledTimes(numMockCalls + 1);
   });
 
   it('should be possible to remove an onAfterUpdate event when a component with withStore is unmounted', () => {
     const callback = jest.fn();
+    let numMockCalls;
 
     type Store = {
       test?:  Record<string, unknown>;
@@ -121,19 +132,23 @@ describe('onAfterUpdate callback', () => {
     const update = getStore.test()[1];
 
     expect(callback).toHaveBeenCalledTimes(0);
+    numMockCalls = callback.mock.calls.length;
 
     act(() => update({}));
-    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledTimes(numMockCalls + 1);
+    numMockCalls = callback.mock.calls.length;
 
     act(() => update({}));
-    expect(callback).toHaveBeenCalledTimes(2);
+    expect(callback).toHaveBeenCalledTimes(numMockCalls + 1);
+    numMockCalls = callback.mock.calls.length;
 
     act(() => getStore.mount()[1](false));
-    expect(callback).toHaveBeenCalledTimes(3);
+    expect(callback).toHaveBeenCalledTimes(numMockCalls + 1);
+    numMockCalls = callback.mock.calls.length;
 
     act(() => update({}));
     act(() => update({}));
-    expect(callback).toHaveBeenCalledTimes(3);
+    expect(callback).toHaveBeenCalledTimes(numMockCalls + 1);
   });
 
   it('should work via createStore', () => {

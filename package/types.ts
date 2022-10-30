@@ -29,7 +29,7 @@ export type Subscription<S extends Store> = {
   _notify(path: string, params: Params<S>): void;
 }
 
-export type ExtraFn<S> = (
+export type ExtraFn<S extends Store> = (
   res: Result<S>, 
   subscription: Subscription<S>
 ) => Extra;
@@ -39,9 +39,11 @@ export type Extra = {
 }
 export type ValueOf<T> = T[keyof T];
 
-export type Validator<S> = ProxyHandler<ValueOf<Result<S>>> & Extra
+export type Validator<
+  S extends Store
+> = ProxyHandler<ValueOf<Result<S>>> & Extra
 
-export type Hook<S> = (
+export type Hook<S extends Store> = (
   initial?: S,
   onAfterUpdate?: Listener<S>
 ) => HookReturn<S>;
@@ -50,18 +52,21 @@ export type HookDry<S> = (initial?: S) => HookReturn<S>;
 
 export type Hoc<S> = { store: HookReturn<S> };
 
-export type Args<S> = [
+export type Args<S extends Store> = [
   param: S | ComponentClass<Hoc<S>>,
   callback: Listener<S> | undefined,
 ]
 
-export type ArgsHoc<S> = [
+export type ArgsHoc<S extends Store> = [
   component: ComponentClass<Hoc<S>>,
   param: S,
   callback: Listener<S> | undefined
 ]
 
-export type HocFunc<S, R extends ComponentClass<any> = ComponentClass<any>> = (
+export type HocFunc<
+  S extends Store, 
+  R extends ComponentClass<any> = ComponentClass<any>
+> = (
   component: R,
   initial?: S,
   onAfterUpdate?: Listener<S>

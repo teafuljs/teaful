@@ -1,4 +1,4 @@
-import {useEffect, useReducer, createElement, ComponentClass, FunctionComponent} from 'react';
+import {useSyncExternalStore, createElement, ComponentClass, FunctionComponent} from 'react';
 import type { Args, ArgsHoc, ExtraFn, Hoc, Listener, ListenersObj, ReducerFn, Result, Store, Subscription, Validator } from './types';
 
 let MODE_GET = 1;
@@ -9,7 +9,7 @@ let DOT = '.';
 let extras: ExtraFn<Store>[] = [];
 
 export default function createStore<S extends Store>(
-  initial: S = {} as S, 
+  initial: S = {} as S,
   callback?: Listener<S>
 ) {
   let subscription = createSubscription<S>();
@@ -30,17 +30,17 @@ export default function createStore<S extends Store>(
   let validator: Validator<S> = {
     _path: [] as string[],
     _getHoC<S extends Store>(
-      Comp: ComponentClass<Hoc<S>>, 
-      path: string[], 
-      initValue: S, 
+      Comp: ComponentClass<Hoc<S>>,
+      path: string[],
+      initValue: S,
       callback?:  Listener<S>
     ) {
       let componentName = Comp.displayName || Comp.name;
       let WithStore: FunctionComponent = (props) => {
         let last = path.length - 1;
         let store = path.length ? path.reduce(
-            (a: Store, c: string, index) => index === last 
-              ? a[c](initValue, callback) 
+            (a: Store, c: string, index) => index === last
+              ? a[c](initValue, callback)
               : a[c],
             useStore,
         ) : useStore(initValue, callback);
@@ -98,9 +98,6 @@ export default function createStore<S extends Store>(
 
       // subscribe to the fragmented store
       if (mode === MODE_USE) {
-        useEffect(() => {
-          if (initializeValue) update(value);
-        }, []);
         useSubscription(DOT+prop, callback);
       }
 
@@ -116,23 +113,24 @@ export default function createStore<S extends Store>(
   let setStore = createProxy(MODE_SET);
 
   /**
-   * Hook to register a listener to force a render when the
-   * subscribed field changes.
+   * Hook to subscribe to store changes using useSyncExternalStore.
+   * Compatible with React 18+ concurrent mode and SSR.
    * @param {string} path
    * @param {function} callback
    */
   function useSubscription(path: string, callback?: Listener<S>) {
-    // @ts-expect-error - useReducer as forceRender without rest of args
-    let forceRender = useReducer(() => [])[1];
-
-    useEffect(() => {
-      subscription._subscribe(path, forceRender);
-      subscription._subscribe(DOT, callback);
-      return () => {
-        subscription._unsubscribe(path, forceRender);
-        subscription._unsubscribe(DOT, callback);
-      };
-    }, [path]);
+    useSyncExternalStore(
+      (onStoreChange) => {
+        subscription._subscribe(path, onStoreChange);
+        subscription._subscribe(DOT, callback);
+        return () => {
+          subscription._unsubscribe(path, onStoreChange);
+          subscription._unsubscribe(DOT, callback);
+        };
+      },
+      () => path === DOT ? allStore : getField(path.slice(1)),
+      () => path === DOT ? allStore : getField(path.slice(1)),
+    );
   }
 
   /**
@@ -167,7 +165,7 @@ export default function createStore<S extends Store>(
   }
 
   function getField(
-    path?: string[] | string, 
+    path?: string[] | string,
     fn: ReducerFn = (a, c) => a?.[c]
   ) {
     if (!path) return allStore;

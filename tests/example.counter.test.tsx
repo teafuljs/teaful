@@ -226,7 +226,8 @@ describe('Example: Counter', () => {
         const {useStore} = createStore<storeType>({anotherValue: ''});
 
         function Counter() {
-          const initialCountValue = useRef<number>();
+          const initialCountValue =
+            useRef<number | undefined>(undefined);
           const [count, setCount] = useStore.count();
 
           useEffect(() => {

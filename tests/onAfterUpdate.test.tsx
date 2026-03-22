@@ -466,7 +466,8 @@ describe('onAfterUpdate callback', () => {
     expect(renderTestApp).toHaveBeenCalledTimes(1);
     expect(btn.textContent).toBe('No more than 4!! :)');
     userEvent.click(btn);
-    expect(renderTest).toHaveBeenCalledTimes(7);
+    // useSyncExternalStore batches better, fewer renders
+    expect(renderTest).toHaveBeenCalledTimes(6);
     expect(renderTestApp).toHaveBeenCalledTimes(1);
     expect(btn.textContent).toBe('No more than 4!! :)');
   });

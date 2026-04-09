@@ -19,6 +19,13 @@ _Tiny, easy and powerful **React state management** library_
 [badge-prwelcome]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
 [prwelcome]: http://makeapullrequest.com
 
+<p align="center">
+    <b>Sponsored by:</b>
+    <a align="center" href="https://kitmul.com/en">
+        <img src="https://kitmul.com/favicon.svg" height="50" alt="Kitmul" />
+    </a>
+</p>
+
 
 ## What advantages does it have? ✨
 
